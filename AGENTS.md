@@ -2,7 +2,7 @@
 
 ## Overview
 
-Persian-first, mobile-responsive tailor shop ecommerce website with guest browsing, customer cart/checkout, admin panel for full management, and Zarinpal payment integration.
+Persian-first, mobile-responsive tailor shop ecommerce website with guest browsing, customer cart/checkout, admin panel for full management, card-to-card payment (Zarinpal in Phase 8), and SMS notifications (Phase 8).
 
 ## Quick commands
 
@@ -27,8 +27,8 @@ Test files live in `tests/`, mirroring the `src/` directory structure. They impo
 - **Dark mode**: ThemeService with signal-based state, persists to localStorage.
 - **State management**: `@ngrx/signals` (`signalStore`) for feature state.
 - **Testing**: Jest with `jest-preset-angular`. Zoneless test environment.
-- **Payment**: Zarinpal integration
-- **SMS**: Kavenegar integration
+- **Payment**: Card-to-card (primary), Zarinpal (Phase 8)
+- **SMS**: Kavenegar integration (Phase 8)
 
 ## Current Progress
 
@@ -41,12 +41,12 @@ Test files live in `tests/`, mirroring the `src/` directory structure. They impo
 - [ ] Swagger/OpenAPI docs
 
 ### Phase 1 — Auth Frontend + Layout (3 days)
-- [x] AuthGuard + AdminGuard (stubbed)
-- [x] AuthInterceptor (stubbed)
-- [ ] Shared layout: Navbar (logo, nav links, cart badge, login/profile dropdown), Footer
-- [ ] LoginPage + RegisterPage
-- [ ] AuthStore (SignalStore, `providedIn: 'root'`)
-- [ ] ProfilePage
+- [x] AuthGuard + AdminGuard (wired to AuthStore)
+- [x] AuthInterceptor (attach JWT + handle 401 with refresh)
+- [x] Shared layout: Navbar (logo, nav links, cart badge, login/profile dropdown), Footer
+- [x] LoginPage + RegisterPage
+- [x] AuthStore (SignalStore, `providedIn: 'root'`)
+- [x] ProfilePage
 
 ### Phase 2 — Products + Categories (4 days)
 - [ ] Backend: Category CRUD
@@ -64,12 +64,11 @@ Test files live in `tests/`, mirroring the `src/` directory structure. They impo
 - [ ] Frontend: CheckoutPage (multi-step stepper)
 - [ ] Cart count badge in navbar
 
-### Phase 4 — Orders + Payment (3 days)
+### Phase 4 — Orders (3 days)
 - [ ] Backend: Order creation from cart
-- [ ] Backend: Zarinpal integration (request + verify)
 - [ ] Frontend: OrderHistoryPage + OrderDetailPage
 - [ ] Admin: OrderListPage + status management + tracking
-- [ ] SMS notification service (Kavenegar)
+- [ ] Card-to-card payment receipt upload flow
 
 ### Phase 5 — Portfolio + Contact (2 days)
 - [ ] Backend: Portfolio CRUD
@@ -96,6 +95,12 @@ Test files live in `tests/`, mirroring the `src/` directory structure. They impo
 - [ ] Image lazy loading, code splitting
 - [ ] Build + deploy
 
-**Total estimate: ~24 working days**
+### Phase 8 — Paid Services (2 days)
+- [ ] Backend: Zarinpal integration (request + verify)
+- [ ] Frontend: Zarinpal payment option in checkout
+- [ ] SMS notification service (Kavenegar)
+- [ ] SMS on order status transitions
+
+**Total estimate: ~26 working days**
 
 > Full details: Database schema, API endpoints, routes, workflows, i18n keys, and technical decisions are in `PLAN.md`.

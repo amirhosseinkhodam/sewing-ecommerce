@@ -1,13 +1,13 @@
-import { Component, inject } from '@angular/core';
-import { LanguageService } from '../../../shared/services/language';
+import { Component, inject } from "@angular/core";
+import { LanguageService } from "../../../shared/services/language";
 
-import { CardComponent } from '../../../shared/components/card';
-import { ButtonComponent } from '../../../shared/components/button';
-import { ThemeToggleComponent } from '../../../shared/components/theme-toggle';
-import { LanguageToggleComponent } from '../../../shared/components/language-toggle';
+import { CardComponent } from "../../../shared/components/card";
+import { ButtonComponent } from "../../../shared/components/button";
+import { ThemeToggleComponent } from "../../../shared/components/theme-toggle";
+import { LanguageToggleComponent } from "../../../shared/components/language-toggle";
 
 @Component({
-  selector: 'app-home',
+  selector: "app-home",
   standalone: true,
   imports: [
     CardComponent,
@@ -26,7 +26,7 @@ import { LanguageToggleComponent } from '../../../shared/components/language-tog
 
           <div class="text-center">
             <h1 class="text-2xl font-bold text-slate-900 dark:text-slate-100">
-              {{ t('appName') }}
+              {{ t("appName") }}
             </h1>
             <p class="mt-2 text-sm text-slate-500 dark:text-slate-400">
               Angular 19 + Tailwind + i18n + Dark Mode
@@ -35,10 +35,10 @@ import { LanguageToggleComponent } from '../../../shared/components/language-tog
 
           <div class="flex gap-3">
             <app-button variant="primary" (buttonClick)="onGetStarted()">
-              {{ t('home') }}
+              {{ t("home") }}
             </app-button>
             <app-button variant="secondary" (buttonClick)="onSettings()">
-              {{ t('settings') }}
+              {{ t("settings") }}
             </app-button>
           </div>
         </div>

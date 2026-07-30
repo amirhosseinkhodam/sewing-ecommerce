@@ -1,10 +1,10 @@
-import { Component, input, output, forwardRef, signal } from '@angular/core';
+import { Component, input, output, forwardRef, signal } from "@angular/core";
 import {
   FormsModule,
   ControlValueAccessor,
   NG_VALUE_ACCESSOR,
-} from '@angular/forms';
-import { NgSelectModule } from '@ng-select/ng-select';
+} from "@angular/forms";
+import { NgSelectModule } from "@ng-select/ng-select";
 
 export interface SelectOption {
   value: number | string;
@@ -12,7 +12,7 @@ export interface SelectOption {
 }
 
 @Component({
-  selector: 'app-select',
+  selector: "app-select",
   standalone: true,
   imports: [FormsModule, NgSelectModule],
   template: `
@@ -52,16 +52,16 @@ export class SelectComponent implements ControlValueAccessor {
   readonly cssClass = input<string>();
   readonly clearable = input<boolean>(true);
   readonly searchable = input<boolean>(false);
-  readonly variant = input<'default' | 'error' | 'disabled'>('default');
+  readonly variant = input<"default" | "error" | "disabled">("default");
   readonly value = input<number | string | null>(null);
   readonly options = input.required<SelectOption[]>();
   readonly placeholder = input<string>();
   readonly label = input<string>();
 
-  readonly change = output<number | string | null>({ alias: 'selectChange' });
-  readonly blur = output<void>({ alias: 'selectBlur' });
-  readonly focus = output<void>({ alias: 'selectFocus' });
-  readonly keydown = output<KeyboardEvent>({ alias: 'selectKeydown' });
+  readonly change = output<number | string | null>({ alias: "selectChange" });
+  readonly blur = output<void>({ alias: "selectBlur" });
+  readonly focus = output<void>({ alias: "selectFocus" });
+  readonly keydown = output<KeyboardEvent>({ alias: "selectKeydown" });
 
   #onChange: (value: number | string | null) => void = () => {};
   #onTouched: () => void = () => {};
@@ -100,16 +100,16 @@ export class SelectComponent implements ControlValueAccessor {
   }
 
   readonly computedClasses = () => {
-    const base = 'w-full';
+    const base = "w-full";
 
     const variants = {
-      default: '',
-      error: 'ng-select-error',
-      disabled: 'ng-select-disabled',
+      default: "",
+      error: "ng-select-error",
+      disabled: "ng-select-disabled",
     };
 
     return [base, variants[this.variant()], this.cssClass()]
       .filter(Boolean)
-      .join(' ');
+      .join(" ");
   };
 }

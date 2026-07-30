@@ -1,8 +1,8 @@
-import { Injectable, signal, effect } from '@angular/core';
-import en from '../../i18n/en.json';
-import fa from '../../i18n/fa.json';
+import { Injectable, signal, effect } from "@angular/core";
+import en from "../../i18n/en.json";
+import fa from "../../i18n/fa.json";
 
-export type Language = 'en' | 'fa';
+export type Language = "en" | "fa";
 
 export interface LanguageOptionModel {
   code: Language;
@@ -13,13 +13,13 @@ export interface LanguageOptionModel {
 
 const translations: Record<Language, Record<string, string>> = { en, fa };
 
-@Injectable({ providedIn: 'root' })
+@Injectable({ providedIn: "root" })
 export class LanguageService {
-  readonly #STORAGE_KEY = 'app-language';
+  readonly #STORAGE_KEY = "app-language";
 
   readonly languages: LanguageOptionModel[] = [
-    { code: 'en', name: 'English', nativeName: 'English', rtl: false },
-    { code: 'fa', name: 'Persian', nativeName: 'فارسی', rtl: true },
+    { code: "en", name: "English", nativeName: "English", rtl: false },
+    { code: "fa", name: "Persian", nativeName: "فارسی", rtl: true },
   ];
 
   currentLanguage = signal<Language>(this.#loadLanguage());
@@ -30,7 +30,7 @@ export class LanguageService {
       const option = this.languages.find((l) => l.code === lang);
       if (option) {
         document.documentElement.lang = lang;
-        document.documentElement.dir = option.rtl ? 'rtl' : 'ltr';
+        document.documentElement.dir = option.rtl ? "rtl" : "ltr";
         localStorage.setItem(this.#STORAGE_KEY, lang);
       }
     });
@@ -38,7 +38,7 @@ export class LanguageService {
 
   translate(key: string): string {
     const lang = this.currentLanguage();
-    return translations[lang]?.[key] ?? translations['en']?.[key] ?? key;
+    return translations[lang]?.[key] ?? translations["en"]?.[key] ?? key;
   }
 
   toggle(): void {
@@ -62,10 +62,10 @@ export class LanguageService {
       const option = this.languages.find((l) => l.code === saved);
       if (option) {
         document.documentElement.lang = saved;
-        document.documentElement.dir = option.rtl ? 'rtl' : 'ltr';
+        document.documentElement.dir = option.rtl ? "rtl" : "ltr";
       }
       return saved;
     }
-    return 'en';
+    return "en";
   }
 }

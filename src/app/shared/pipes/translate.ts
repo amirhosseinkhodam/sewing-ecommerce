@@ -5,10 +5,10 @@ import {
   PipeTransform,
   effect,
   inject,
-} from '@angular/core';
-import { LanguageService } from '../services/language';
+} from "@angular/core";
+import { LanguageService } from "../services/language";
 
-@Pipe({ name: 'translate', standalone: true, pure: false })
+@Pipe({ name: "translate", standalone: true, pure: false })
 export class TranslatePipe implements PipeTransform {
   readonly #languageService = inject(LanguageService);
   #lastLang = this.#languageService.currentLanguage();

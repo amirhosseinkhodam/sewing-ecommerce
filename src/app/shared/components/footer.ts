@@ -1,9 +1,9 @@
-import { Component, inject } from '@angular/core';
-import { RouterLink } from '@angular/router';
-import { LanguageService } from '../services/language';
+import { Component, inject } from "@angular/core";
+import { RouterLink } from "@angular/router";
+import { LanguageService } from "../services/language";
 
 @Component({
-  selector: 'app-footer',
+  selector: "app-footer",
   standalone: true,
   imports: [RouterLink],
   template: `
@@ -12,16 +12,18 @@ import { LanguageService } from '../services/language';
         <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
           <div class="col-span-1 md:col-span-2">
             <h3 class="text-lg font-bold text-white mb-4">
-              {{ t('appName') }}
+              {{ t("appName") }}
             </h3>
             <p class="text-sm text-slate-400 leading-relaxed max-w-md">
-              {{ t('aboutUs') }}
+              {{ t("aboutUs") }}
             </p>
           </div>
 
           <div>
-            <h4 class="text-sm font-semibold text-white uppercase tracking-wider mb-4">
-              {{ t('quickLinks') }}
+            <h4
+              class="text-sm font-semibold text-white uppercase tracking-wider mb-4"
+            >
+              {{ t("quickLinks") }}
             </h4>
             <ul class="space-y-2">
               <li>
@@ -29,7 +31,7 @@ import { LanguageService } from '../services/language';
                   routerLink="/products"
                   class="text-sm text-slate-400 hover:text-white transition-colors"
                 >
-                  {{ t('products') }}
+                  {{ t("products") }}
                 </a>
               </li>
               <li>
@@ -37,7 +39,7 @@ import { LanguageService } from '../services/language';
                   routerLink="/portfolio"
                   class="text-sm text-slate-400 hover:text-white transition-colors"
                 >
-                  {{ t('portfolio') }}
+                  {{ t("portfolio") }}
                 </a>
               </li>
               <li>
@@ -45,7 +47,7 @@ import { LanguageService } from '../services/language';
                   routerLink="/about"
                   class="text-sm text-slate-400 hover:text-white transition-colors"
                 >
-                  {{ t('about') }}
+                  {{ t("about") }}
                 </a>
               </li>
               <li>
@@ -53,15 +55,17 @@ import { LanguageService } from '../services/language';
                   routerLink="/contact"
                   class="text-sm text-slate-400 hover:text-white transition-colors"
                 >
-                  {{ t('contact') }}
+                  {{ t("contact") }}
                 </a>
               </li>
             </ul>
           </div>
 
           <div>
-            <h4 class="text-sm font-semibold text-white uppercase tracking-wider mb-4">
-              {{ t('contactUs') }}
+            <h4
+              class="text-sm font-semibold text-white uppercase tracking-wider mb-4"
+            >
+              {{ t("contactUs") }}
             </h4>
             <ul class="space-y-2">
               <li class="flex items-center gap-2 text-sm text-slate-400">
@@ -84,7 +88,7 @@ import { LanguageService } from '../services/language';
                     d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
                   />
                 </svg>
-                {{ t('address') }}
+                {{ t("address") }}
               </li>
               <li class="flex items-center gap-2 text-sm text-slate-400">
                 <svg
@@ -101,7 +105,7 @@ import { LanguageService } from '../services/language';
                     d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"
                   />
                 </svg>
-                {{ t('phoneNumber') }}
+                {{ t("phoneNumber") }}
               </li>
             </ul>
           </div>
@@ -109,7 +113,8 @@ import { LanguageService } from '../services/language';
 
         <div class="mt-8 pt-8 border-t border-slate-800">
           <p class="text-center text-sm text-slate-500">
-            &copy; {{ currentYear }} {{ t('appName') }}. {{ t('allRightsReserved') }}
+            &copy; {{ currentYear }} {{ t("appName") }}.
+            {{ t("allRightsReserved") }}
           </p>
         </div>
       </div>

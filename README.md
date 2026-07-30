@@ -58,7 +58,7 @@ npm run build
 ```
 src/
 ├── main.ts                          # Bootstrap
-├── styles.css                       # Tailwind + Material + ng-select
+├── styles.scss                      # Tailwind + Material + ng-select
 ├── app/
 │   ├── app.ts                       # Root component
 │   ├── main.route.ts                # Routes

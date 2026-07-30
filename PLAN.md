@@ -2,7 +2,7 @@
 
 ## Overview
 
-A Persian-first, mobile-responsive tailor shop ecommerce website with guest browsing, customer cart/checkout, admin panel for full management, and Zarinpal payment integration.
+A Persian-first, mobile-responsive tailor shop ecommerce website with guest browsing, customer cart/checkout, admin panel for full management, card-to-card payment (Zarinpal in Phase 8), and SMS notifications (Phase 8).
 
 ---
 
@@ -29,7 +29,7 @@ Database (PostgreSQL)
 | ORM | Prisma | Type-safe, auto-generated types, migrations |
 | Database | PostgreSQL | Reliable, JSON support, full-text search |
 | Auth | JWT (access + refresh) | Stateless, standard |
-| Payment | Zarinpal | Most popular Iranian gateway |
+| Payment | Card-to-card (MVP), Zarinpal (Phase 8) | Simple MVP, no API keys needed upfront |
 | Styling | Tailwind CSS + tailwindcss-rtl | Mobile-first, RTL ready |
 | CDN | ArvanCloud (production) | Iranian CDN |
 
@@ -327,10 +327,11 @@ src/app/
 7. Shows "Added to cart" toast notification -> clears `autoAdd` from URL
 8. Goes to `/cart` -> `GET /api/cart` -> reviews items, updates qty
 9. "Proceed to Checkout" -> multi-step: address -> shipping -> payment -> review
-10. "Place Order" -> `POST /api/orders` -> `{ status: PENDING }`
-11. Redirect to Zarinpal -> callback -> `POST /api/payment/verify`
-12. On success -> `/orders/:id` with status CONFIRMED -> cart cleared on server
-13. On failure/cancel -> show error message -> redirect to `/orders/:id` with status PENDING -> user can retry payment from order detail
+10. "Place Order" -> `POST /api/orders` -> status PENDING, paymentStatus PENDING
+11. Redirect to `/orders/:id` -> shows card-to-card payment instructions (bank card info, amount)
+12. User transfers money externally, uploads receipt screenshot
+13. Admin confirms payment -> status CONFIRMED, paymentStatus PAID
+14. (Phase 8: Zarinpal redirect available as alternative payment method)
 
 ### Checkout flow (multi-step)
 
@@ -345,9 +346,8 @@ src/app/
 - Show estimated delivery time + shipping cost
 
 **Step 3: Payment**
-- Radio: ZARINPAL (پرداخت آنلاین) or CARD_TO_CARD (کارت به کارت)
-- If ZARINPAL -> redirect after order placement
-- If CARD_TO_CARD -> show admin bank card info + instructions: "Transfer amount to card XXXX-XXXX-XXXX-XXXX under name YYY, then upload receipt screenshot"
+- Default: CARD_TO_CARD (کارت به کارت) — show admin bank card info + instructions: "Transfer amount to card XXXX-XXXX-XXXX-XXXX under name YYY, then upload receipt screenshot"
+- (Phase 8: ZARINPAL option added as alternative)
 
 **Step 4: Review**
 - Show order summary: items, address, shipping, payment method, total
@@ -359,9 +359,10 @@ src/app/
 2. Order placed -> `POST /api/orders` -> status PENDING, paymentStatus PENDING
 3. Redirect to `/orders/:id` -> show bank card details (admin's card number, name, amount)
 4. User transfers money externally
-5. User uploads receipt screenshot -> `POST /api/payment/receipt` (new endpoint)
+5. User uploads receipt screenshot -> `POST /api/payment/receipt`
 6. Admin reviews receipt in OrdersPage -> confirms or rejects
-7. On confirm -> status CONFIRMED, paymentStatus PAID -> SMS sent
+7. On confirm -> status CONFIRMED, paymentStatus PAID
+8. (Phase 8: SMS notification sent to customer on confirmation)
 
 ### Auth flow
 
@@ -388,14 +389,15 @@ PENDING -> CONFIRMED -> PROCESSING -> SHIPPED -> DELIVERED
   +-> CANCELLED
 ```
 
-Each transition sends SMS to customer. Only admin can change status.
+Only admin can change status. (Phase 8: SMS sent to customer on each transition.)
 
-### Payment failure handling
+### Payment handling
 
-- Zarinpal callback with Status=NOK or verify failure -> show error page with "Payment failed" message
-- User can retry payment from order detail page (if status is PENDING)
-- Retry -> new `POST /api/payment/request` with same order -> new Zarinpal redirect
-- After 3 failed attempts -> order auto-cancelled after 24 hours
+- Card-to-card is the default payment method
+- On order placement -> `/orders/:id` shows bank card info and receipt upload form
+- User uploads receipt for admin review
+- Admin confirms or rejects from OrderListPage
+- (Phase 8: Zarinpal option added, with callback handling, retry flow, and auto-cancel after 24h)
 
 ---
 
@@ -433,12 +435,11 @@ Each transition sends SMS to customer. Only admin can change status.
 - [ ] Frontend: CheckoutPage (multi-step stepper)
 - [ ] Cart count badge in navbar
 
-### Phase 4 — Orders + Payment (3 days)
+### Phase 4 — Orders (3 days)
 - [ ] Backend: Order creation from cart
-- [ ] Backend: Zarinpal integration (request + verify)
 - [ ] Frontend: OrderHistoryPage + OrderDetailPage
 - [ ] Admin: OrderListPage + status management + tracking
-- [ ] SMS notification service (Kavenegar)
+- [ ] Card-to-card payment receipt upload flow
 
 ### Phase 5 — Portfolio + Contact (2 days)
 - [ ] Backend: Portfolio CRUD
@@ -465,7 +466,13 @@ Each transition sends SMS to customer. Only admin can change status.
 - [ ] Image lazy loading, code splitting
 - [ ] Build + deploy
 
-**Total estimate: ~24 working days**
+### Phase 8 — Paid Services (2 days)
+- [ ] Backend: Zarinpal integration (request + verify)
+- [ ] Frontend: Zarinpal payment option in checkout
+- [ ] SMS notification service (Kavenegar)
+- [ ] SMS on order status transitions
+
+**Total estimate: ~26 working days**
 
 ---
 
@@ -493,7 +500,7 @@ backend/
 │   ├── portfolio/ (module, controller, service, dto)
 │   ├── contact/ (module, controller, service, dto)
 │   ├── upload/ (module, controller, service)
-│   └── payment/ (module, controller, service, dto)
+│   └── payment/ (module, controller, service, dto — Phase 8)
 └── uploads/ (gitignored)
 ```
 
@@ -561,12 +568,15 @@ Breadcrumbs: `home, products, portfolio, about, contact, cart, checkout, orders,
 - Day 5: Orders backend + OrderHistory/OrderDetail frontend
 
 **Week 4**
-- Day 1: Zarinpal payment integration
-- Day 2-3: Portfolio (admin + public) + Contact
-- Day 4: Admin Dashboard + Customers + Messages
-- Day 5: AboutPage, home page polish, responsive audit
+- Day 1-2: Portfolio (admin + public) + Contact
+- Day 3: Admin Dashboard + Customers + Messages
+- Day 4: AboutPage, home page polish, responsive audit
 
 **Week 5**
 - Day 1-2: i18n complete pass, SEO meta tags, error/loading/empty states
 - Day 3: Testing critical paths (checkout, admin CRUD)
 - Day 4: Build + deploy
+
+**Week 6**
+- Day 1: Zarinpal integration (request, verify, callback)
+- Day 2: SMS notification (Kavenegar) + order status SMS

@@ -15,6 +15,12 @@ module.exports = {
         dialog:
           '0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1)',
       },
+      spacing: {
+        '4.5': '18px',
+      },
+      minHeight: {
+        'screen-80': '80vh',
+      },
       height: {
         '98': '24.5rem',
       },

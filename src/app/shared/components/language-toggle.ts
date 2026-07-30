@@ -1,9 +1,9 @@
-import { Component, inject } from '@angular/core';
-import { LanguageService, LanguageOptionModel } from '../services/language';
-import { ThemeService } from '../services/theme';
+import { Component, inject } from "@angular/core";
+import { LanguageService, LanguageOptionModel } from "../services/language";
+import { ThemeService } from "../services/theme";
 
 @Component({
-  selector: 'app-language-toggle',
+  selector: "app-language-toggle",
   standalone: true,
   template: `
     <button

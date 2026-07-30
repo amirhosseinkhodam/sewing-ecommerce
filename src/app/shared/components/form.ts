@@ -1,8 +1,8 @@
-import { Component, input, output } from '@angular/core';
-import { FormGroup, ReactiveFormsModule } from '@angular/forms';
+import { Component, input, output } from "@angular/core";
+import { FormGroup, ReactiveFormsModule } from "@angular/forms";
 
 @Component({
-  selector: 'app-form',
+  selector: "app-form",
   standalone: true,
   imports: [ReactiveFormsModule],
   template: `
@@ -18,24 +18,24 @@ import { FormGroup, ReactiveFormsModule } from '@angular/forms';
 export class FormComponent {
   readonly formGroup = input<FormGroup>();
   readonly cssClass = input<string>();
-  readonly variant = input<'default' | 'inline' | 'vertical' | 'horizontal'>(
-    'default',
+  readonly variant = input<"default" | "inline" | "vertical" | "horizontal">(
+    "default",
   );
 
-  readonly formSubmit = output<Event>({ alias: 'ngSubmit' });
+  readonly formSubmit = output<Event>({ alias: "ngSubmit" });
 
   readonly computedClasses = () => {
-    const base = '';
+    const base = "";
 
     const variants = {
-      default: '',
-      inline: 'flex gap-4 items-end',
-      vertical: '',
-      horizontal: 'flex gap-4 items-center',
+      default: "",
+      inline: "flex gap-4 items-end",
+      vertical: "",
+      horizontal: "flex gap-4 items-center",
     };
 
     return [base, variants[this.variant()], this.cssClass()]
       .filter(Boolean)
-      .join(' ');
+      .join(" ");
   };
 }

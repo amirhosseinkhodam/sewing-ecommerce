@@ -15,16 +15,15 @@ html.dark {
 html[dir="rtl"] input,
 html[dir="rtl"] textarea,
 html[dir="rtl"] select {
-  text-align: right;
+  @apply text-right;
 }
 
 app-select {
-  display: block;
-  width: 100%;
+  @apply block w-full;
 }
 
 app-select .ng-select {
-  width: 100%;
+  @apply w-full;
 }
 
 app-select .ng-select.ng-select-single .ng-select-container {
@@ -75,42 +74,31 @@ app-select .ng-dropdown-panel .ng-input input {
 
 /* Status filter — mat-chip-listbox responsive */
 app-status-filter {
-  display: block;
-  width: 100%;
+  @apply block w-full;
 }
 
 app-status-filter mat-chip-option {
-  cursor: pointer;
+  @apply cursor-pointer;
 }
 
 @media (max-width: 639px) {
   app-status-filter .mat-mdc-chip-listbox,
   app-status-filter .mdc-evolution-chip-set__chips {
-    display: flex !important;
-    flex-wrap: nowrap;
-    gap: 8px !important;
-    width: 100% !important;
-    margin: 0 !important;
+    @apply flex flex-nowrap gap-2 w-full m-0 #{!important};
   }
 
   app-status-filter mat-chip-option {
-    width: 100% !important;
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    margin: 0 !important;
+    @apply w-full flex items-center justify-center m-0 #{!important};
   }
 }
 
 @media (min-width: 640px) {
   app-status-filter .mat-mdc-chip-listbox,
   app-status-filter .mdc-evolution-chip-set__chips {
-    display: inline-flex !important;
-    grid-template-columns: none !important;
-    width: auto !important;
+    @apply inline-flex grid-cols-none w-auto #{!important};
   }
 
   app-status-filter mat-chip-option {
-    width: auto !important;
+    @apply w-auto #{!important};
   }
 }

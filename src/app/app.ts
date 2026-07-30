@@ -1,12 +1,18 @@
-import { Component } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
-import { NavbarComponent } from './shared/components/navbar';
-import { FooterComponent } from './shared/components/footer';
+import { Component } from "@angular/core";
+import { RouterOutlet } from "@angular/router";
+import { FooterComponent } from "./shared/components/footer";
+import { NavbarComponent } from "./shared/components/navbar";
+import { NotificationComponent } from "./shared/components/notification";
 
 @Component({
-  selector: 'app-root',
+  selector: "app-root",
   standalone: true,
-  imports: [RouterOutlet, NavbarComponent, FooterComponent],
+  imports: [
+    RouterOutlet,
+    NavbarComponent,
+    FooterComponent,
+    NotificationComponent,
+  ],
   template: `
     <div class="min-h-screen flex flex-col bg-slate-50 dark:bg-slate-900">
       <app-navbar />
@@ -14,6 +20,7 @@ import { FooterComponent } from './shared/components/footer';
         <router-outlet />
       </main>
       <app-footer />
+      <app-notification />
     </div>
   `,
 })

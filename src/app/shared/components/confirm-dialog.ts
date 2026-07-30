@@ -1,23 +1,23 @@
-import { Component, inject } from '@angular/core';
-import { MatDialogModule, MatDialogRef } from '@angular/material/dialog';
-import { LanguageService } from '../services/language';
-import { ButtonComponent } from './button';
+import { Component, inject } from "@angular/core";
+import { MatDialogModule, MatDialogRef } from "@angular/material/dialog";
+import { LanguageService } from "../services/language";
+import { ButtonComponent } from "./button";
 
 @Component({
-  selector: 'app-confirm-dialog',
+  selector: "app-confirm-dialog",
   standalone: true,
   imports: [MatDialogModule, ButtonComponent],
   template: `
-    <h2 mat-dialog-title>{{ t('confirm') }}</h2>
+    <h2 mat-dialog-title>{{ t("confirm") }}</h2>
     <mat-dialog-content>
-      {{ t('confirm') }}
+      {{ t("confirm") }}
     </mat-dialog-content>
     <mat-dialog-actions align="end" class="gap-2">
       <app-button variant="primary" (buttonClick)="onCancel()">
-        {{ t('cancel') }}
+        {{ t("cancel") }}
       </app-button>
       <app-button variant="mat-raised" color="warn" (buttonClick)="onConfirm()">
-        {{ t('delete') }}
+        {{ t("delete") }}
       </app-button>
     </mat-dialog-actions>
   `,

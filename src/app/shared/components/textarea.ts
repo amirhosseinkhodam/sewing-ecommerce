@@ -5,11 +5,11 @@ import {
   forwardRef,
   ViewChild,
   ElementRef,
-} from '@angular/core';
-import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
+} from "@angular/core";
+import { ControlValueAccessor, NG_VALUE_ACCESSOR } from "@angular/forms";
 
 @Component({
-  selector: 'app-textarea',
+  selector: "app-textarea",
   standalone: true,
   imports: [],
   template: `
@@ -45,15 +45,15 @@ export class TextareaComponent implements ControlValueAccessor {
   readonly disabled = input<boolean>(false);
   readonly cssClass = input<string>();
   readonly focusRing = input<boolean>(false);
-  readonly variant = input<'default' | 'error' | 'disabled'>('default');
+  readonly variant = input<"default" | "error" | "disabled">("default");
   readonly error = input<boolean>(false);
   readonly label = input<string>();
 
-  readonly input = output<string>({ alias: 'inputChange' });
-  readonly blur = output<void>({ alias: 'inputBlur' });
-  readonly focus = output<void>({ alias: 'inputFocus' });
+  readonly input = output<string>({ alias: "inputChange" });
+  readonly blur = output<void>({ alias: "inputBlur" });
+  readonly focus = output<void>({ alias: "inputFocus" });
 
-  @ViewChild('textareaElement', { static: true })
+  @ViewChild("textareaElement", { static: true })
   textareaElement!: ElementRef<HTMLTextAreaElement>;
   #onChange: (value: string) => void = () => {};
   #onTouched: () => void = () => {};
@@ -75,7 +75,7 @@ export class TextareaComponent implements ControlValueAccessor {
 
   writeValue(value: string): void {
     if (this.textareaElement) {
-      this.textareaElement.nativeElement.value = value ?? '';
+      this.textareaElement.nativeElement.value = value ?? "";
     }
   }
 
@@ -95,23 +95,23 @@ export class TextareaComponent implements ControlValueAccessor {
 
   readonly computedClasses = () => {
     const focusClasses = this.focusRing()
-      ? 'focus:ring-2 focus:ring-slate-500 focus:ring-offset-2'
-      : 'focus:outline-none';
+      ? "focus:ring-2 focus:ring-slate-500 focus:ring-offset-2"
+      : "focus:outline-none";
     const base = `w-full rounded-control border px-3 py-2 transition-colors ${focusClasses} placeholder:text-slate-400 dark:placeholder:text-slate-500 resize-vertical`;
 
     const variants = {
       default:
-        'border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100',
+        "border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100",
       error:
-        'border-red-500 dark:border-red-600 bg-red-50 dark:bg-red-900/30 text-red-900 dark:text-red-100',
+        "border-red-500 dark:border-red-600 bg-red-50 dark:bg-red-900/30 text-red-900 dark:text-red-100",
       disabled:
-        'border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-500 dark:text-slate-400 cursor-not-allowed opacity-50',
+        "border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-500 dark:text-slate-400 cursor-not-allowed opacity-50",
     };
 
-    const errorClass = this.error() ? 'ring-red-500 border-red-500' : '';
+    const errorClass = this.error() ? "ring-red-500 border-red-500" : "";
 
     return [base, variants[this.variant()], errorClass, this.cssClass()]
       .filter(Boolean)
-      .join(' ');
+      .join(" ");
   };
 }
