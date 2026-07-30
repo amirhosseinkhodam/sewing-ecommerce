@@ -1,0 +1,116 @@
+@import '@angular/material/prebuilt-themes/indigo-pink.css';
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html {
+  color-scheme: light;
+}
+
+html.dark {
+  color-scheme: dark;
+}
+
+html[dir="rtl"] input,
+html[dir="rtl"] textarea,
+html[dir="rtl"] select {
+  text-align: right;
+}
+
+app-select {
+  display: block;
+  width: 100%;
+}
+
+app-select .ng-select {
+  width: 100%;
+}
+
+app-select .ng-select.ng-select-single .ng-select-container {
+  @apply rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 px-3 py-2 text-slate-900 dark:text-slate-100;
+  @apply hover:border-slate-400 dark:hover:border-slate-500;
+  min-height: 42px;
+}
+
+app-select .ng-select.ng-select-focused .ng-select-container {
+  @apply border-blue-500 dark:border-blue-400 ring-2 ring-slate-500 ring-offset-2;
+}
+
+app-select .ng-select .ng-input > input {
+  @apply text-slate-900 dark:text-slate-100;
+}
+
+app-select .ng-select .ng-placeholder {
+  @apply text-slate-400 dark:text-slate-500;
+}
+
+app-select .ng-select .ng-arrow-wrapper {
+  @apply text-slate-400 dark:text-slate-500;
+}
+
+app-select .ng-select .ng-clear-wrapper {
+  @apply text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-400;
+}
+
+app-select .ng-dropdown-panel .ng-dropdown-panel-items {
+  @apply rounded-control border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 shadow-lg;
+}
+
+app-select .ng-dropdown-panel .ng-option {
+  @apply px-3 py-1.5 text-slate-900 dark:text-slate-100 hover:bg-slate-100 dark:hover:bg-slate-600;
+}
+
+app-select .ng-dropdown-panel .ng-option.ng-option-marked {
+  @apply bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300;
+}
+
+app-select .ng-dropdown-panel .ng-option.ng-option-selected {
+  @apply bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-200 font-medium;
+}
+
+app-select .ng-dropdown-panel .ng-input input {
+  @apply rounded-t-control border-b border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 px-3 py-2 text-slate-900 dark:text-slate-100 focus:outline-none;
+}
+
+/* Status filter — mat-chip-listbox responsive */
+app-status-filter {
+  display: block;
+  width: 100%;
+}
+
+app-status-filter mat-chip-option {
+  cursor: pointer;
+}
+
+@media (max-width: 639px) {
+  app-status-filter .mat-mdc-chip-listbox,
+  app-status-filter .mdc-evolution-chip-set__chips {
+    display: flex !important;
+    flex-wrap: nowrap;
+    gap: 8px !important;
+    width: 100% !important;
+    margin: 0 !important;
+  }
+
+  app-status-filter mat-chip-option {
+    width: 100% !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    margin: 0 !important;
+  }
+}
+
+@media (min-width: 640px) {
+  app-status-filter .mat-mdc-chip-listbox,
+  app-status-filter .mdc-evolution-chip-set__chips {
+    display: inline-flex !important;
+    grid-template-columns: none !important;
+    width: auto !important;
+  }
+
+  app-status-filter mat-chip-option {
+    width: auto !important;
+  }
+}

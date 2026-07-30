@@ -1,0 +1,22 @@
+{
+  "appName": "My App",
+  "home": "Home",
+  "settings": "Settings",
+  "save": "Save",
+  "cancel": "Cancel",
+  "delete": "Delete",
+  "edit": "Edit",
+  "add": "Add",
+  "refresh": "Refresh",
+  "loading": "Loading...",
+  "search": "Search...",
+  "noData": "No data found.",
+  "confirm": "Confirm",
+  "success": "Success",
+  "error": "Error",
+  "couldNotLoadData": "Could not load data.",
+  "couldNotSave": "Could not save.",
+  "couldNotDelete": "Could not delete.",
+  "darkMode": "Dark mode",
+  "language": "Language"
+}
