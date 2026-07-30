@@ -236,6 +236,7 @@ src/app/
 └── shared/
     ├── index.ts (exists)
     ├── components/ (10 exist: button, card, input, select, textarea, form, confirm-dialog, confirm-bottom-sheet, theme-toggle, language-toggle)
+    │   └── NEW: navbar.ts, footer.ts, breadcrumbs.ts, quantity-selector.ts, image-gallery.ts, skeleton.ts, back-to-top.ts
     ├── services/theme.ts, language.ts (exist)
     ├── pipes/translate.ts, localized-date.ts (exist)
     ├── forms/password.ts (exist)
@@ -319,14 +320,48 @@ src/app/
 
 1. Guest visits `/products` -> `GET /api/products?page=1`
 2. Clicks product -> `GET /api/products/:slug` -> detail with sizes + "Add to Cart"
-3. Clicks "Add to Cart" -> no JWT -> redirect to `/login?returnUrl=/products/:slug&variantId=...`
+3. Clicks "Add to Cart" -> no JWT -> redirect to `/login?returnUrl=/products/:slug&autoAdd=1&variantId=...`
 4. Logs in -> `POST /api/auth/login` -> JWT stored in AuthStore
-5. Redirected back -> `POST /api/cart/items { productId, variantId, quantity: 1 }`
-6. Goes to `/cart` -> `GET /api/cart` -> reviews items, updates qty
-7. "Proceed to Checkout" -> multi-step: address -> shipping -> payment -> review
-8. "Place Order" -> `POST /api/orders` -> `{ status: PENDING }`
-9. Redirect to Zarinpal -> callback -> `POST /api/payment/verify`
-10. On success -> `/orders/:id` with status CONFIRMED
+5. LoginPage detects `autoAdd=1` query param -> redirects back to `/products/:slug`
+6. ProductDetailPage reads `autoAdd` + `variantId` from query params -> auto-adds item to cart -> `POST /api/cart/items { productId, variantId, quantity: 1 }`
+7. Shows "Added to cart" toast notification -> clears `autoAdd` from URL
+8. Goes to `/cart` -> `GET /api/cart` -> reviews items, updates qty
+9. "Proceed to Checkout" -> multi-step: address -> shipping -> payment -> review
+10. "Place Order" -> `POST /api/orders` -> `{ status: PENDING }`
+11. Redirect to Zarinpal -> callback -> `POST /api/payment/verify`
+12. On success -> `/orders/:id` with status CONFIRMED -> cart cleared on server
+13. On failure/cancel -> show error message -> redirect to `/orders/:id` with status PENDING -> user can retry payment from order detail
+
+### Checkout flow (multi-step)
+
+**Step 1: Address**
+- If user has saved addresses -> show list with radio selection + "Add New Address" button
+- If no saved addresses -> show inline address form (province/city dropdown from Iranian provinces data)
+- Address saved via `POST /api/addresses` -> user selects it for this order
+- Default address auto-selected if exists
+
+**Step 2: Shipping**
+- Radio: POST (پست) or COURIER (پیک)
+- Show estimated delivery time + shipping cost
+
+**Step 3: Payment**
+- Radio: ZARINPAL (پرداخت آنلاین) or CARD_TO_CARD (کارت به کارت)
+- If ZARINPAL -> redirect after order placement
+- If CARD_TO_CARD -> show admin bank card info + instructions: "Transfer amount to card XXXX-XXXX-XXXX-XXXX under name YYY, then upload receipt screenshot"
+
+**Step 4: Review**
+- Show order summary: items, address, shipping, payment method, total
+- "Place Order" button -> `POST /api/orders`
+
+### Card-to-card payment flow
+
+1. User selects CARD_TO_CARD at checkout step 3
+2. Order placed -> `POST /api/orders` -> status PENDING, paymentStatus PENDING
+3. Redirect to `/orders/:id` -> show bank card details (admin's card number, name, amount)
+4. User transfers money externally
+5. User uploads receipt screenshot -> `POST /api/payment/receipt` (new endpoint)
+6. Admin reviews receipt in OrdersPage -> confirms or rejects
+7. On confirm -> status CONFIRMED, paymentStatus PAID -> SMS sent
 
 ### Auth flow
 
@@ -353,7 +388,14 @@ PENDING -> CONFIRMED -> PROCESSING -> SHIPPED -> DELIVERED
   +-> CANCELLED
 ```
 
-Each transition sends SMS to customer.
+Each transition sends SMS to customer. Only admin can change status.
+
+### Payment failure handling
+
+- Zarinpal callback with Status=NOK or verify failure -> show error page with "Payment failed" message
+- User can retry payment from order detail page (if status is PENDING)
+- Retry -> new `POST /api/payment/request` with same order -> new Zarinpal redirect
+- After 3 failed attempts -> order auto-cancelled after 24 hours
 
 ---
 
@@ -367,7 +409,8 @@ Each transition sends SMS to customer.
 - [ ] Global guards, filters, pipes
 - [ ] Swagger/OpenAPI docs
 
-### Phase 1 — Auth Frontend (2 days)
+### Phase 1 — Auth Frontend + Layout (3 days)
+- [ ] Shared layout: Navbar (logo, nav links, cart badge, login/profile dropdown), Footer
 - [ ] LoginPage + RegisterPage
 - [ ] AuthStore (SignalStore, `providedIn: 'root'`)
 - [ ] AuthGuard + AdminGuard
@@ -409,18 +452,20 @@ Each transition sends SMS to customer.
 - [ ] Backend: Dashboard stats endpoint
 - [ ] Frontend: DashboardPage (stats cards, charts, recent orders)
 - [ ] Frontend: CustomerListPage
-- [ ] Frontend: SettingsPage
+- [ ] Frontend: SettingsPage (shop name, business hours, bank card info, shipping rates)
 - [ ] Admin layout (sidebar + header)
 
 ### Phase 7 — Polish + Launch (3 days)
-- [ ] SEO meta tags for all pages
+- [ ] SEO meta tags for all pages (Title, Description, OG tags)
 - [ ] Complete i18n pass (all Persian text verified)
-- [ ] Loading states, error boundaries, empty states
+- [ ] Loading skeletons for all data-fetching pages
+- [ ] Error boundaries: API failure -> inline error + retry button, 404 page, 500 page
+- [ ] Empty states: no products, no orders, no messages, empty cart
 - [ ] Responsive audit (mobile/tablet/desktop)
 - [ ] Image lazy loading, code splitting
 - [ ] Build + deploy
 
-**Total estimate: ~23 working days**
+**Total estimate: ~24 working days**
 
 ---
 
@@ -454,27 +499,29 @@ backend/
 
 ---
 
-## 10. i18n Keys (~150 per language)
+## 10. i18n Keys (~180 per language)
 
-Navigation: `appName, home, products, portfolio, about, contact, cart, orders, profile, logout, login, register, admin, settings, search`
+Navigation: `appName, home, products, portfolio, about, contact, cart, orders, profile, logout, login, register, admin, settings, search, backToHome`
 
-Product: `product(s), category(ies), price, size(s), fabric, addToCart, addedToCart, outOfStock, inStock, relatedProducts, noProductsFound, sortBy, filter, clearFilters, fromPrice, toPrice`
+Product: `product(s), category(ies), price, size(s), fabric, addToCart, addedToCart, outOfStock, inStock, relatedProducts, noProductsFound, sortBy, filter, clearFilters, fromPrice, toPrice, startingFrom, viewDetails`
 
-Cart: `cart, cartEmpty, cartEmptyMessage, startShopping, quantity, total, subtotal, shipping, grandTotal, proceedToCheckout, remove, updateCart`
+Cart: `cart, cartEmpty, cartEmptyMessage, startShopping, quantity, total, subtotal, shipping, grandTotal, proceedToCheckout, remove, updateCart, itemAdded, continueShopping`
 
-Checkout: `checkout, shippingAddress, selectAddress, addAddress, shippingMethod, post, courier, paymentMethod, zarinpal, cardToCard, placeOrder, reviewOrder`
+Checkout: `checkout, shippingAddress, selectAddress, addAddress, shippingMethod, post, courier, paymentMethod, zarinpal, cardToCard, placeOrder, reviewOrder, bankCardInfo, transferAmount, cardNumber, cardHolder, uploadReceipt, receiptUploaded`
 
-Order: `order(s), orderDetail, orderNumber, orderDate, orderStatus, orderHistory, status(Pending|Confirmed|Processing|Shipped|Delivered|Cancelled), paymentStatus, payment(Pending|Paid|Failed), trackingCode`
+Order: `order(s), orderDetail, orderNumber, orderDate, orderStatus, orderHistory, status(Pending|Confirmed|Processing|Shipped|Delivered|Cancelled), paymentStatus, payment(Pending|Paid|Failed|Refunded), trackingCode, retryPayment, paymentFailed, paymentCancelled`
 
-Auth: `email, password, confirmPassword, firstName, lastName, phone, register, login, forgotPassword, loginRequired, loginToAddToCart`
+Auth: `email, password, confirmPassword, firstName, lastName, phone, register, login, forgotPassword, loginRequired, loginToAddToCart, alreadyHaveAccount, dontHaveAccount`
 
-Admin: `dashboard, totalOrders, totalRevenue, totalCustomers, totalProducts, recentOrders, manageProducts, manageOrders, manageCategories, managePortfolio, manageCustomers, messages`
+Admin: `dashboard, totalOrders, totalRevenue, totalCustomers, totalProducts, recentOrders, manageProducts, manageOrders, manageCategories, managePortfolio, manageCustomers, messages, shopName, businessHours, bankCardSettings, shippingSettings`
 
-General: `save, cancel, delete, edit, add, refresh, loading, noData, confirm, success, error, couldNotLoadData, couldNotSave, couldNotDelete, darkMode, language, yes, no, submit, back, next, done, search, filter, clear, close, viewAll`
+General: `save, cancel, delete, edit, add, refresh, loading, noData, confirm, success, error, couldNotLoadData, couldNotSave, couldNotDelete, darkMode, language, yes, no, submit, back, next, done, search, filter, clear, close, viewAll, required, optional, or`
 
-Portfolio: `portfolio, portfolioDetail, viewProject, relatedProjects`
+Portfolio: `portfolio, portfolioDetail, viewProject, relatedProjects, ourWork`
 
-Contact: `contactUs, aboutUs, name, message, sendMessage, messageSent, address, phoneNumber, workingHours`
+Contact: `contactUs, aboutUs, name, message, sendMessage, messageSent, address, phoneNumber, workingHours, getInTouch`
+
+Breadcrumbs: `home, products, portfolio, about, contact, cart, checkout, orders, profile, settings`
 
 ---
 
@@ -500,7 +547,7 @@ Contact: `contactUs, aboutUs, name, message, sendMessage, messageSent, address, 
 **Week 1**
 - Day 1-2: NestJS init + Prisma schema + migrations + seed
 - Day 3: Auth module (register, login, JWT, guards)
-- Day 4-5: Auth frontend (LoginPage, RegisterPage, AuthStore, AuthGuard, AuthInterceptor, ProfilePage)
+- Day 4-6: Auth frontend (LoginPage, RegisterPage, AuthStore, AuthGuard, AuthInterceptor, ProfilePage) + Shared layout (Navbar, Footer)
 
 **Week 2**
 - Day 1: Categories + Products backend (CRUD, filtering, pagination, image upload)

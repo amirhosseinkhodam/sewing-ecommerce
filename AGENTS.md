@@ -1,8 +1,8 @@
-# Angular Base Template — AGENTS.md
+# Tailor Ecommerce — AGENTS.md
 
 ## Overview
 
-Angular 19 standalone frontend with Tailwind CSS, i18n (English + Persian), dark/light mode, and a reusable custom element library.
+Persian-first, mobile-responsive tailor shop ecommerce website with guest browsing, customer cart/checkout, admin panel for full management, and Zarinpal payment integration.
 
 ## Quick commands
 
@@ -21,128 +21,81 @@ Test files live in `tests/`, mirroring the `src/` directory structure. They impo
 ## Architecture
 
 - **Frontend**: Angular 19 standalone (no `NgModule`). Uses `bootstrapApplication` with `provideHttpClient()` and `provideRouter()`.
+- **Backend**: NestJS + Prisma + PostgreSQL (separate repository)
 - **Styling**: Tailwind CSS with custom design tokens in `tailwind.config.js`. No CSS/SCSS in components.
 - **i18n**: English (`en`) and Persian (`fa`, RTL). Translation files in `src/app/i18n/`.
 - **Dark mode**: ThemeService with signal-based state, persists to localStorage.
 - **State management**: `@ngrx/signals` (`signalStore`) for feature state.
 - **Testing**: Jest with `jest-preset-angular`. Zoneless test environment.
+- **Payment**: Zarinpal integration
+- **SMS**: Kavenegar integration
 
-## Conventions
+## Current Progress
 
-### File style
+### Phase 0 — Backend Foundation (3 days)
+- [ ] Initialize NestJS project with Prisma + PostgreSQL
+- [ ] Define all Prisma models + run migrations + seed
+- [ ] Auth module: JWT, bcrypt, Passport strategies
+- [ ] File upload module (Multer)
+- [ ] Global guards, filters, pipes
+- [ ] Swagger/OpenAPI docs
 
-- Single quotes, trailing commas (Prettier config).
-- Components in `src/app/features/<name>/pages/`.
-- Tests in `tests/app/`, mirroring the `src/` directory structure.
+### Phase 1 — Auth Frontend + Layout (3 days)
+- [x] AuthGuard + AdminGuard (stubbed)
+- [x] AuthInterceptor (stubbed)
+- [ ] Shared layout: Navbar (logo, nav links, cart badge, login/profile dropdown), Footer
+- [ ] LoginPage + RegisterPage
+- [ ] AuthStore (SignalStore, `providedIn: 'root'`)
+- [ ] ProfilePage
 
-### Naming conventions
+### Phase 2 — Products + Categories (4 days)
+- [ ] Backend: Category CRUD
+- [ ] Backend: Product CRUD + variants + image upload
+- [ ] Admin: CategoryListPage
+- [ ] Admin: ProductListPage + ProductFormPage
+- [ ] Public: CatalogPage (grid, filters, pagination, search)
+- [ ] Public: ProductDetailPage (gallery, sizes, add-to-cart)
 
-- **String literals / enum values**: Use camelCase — e.g. `'superAdmin'`, `'taskCreated'`.
-- **Interfaces / types**: Always append `Model` suffix — e.g. `UserModel`, `TaskModel`.
-- **Classes / services / components / pipes**: PascalCase — e.g. `DashboardStore`, `TaskFormService`.
-- **Files**: Match the primary export — `auth.service.ts` exports `AuthService`.
-- **Translation keys**: camelCase — e.g. `superAdmin`, `signInToAccount`.
+### Phase 3 — Cart + Checkout (4 days)
+- [ ] Backend: Cart CRUD
+- [ ] Backend: Address CRUD
+- [ ] Frontend: AddressManagementPage
+- [ ] Frontend: CartPage
+- [ ] Frontend: CheckoutPage (multi-step stepper)
+- [ ] Cart count badge in navbar
 
-### File naming (drop directory-redundant suffixes)
+### Phase 4 — Orders + Payment (3 days)
+- [ ] Backend: Order creation from cart
+- [ ] Backend: Zarinpal integration (request + verify)
+- [ ] Frontend: OrderHistoryPage + OrderDetailPage
+- [ ] Admin: OrderListPage + status management + tracking
+- [ ] SMS notification service (Kavenegar)
 
-Files inside a feature subdirectory (`models/`, `services/`, `store/`, `forms/`, `pages/`, `components/`, `pipes/`) do **not** repeat the directory name as a suffix.
+### Phase 5 — Portfolio + Contact (2 days)
+- [ ] Backend: Portfolio CRUD
+- [ ] Admin: PortfolioListPage + PortfolioFormPage
+- [ ] Public: PortfolioPage + PortfolioDetailPage
+- [ ] Public: AboutPage
+- [ ] Public: ContactPage
+- [ ] Admin: MessagesPage
 
-| Directory | Before | After |
-|---|---|---|
-| `models/` | `auth.model.ts` | `auth.ts` |
-| `services/` | `auth.service.ts` | `auth.ts` |
-| `store/` | `auth.store.ts` | `auth.ts` |
-| `forms/` | `login.form.service.ts` | `login.ts` |
-| `pages/` | `login.component.ts` | `login.ts` |
-| `components/` | `password-input.component.ts` | `password-input.ts` |
-| `pipes/` | `translate.pipe.ts` | `translate.ts` |
+### Phase 6 — Admin Dashboard (2 days)
+- [ ] Backend: Dashboard stats endpoint
+- [ ] Frontend: DashboardPage (stats cards, charts, recent orders)
+- [ ] Frontend: CustomerListPage
+- [ ] Frontend: SettingsPage
+- [ ] Admin layout (sidebar + header)
 
-### No `private` keyword — use `#` prefix
+### Phase 7 — Polish + Launch (3 days)
+- [ ] SEO meta tags for all pages (Title, Description, OG tags)
+- [ ] Complete i18n pass (all Persian text verified)
+- [ ] Loading skeletons for all data-fetching pages
+- [ ] Error boundaries: API failure -> inline error + retry button, 404 page, 500 page
+- [ ] Empty states: no products, no orders, no messages, empty cart
+- [ ] Responsive audit (mobile/tablet/desktop)
+- [ ] Image lazy loading, code splitting
+- [ ] Build + deploy
 
-- Never use TypeScript's `private` keyword. Use the native ECMAScript `#` prefix for truly private fields and methods instead.
-- **Angular template bindings can't access `#` fields** — anything referenced in the template MUST be public.
-- **Default to `#`** for everything else: injected services used only in class logic, `FormBuilder`, utility methods, etc.
+**Total estimate: ~24 working days**
 
-### Forms conventions
-
-- **Single property form** → use template-driven `ngModel` (`FormsModule`).
-- **Multiple property form** → use Reactive Forms (`ReactiveFormsModule`, `FormBuilder`, `formControlName`, `FormGroup`).
-
-### TypeScript hygiene rules
-
-- **Use `interface` instead of `type`** for object shapes. Union types (`type X = 'a' | 'b'`) are the only acceptable use of `type`.
-- **`readonly` on all immutable properties**: Add `readonly` to every interface and class property that is assigned once and never mutated.
-- **Remove dead code**: Always remove unused imports, unused variables, unused `const` declarations.
-- **No `any` or `unknown` in interfaces or types**: Never use `any` or `unknown` as a field type in interfaces or type aliases.
-- **Interfaces and types live in `models/` directories only**: Never define `interface` or `type` inside a component, service, pipe, or store file (except store `initialState` type annotations).
-
-## Dark mode conventions
-
-- Tailwind `dark:` classes work globally (generated by Tailwind, not scoped).
-- **Pattern**: Inject `ThemeService`, bind `[class.dark]="theme.isDark()"` on the component's root element.
-- `ThemeService` (signal-based) manages `isDark`, adds/removes `.dark` on `<html>`, persists to `localStorage` key `app-theme`.
-
-## i18n conventions
-
-- Supported languages: English (`en`), Persian/Farsi (`fa`, RTL).
-- Translation files: `src/app/i18n/en.json` and `fa.json`. **Single source of truth**.
-- `LanguageService` loads translations, exposes `translate(key: string)` method, manages `currentLanguage` signal.
-- Components use a thin `t(key)` helper that delegates to `languageService.translate(key)`.
-- To add a new language: create `i18n/<code>.json`, add the language to `LanguageService.languages[]`, and add the `translations` entry.
-
-## State management conventions
-
-| Use case | Tool | Scope |
-|---|---|---|
-| Global state needed by multiple components | `@ngrx/signals` (`signalStore`) | Root-level (`providedIn: 'root'`) |
-| Scoped feature state | `@ngrx/signals` (`signalStore`) | Component-level |
-| Simple UI state (theme, language) | Angular `signal()` in a service | Root-level with `providedIn: 'root'` |
-
-## Component conventions
-
-- Each component is a **single `.ts` file** with inline `template:`.
-- Use `input()`, `input.required()`, and `output()` from `@angular/core`.
-- Components in `shared/components/` must not depend on any feature-specific store, service, or model.
-- Use `@if`/`@for` built-in control flow — never `*ngIf`/`*ngFor`.
-
-## Custom Element Pattern
-
-All shared UI primitives **must** use custom elements (`<app-button>`, `<app-input>`, etc.) — never native HTML elements directly in components.
-
-### Existing Components
-
-- `ButtonComponent` (`src/app/shared/components/button.ts`)
-- `InputComponent` (`src/app/shared/components/input.ts`)
-- `CardComponent` (`src/app/shared/components/card.ts`)
-- `TextareaComponent` (`src/app/shared/components/textarea.ts`)
-- `SelectComponent` (`src/app/shared/components/select.ts`)
-- `FormComponent` (`src/app/shared/components/form.ts`)
-- `ConfirmDialogComponent` (`src/app/shared/components/confirm-dialog.ts`)
-- `ConfirmBottomSheetComponent` (`src/app/shared/components/confirm-bottom-sheet.ts`)
-- `ThemeToggleComponent` (`src/app/shared/components/theme-toggle.ts`)
-- `LanguageToggleComponent` (`src/app/shared/components/language-toggle.ts`)
-
-### Existing Shared Services
-
-- `ThemeService` (`src/app/shared/services/theme.ts`)
-- `LanguageService` (`src/app/shared/services/language.ts`)
-
-### Existing Shared Pipes
-
-- `TranslatePipe` (`src/app/shared/pipes/translate.ts`)
-- `LocalizedDatePipe` (`src/app/shared/pipes/localized-date.ts`) — Dual calendar (Gregorian/Jalali)
-
-### Existing Shared Forms
-
-- `PasswordFormService` (`src/app/shared/forms/password.ts`)
-
-### Existing Shared Constants
-
-- `HTTP_METHODS` (`src/app/shared/const/http-methods.ts`)
-
-### Existing Core Infrastructure
-
-- `authGuard`, `adminGuard` (`src/app/core/guards/auth.guard.ts`)
-- `authInterceptor` (`src/app/core/interceptors/auth.interceptor.ts`)
-
-
+> Full details: Database schema, API endpoints, routes, workflows, i18n keys, and technical decisions are in `PLAN.md`.
