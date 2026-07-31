@@ -12,11 +12,11 @@ export class NotificationService {
 
   readonly notification = this.#notification.asReadonly();
 
-  show(message: string, type: NotificationType = "error"): void {
+  show(type: NotificationType, message: string): void {
     const existing = this.#timer();
     if (existing) clearTimeout(existing);
 
-    this.#notification.set({ message, type });
+    this.#notification.set({ type, message });
 
     this.#timer.set(
       setTimeout(() => {

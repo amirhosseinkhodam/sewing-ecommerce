@@ -1,6 +1,6 @@
 import { Component, inject } from "@angular/core";
 import { RouterLink } from "@angular/router";
-import { LanguageService } from "../../../shared/services/language";
+import { TranslatePipe } from "../../../shared/pipes/translate";
 import { CardComponent } from "../../../shared/components/card";
 import { ButtonComponent } from "../../../shared/components/button";
 import { AuthStore } from "../store/auth";
@@ -8,7 +8,7 @@ import { AuthStore } from "../store/auth";
 @Component({
   selector: "app-profile",
   standalone: true,
-  imports: [RouterLink, CardComponent, ButtonComponent],
+  imports: [RouterLink, CardComponent, ButtonComponent, TranslatePipe],
   template: `
     <div class="max-w-2xl mx-auto px-4 py-8">
       @if (store.user(); as user) {
@@ -35,7 +35,7 @@ import { AuthStore } from "../store/auth";
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div class="p-4 bg-slate-50 dark:bg-slate-800 rounded-lg">
                 <p class="text-xs text-slate-500 dark:text-slate-400">
-                  {{ t("firstName") }}
+                  {{ 'firstName' | translate }}
                 </p>
                 <p
                   class="text-sm font-medium text-slate-900 dark:text-slate-100"
@@ -45,7 +45,7 @@ import { AuthStore } from "../store/auth";
               </div>
               <div class="p-4 bg-slate-50 dark:bg-slate-800 rounded-lg">
                 <p class="text-xs text-slate-500 dark:text-slate-400">
-                  {{ t("lastName") }}
+                  {{ 'lastName' | translate }}
                 </p>
                 <p
                   class="text-sm font-medium text-slate-900 dark:text-slate-100"
@@ -55,7 +55,7 @@ import { AuthStore } from "../store/auth";
               </div>
               <div class="p-4 bg-slate-50 dark:bg-slate-800 rounded-lg">
                 <p class="text-xs text-slate-500 dark:text-slate-400">
-                  {{ t("email") }}
+                  {{ 'email' | translate }}
                 </p>
                 <p
                   class="text-sm font-medium text-slate-900 dark:text-slate-100"
@@ -65,7 +65,7 @@ import { AuthStore } from "../store/auth";
               </div>
               <div class="p-4 bg-slate-50 dark:bg-slate-800 rounded-lg">
                 <p class="text-xs text-slate-500 dark:text-slate-400">
-                  {{ t("phone") }}
+                  {{ 'phone' | translate }}
                 </p>
                 <p
                   class="text-sm font-medium text-slate-900 dark:text-slate-100"
@@ -77,28 +77,28 @@ import { AuthStore } from "../store/auth";
 
             <div class="flex flex-col sm:flex-row gap-3">
               <app-button variant="secondary" routerLink="/orders">
-                {{ t("myOrders") }}
+                {{ 'myOrders' | translate }}
               </app-button>
               <app-button variant="secondary" routerLink="/addresses">
-                {{ t("myAddresses") }}
+                {{ 'myAddresses' | translate }}
               </app-button>
               <app-button variant="destructive" (buttonClick)="store.logout()">
-                {{ t("logout") }}
+                {{ 'logout' | translate }}
               </app-button>
             </div>
           </div>
         </app-card>
       } @else if (store.loading()) {
         <div class="flex items-center justify-center py-20">
-          <p class="text-slate-500 dark:text-slate-400">{{ t("loading") }}</p>
+          <p class="text-slate-500 dark:text-slate-400">{{ 'loading' | translate }}</p>
         </div>
       } @else {
         <div class="flex flex-col items-center justify-center py-20 gap-4">
           <p class="text-slate-500 dark:text-slate-400">
-            {{ t("loginRequired") }}
+            {{ 'loginRequired' | translate }}
           </p>
           <app-button variant="primary" routerLink="/login">
-            {{ t("login") }}
+            {{ 'login' | translate }}
           </app-button>
         </div>
       }
@@ -106,10 +106,5 @@ import { AuthStore } from "../store/auth";
   `,
 })
 export class ProfileComponent {
-  readonly #languageService = inject(LanguageService);
   readonly store = inject(AuthStore);
-
-  t(key: string): string {
-    return this.#languageService.translate(key);
-  }
 }

@@ -1,4 +1,4 @@
-@import '@angular/material/prebuilt-themes/indigo-pink.css';
+@import "@angular/material/prebuilt-themes/indigo-pink.css";
 
 @tailwind base;
 @tailwind components;
@@ -6,10 +6,12 @@
 
 html {
   color-scheme: light;
+  font-family: 'Amiri', Tahoma, Arial, sans-serif;
 }
 
 html.dark {
   color-scheme: dark;
+  font-family: 'Amiri', Tahoma, Arial, sans-serif;
 }
 
 html[dir="rtl"] input,

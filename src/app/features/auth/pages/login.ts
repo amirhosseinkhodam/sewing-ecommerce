@@ -1,7 +1,7 @@
 import { Component, inject } from "@angular/core";
 import { RouterLink } from "@angular/router";
 import { ReactiveFormsModule } from "@angular/forms";
-import { LanguageService } from "../../../shared/services/language";
+import { TranslatePipe } from "../../../shared/pipes/translate";
 import { CardComponent } from "../../../shared/components/card";
 import { ButtonComponent } from "../../../shared/components/button";
 import { InputComponent } from "../../../shared/components/input";
@@ -17,6 +17,7 @@ import { AuthStore } from "../store/auth";
     CardComponent,
     ButtonComponent,
     InputComponent,
+    TranslatePipe,
   ],
   template: `
     <div class="min-h-screen-80 flex items-center justify-center px-4">
@@ -24,7 +25,7 @@ import { AuthStore } from "../store/auth";
         <div class="flex flex-col gap-6">
           <div class="text-center">
             <h1 class="text-2xl font-bold text-slate-900 dark:text-slate-100">
-              {{ t("signInToAccount") }}
+              {{ 'signInToAccount' | translate }}
             </h1>
           </div>
 
@@ -36,16 +37,16 @@ import { AuthStore } from "../store/auth";
             <app-input
               formControlName="email"
               type="email"
-              [label]="t('email')"
-              [placeholder]="t('email')"
+              [label]="'email' | translate"
+              [placeholder]="'email' | translate"
               autocomplete="email"
             />
 
             <app-input
               formControlName="password"
               type="password"
-              [label]="t('password')"
-              [placeholder]="t('password')"
+              [label]="'password' | translate"
+              [placeholder]="'password' | translate"
               autocomplete="current-password"
             />
 
@@ -55,20 +56,20 @@ import { AuthStore } from "../store/auth";
               [disabled]="store.loading()"
             >
               @if (store.loading()) {
-                {{ t("loading") }}
+                {{ 'loading' | translate }}
               } @else {
-                {{ t("login") }}
+                {{ 'login' | translate }}
               }
             </app-button>
           </form>
 
           <div class="text-center text-sm text-slate-500 dark:text-slate-400">
-            {{ t("dontHaveAccount") }}
+            {{ 'dontHaveAccount' | translate }}
             <a
               routerLink="/register"
               class="text-slate-900 dark:text-white font-medium hover:underline"
             >
-              {{ t("register") }}
+              {{ 'register' | translate }}
             </a>
           </div>
         </div>
@@ -77,13 +78,8 @@ import { AuthStore } from "../store/auth";
   `,
 })
 export class LoginComponent {
-  readonly #languageService = inject(LanguageService);
   readonly loginForm = inject(LoginFormService);
   readonly store = inject(AuthStore);
-
-  t(key: string): string {
-    return this.#languageService.translate(key);
-  }
 
   onSubmit(): void {
     if (this.loginForm.form.invalid) return;

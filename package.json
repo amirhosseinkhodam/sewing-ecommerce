@@ -22,6 +22,8 @@
     "@angular/material": "^19.0.0",
     "@angular/platform-browser": "^19.0.0",
     "@angular/router": "^19.0.0",
+    "@hugeicons/angular": "^1.0.10",
+    "@hugeicons/core-free-icons": "^4.2.3",
     "@ng-select/ng-select": "^19.0.0",
     "@ngrx/operators": "^19.2.1",
     "@ngrx/signals": "^19.2.1",

@@ -1,5 +1,7 @@
-import { inject } from "@angular/core";
 import { HttpErrorResponse } from "@angular/common/http";
+import { inject } from "@angular/core";
+import { Router } from "@angular/router";
+import { tapResponse } from "@ngrx/operators";
 import {
   patchState,
   signalStore,
@@ -9,15 +11,13 @@ import {
 } from "@ngrx/signals";
 import { rxMethod } from "@ngrx/signals/rxjs-interop";
 import { pipe, switchMap, tap } from "rxjs";
-import { tapResponse } from "@ngrx/operators";
+import { NotificationService } from "../../../shared/services/notification";
 import {
   AuthPayloadModel,
   AuthUserModel,
   RegisterPayloadModel,
 } from "../models/auth";
 import { AuthService } from "../services/auth";
-import { NotificationService } from "../../../shared/services/notification";
-import { Router } from "@angular/router";
 
 interface AuthState {
   token: string | null;
@@ -65,8 +65,8 @@ export const AuthStore = signalStore(
                 error: (err: HttpErrorResponse) => {
                   patchState(store, { loading: false });
                   notification.show(
-                    err.error?.message ?? "login failed",
                     "error",
+                    err.error?.message ?? "login failed",
                   );
                 },
               }),
@@ -94,8 +94,8 @@ export const AuthStore = signalStore(
                 error: (err: HttpErrorResponse) => {
                   patchState(store, { loading: false });
                   notification.show(
-                    err.error?.message ?? "registration failed",
                     "error",
+                    err.error?.message ?? "registration failed",
                   );
                 },
               }),

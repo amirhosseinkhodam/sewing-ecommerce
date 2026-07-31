@@ -1,7 +1,7 @@
 import { Component, inject } from "@angular/core";
 import { RouterLink } from "@angular/router";
 import { ReactiveFormsModule } from "@angular/forms";
-import { LanguageService } from "../../../shared/services/language";
+import { TranslatePipe } from "../../../shared/pipes/translate";
 import { CardComponent } from "../../../shared/components/card";
 import { ButtonComponent } from "../../../shared/components/button";
 import { InputComponent } from "../../../shared/components/input";
@@ -17,6 +17,7 @@ import { AuthStore } from "../store/auth";
     CardComponent,
     ButtonComponent,
     InputComponent,
+    TranslatePipe,
   ],
   template: `
     <div class="min-h-screen-80 flex items-center justify-center px-4 py-8">
@@ -24,7 +25,7 @@ import { AuthStore } from "../store/auth";
         <div class="flex flex-col gap-6">
           <div class="text-center">
             <h1 class="text-2xl font-bold text-slate-900 dark:text-slate-100">
-              {{ t("createAccount") }}
+              {{ 'createAccount' | translate }}
             </h1>
           </div>
 
@@ -35,7 +36,7 @@ import { AuthStore } from "../store/auth";
             <div
               class="p-3 text-sm text-red-700 dark:text-red-400 bg-red-50 dark:bg-red-900/30 rounded-lg"
             >
-              {{ t("passwordsDoNotMatch") }}
+              {{ 'passwordsDoNotMatch' | translate }}
             </div>
           }
 
@@ -48,46 +49,46 @@ import { AuthStore } from "../store/auth";
               <app-input
                 formControlName="firstName"
                 type="text"
-                [label]="t('firstName')"
-                [placeholder]="t('firstName')"
+                [label]="'firstName' | translate"
+                [placeholder]="'firstName' | translate"
               />
               <app-input
                 formControlName="lastName"
                 type="text"
-                [label]="t('lastName')"
-                [placeholder]="t('lastName')"
+                [label]="'lastName' | translate"
+                [placeholder]="'lastName' | translate"
               />
             </div>
 
             <app-input
               formControlName="email"
               type="email"
-              [label]="t('email')"
-              [placeholder]="t('email')"
+              [label]="'email' | translate"
+              [placeholder]="'email' | translate"
               autocomplete="email"
             />
 
             <app-input
               formControlName="phone"
               type="text"
-              [label]="t('phone')"
-              [placeholder]="t('phone')"
+              [label]="'phone' | translate"
+              [placeholder]="'phone' | translate"
               autocomplete="tel"
             />
 
             <app-input
               formControlName="password"
               type="password"
-              [label]="t('password')"
-              [placeholder]="t('password')"
+              [label]="'password' | translate"
+              [placeholder]="'password' | translate"
               autocomplete="new-password"
             />
 
             <app-input
               formControlName="confirmPassword"
               type="password"
-              [label]="t('confirmPassword')"
-              [placeholder]="t('confirmPassword')"
+              [label]="'confirmPassword' | translate"
+              [placeholder]="'confirmPassword' | translate"
               autocomplete="new-password"
             />
 
@@ -97,20 +98,20 @@ import { AuthStore } from "../store/auth";
               [disabled]="store.loading()"
             >
               @if (store.loading()) {
-                {{ t("loading") }}
+                {{ 'loading' | translate }}
               } @else {
-                {{ t("register") }}
+                {{ 'register' | translate }}
               }
             </app-button>
           </form>
 
           <div class="text-center text-sm text-slate-500 dark:text-slate-400">
-            {{ t("alreadyHaveAccount") }}
+            {{ 'alreadyHaveAccount' | translate }}
             <a
               routerLink="/login"
               class="text-slate-900 dark:text-white font-medium hover:underline"
             >
-              {{ t("login") }}
+              {{ 'login' | translate }}
             </a>
           </div>
         </div>
@@ -119,13 +120,8 @@ import { AuthStore } from "../store/auth";
   `,
 })
 export class RegisterComponent {
-  readonly #languageService = inject(LanguageService);
   readonly registerForm = inject(RegisterFormService);
   readonly store = inject(AuthStore);
-
-  t(key: string): string {
-    return this.#languageService.translate(key);
-  }
 
   onSubmit(): void {
     if (this.registerForm.form.invalid) return;

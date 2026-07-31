@@ -1,6 +1,13 @@
 import { Component, inject, signal } from "@angular/core";
+import { NgClass } from "@angular/common";
 import { RouterLink } from "@angular/router";
-import { LanguageService } from "../services/language";
+import { HugeiconsIconComponent } from "@hugeicons/angular";
+import {
+  ShoppingCart01Icon,
+  Cancel01Icon,
+  Menu01Icon,
+} from "@hugeicons/core-free-icons";
+import { TranslatePipe } from "../pipes/translate";
 import { ThemeToggleComponent } from "./theme-toggle";
 import { LanguageToggleComponent } from "./language-toggle";
 import { AuthStore } from "../../features/auth/store/auth";
@@ -8,7 +15,14 @@ import { AuthStore } from "../../features/auth/store/auth";
 @Component({
   selector: "app-navbar",
   standalone: true,
-  imports: [RouterLink, ThemeToggleComponent, LanguageToggleComponent],
+  imports: [
+    NgClass,
+    RouterLink,
+    HugeiconsIconComponent,
+    TranslatePipe,
+    ThemeToggleComponent,
+    LanguageToggleComponent,
+  ],
   template: `
     <nav
       class="sticky top-0 z-50 bg-white/80 dark:bg-slate-900/80 backdrop-blur-lg border-b border-slate-200 dark:border-slate-800"
@@ -20,7 +34,7 @@ import { AuthStore } from "../../features/auth/store/auth";
               routerLink="/"
               class="text-xl font-bold text-slate-900 dark:text-white"
             >
-              {{ t("appName") }}
+              {{ 'appName' | translate }}
             </a>
 
             <div class="hidden md:flex items-center gap-6">
@@ -28,25 +42,25 @@ import { AuthStore } from "../../features/auth/store/auth";
                 routerLink="/products"
                 class="text-sm font-medium text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white transition-colors"
               >
-                {{ t("products") }}
+                {{ 'products' | translate }}
               </a>
               <a
                 routerLink="/portfolio"
                 class="text-sm font-medium text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white transition-colors"
               >
-                {{ t("portfolio") }}
+                {{ 'portfolio' | translate }}
               </a>
               <a
                 routerLink="/about"
                 class="text-sm font-medium text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white transition-colors"
               >
-                {{ t("about") }}
+                {{ 'about' | translate }}
               </a>
               <a
                 routerLink="/contact"
                 class="text-sm font-medium text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white transition-colors"
               >
-                {{ t("contact") }}
+                {{ 'contact' | translate }}
               </a>
             </div>
           </div>
@@ -58,22 +72,14 @@ import { AuthStore } from "../../features/auth/store/auth";
             <a
               routerLink="/cart"
               class="relative p-2 text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white transition-colors"
-              [attr.aria-label]="t('cart')"
+              [attr.aria-label]="'cart' | translate"
             >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                class="h-6 w-6"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-                stroke-width="2"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"
-                />
-              </svg>
+              <hugeicons-icon
+                [icon]="icons.ShoppingCart01Icon"
+                [size]="24"
+                color="currentColor"
+                [strokeWidth]="1.5"
+              />
               @if (store.isLoggedIn() && cartCount() > 0) {
                 <span
                   class="absolute -top-1 -right-1 flex items-center justify-center w-5 h-5 text-xs font-bold text-white bg-red-500 rounded-full"
@@ -122,20 +128,20 @@ import { AuthStore } from "../../features/auth/store/auth";
                       routerLink="/profile"
                       class="block px-4 py-2 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors"
                     >
-                      {{ t("profile") }}
+                      {{ 'profile' | translate }}
                     </a>
                     <a
                       routerLink="/orders"
                       class="block px-4 py-2 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors"
                     >
-                      {{ t("orders") }}
+                      {{ 'orders' | translate }}
                     </a>
                     @if (store.isAdmin()) {
                       <a
                         routerLink="/admin"
                         class="block px-4 py-2 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors"
                       >
-                        {{ t("admin") }}
+                        {{ 'admin' | translate }}
                       </a>
                     }
                     <hr class="my-1 border-slate-200 dark:border-slate-700" />
@@ -144,7 +150,7 @@ import { AuthStore } from "../../features/auth/store/auth";
                       class="w-full text-left px-4 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors"
                       (click)="store.logout()"
                     >
-                      {{ t("logout") }}
+                      {{ 'logout' | translate }}
                     </button>
                   </div>
                 }
@@ -154,13 +160,13 @@ import { AuthStore } from "../../features/auth/store/auth";
                 routerLink="/login"
                 class="hidden md:inline-flex items-center px-4 py-2 text-sm font-medium text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white transition-colors"
               >
-                {{ t("login") }}
+                {{ 'login' | translate }}
               </a>
               <a
                 routerLink="/register"
                 class="hidden md:inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-slate-900 dark:bg-slate-600 rounded-lg hover:bg-slate-800 dark:hover:bg-slate-500 transition-colors"
               >
-                {{ t("register") }}
+                {{ 'register' | translate }}
               </a>
             }
 
@@ -171,138 +177,126 @@ import { AuthStore } from "../../features/auth/store/auth";
               [attr.aria-label]="mobileMenuOpen() ? 'Close menu' : 'Open menu'"
             >
               @if (mobileMenuOpen()) {
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  class="h-6 w-6"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                  stroke-width="2"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    d="M6 18L18 6M6 6l12 12"
-                  />
-                </svg>
+                <hugeicons-icon
+                  [icon]="icons.Cancel01Icon"
+                  [size]="24"
+                  color="currentColor"
+                  [strokeWidth]="1.5"
+                />
               } @else {
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  class="h-6 w-6"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                  stroke-width="2"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    d="M4 6h16M4 12h16M4 18h16"
-                  />
-                </svg>
+                <hugeicons-icon
+                  [icon]="icons.Menu01Icon"
+                  [size]="24"
+                  color="currentColor"
+                  [strokeWidth]="1.5"
+                />
               }
             </button>
           </div>
         </div>
 
-        @if (mobileMenuOpen()) {
-          <div
-            class="md:hidden pb-4 border-t border-slate-200 dark:border-slate-700"
-          >
-            <div class="flex flex-col gap-1 pt-3">
-              <a
-                routerLink="/products"
-                class="px-3 py-2 text-sm font-medium text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors"
-                (click)="mobileMenuOpen.set(false)"
+        <div
+          class="md:hidden absolute top-16 inset-x-0 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-700 shadow-lg z-40 origin-top transition-all duration-300 ease-in-out"
+          [ngClass]="
+            mobileMenuOpen()
+              ? 'opacity-100 scale-y-100 pointer-events-auto'
+              : 'opacity-0 scale-y-0 pointer-events-none'
+          "
+        >
+          <div class="flex flex-col gap-1 py-3 px-4">
+            <a
+              routerLink="/products"
+              class="px-3 py-2 text-sm font-medium text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors"
+              (click)="mobileMenuOpen.set(false)"
+            >
+              {{ 'products' | translate }}
+            </a>
+            <a
+              routerLink="/portfolio"
+              class="px-3 py-2 text-sm font-medium text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors"
+              (click)="mobileMenuOpen.set(false)"
+            >
+              {{ 'portfolio' | translate }}
+            </a>
+            <a
+              routerLink="/about"
+              class="px-3 py-2 text-sm font-medium text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors"
+              (click)="mobileMenuOpen.set(false)"
+            >
+              {{ 'about' | translate }}
+            </a>
+            <a
+              routerLink="/contact"
+              class="px-3 py-2 text-sm font-medium text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors"
+              (click)="mobileMenuOpen.set(false)"
+            >
+              {{ 'contact' | translate }}
+            </a>
+            @if (!store.isLoggedIn()) {
+              <div
+                class="border-t border-slate-200 dark:border-slate-700 mt-2 pt-2"
               >
-                {{ t("products") }}
-              </a>
-              <a
-                routerLink="/portfolio"
-                class="px-3 py-2 text-sm font-medium text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors"
-                (click)="mobileMenuOpen.set(false)"
-              >
-                {{ t("portfolio") }}
-              </a>
-              <a
-                routerLink="/about"
-                class="px-3 py-2 text-sm font-medium text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors"
-                (click)="mobileMenuOpen.set(false)"
-              >
-                {{ t("about") }}
-              </a>
-              <a
-                routerLink="/contact"
-                class="px-3 py-2 text-sm font-medium text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors"
-                (click)="mobileMenuOpen.set(false)"
-              >
-                {{ t("contact") }}
-              </a>
-              @if (!store.isLoggedIn()) {
-                <div
-                  class="border-t border-slate-200 dark:border-slate-700 mt-2 pt-2"
+                <a
+                  routerLink="/login"
+                  class="block px-3 py-2 text-sm font-medium text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors"
+                  (click)="mobileMenuOpen.set(false)"
                 >
-                  <a
-                    routerLink="/login"
-                    class="block px-3 py-2 text-sm font-medium text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors"
-                    (click)="mobileMenuOpen.set(false)"
-                  >
-                    {{ t("login") }}
-                  </a>
-                  <a
-                    routerLink="/register"
-                    class="block px-3 py-2 text-sm font-medium text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors"
-                    (click)="mobileMenuOpen.set(false)"
-                  >
-                    {{ t("register") }}
-                  </a>
-                </div>
-              } @else {
-                <div
-                  class="border-t border-slate-200 dark:border-slate-700 mt-2 pt-2"
+                  {{ 'login' | translate }}
+                </a>
+                <a
+                  routerLink="/register"
+                  class="block px-3 py-2 text-sm font-medium text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors"
+                  (click)="mobileMenuOpen.set(false)"
                 >
+                  {{ 'register' | translate }}
+                </a>
+              </div>
+            } @else {
+              <div
+                class="border-t border-slate-200 dark:border-slate-700 mt-2 pt-2"
+              >
+                <a
+                  routerLink="/profile"
+                  class="block px-3 py-2 text-sm font-medium text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors"
+                  (click)="mobileMenuOpen.set(false)"
+                >
+                  {{ 'profile' | translate }}
+                </a>
+                <a
+                  routerLink="/orders"
+                  class="block px-3 py-2 text-sm font-medium text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors"
+                  (click)="mobileMenuOpen.set(false)"
+                >
+                  {{ 'orders' | translate }}
+                </a>
+                @if (store.isAdmin()) {
                   <a
-                    routerLink="/profile"
+                    routerLink="/admin"
                     class="block px-3 py-2 text-sm font-medium text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors"
                     (click)="mobileMenuOpen.set(false)"
                   >
-                    {{ t("profile") }}
+                    {{ 'admin' | translate }}
                   </a>
-                  <a
-                    routerLink="/orders"
-                    class="block px-3 py-2 text-sm font-medium text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors"
-                    (click)="mobileMenuOpen.set(false)"
-                  >
-                    {{ t("orders") }}
-                  </a>
-                  @if (store.isAdmin()) {
-                    <a
-                      routerLink="/admin"
-                      class="block px-3 py-2 text-sm font-medium text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors"
-                      (click)="mobileMenuOpen.set(false)"
-                    >
-                      {{ t("admin") }}
-                    </a>
-                  }
-                  <button
-                    type="button"
-                    class="w-full text-left px-3 py-2 text-sm font-medium text-red-600 dark:text-red-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors"
-                    (click)="mobileMenuOpen.set(false); store.logout()"
-                  >
-                    {{ t("logout") }}
-                  </button>
-                </div>
-              }
-            </div>
+                }
+                <button
+                  type="button"
+                  class="w-full text-left px-3 py-2 text-sm font-medium text-red-600 dark:text-red-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors"
+                  (click)="mobileMenuOpen.set(false); store.logout()"
+                >
+                  {{ 'logout' | translate }}
+                </button>
+              </div>
+            }
           </div>
-        }
+        </div>
       </div>
     </nav>
   `,
 })
 export class NavbarComponent {
-  readonly #languageService = inject(LanguageService);
   readonly store = inject(AuthStore);
+
+  readonly icons = { ShoppingCart01Icon, Cancel01Icon, Menu01Icon };
 
   readonly mobileMenuOpen = signal(false);
   readonly profileDropdownOpen = signal(false);
@@ -313,8 +307,4 @@ export class NavbarComponent {
     if (!user) return "";
     return `${user.firstName[0]}${user.lastName[0]}`;
   };
-
-  t(key: string): string {
-    return this.#languageService.translate(key);
-  }
 }

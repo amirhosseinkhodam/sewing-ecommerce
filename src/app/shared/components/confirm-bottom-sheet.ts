@@ -3,26 +3,26 @@ import {
   MatBottomSheetModule,
   MatBottomSheetRef,
 } from "@angular/material/bottom-sheet";
-import { LanguageService } from "../services/language";
+import { TranslatePipe } from "../pipes/translate";
 import { ButtonComponent } from "./button";
 
 @Component({
   selector: "app-confirm-bottom-sheet",
   standalone: true,
-  imports: [MatBottomSheetModule, ButtonComponent],
+  imports: [MatBottomSheetModule, ButtonComponent, TranslatePipe],
   template: `
     <h3 class="mat-body-large mb-2 font-bold">
-      {{ t("confirm") }}
+      {{ 'confirm' | translate }}
     </h3>
     <p class="mat-body-medium text-slate-500 dark:text-slate-400 mb-4">
-      {{ t("confirm") }}
+      {{ 'confirm' | translate }}
     </p>
     <div class="flex gap-2 justify-end">
       <app-button variant="primary" (buttonClick)="onCancel()">
-        {{ t("cancel") }}
+        {{ 'cancel' | translate }}
       </app-button>
       <app-button variant="mat-raised" color="warn" (buttonClick)="onConfirm()">
-        {{ t("delete") }}
+        {{ 'delete' | translate }}
       </app-button>
     </div>
   `,
@@ -31,11 +31,6 @@ export class ConfirmBottomSheetComponent {
   readonly #bottomSheetRef = inject(
     MatBottomSheetRef<ConfirmBottomSheetComponent>,
   );
-  readonly #languageService = inject(LanguageService);
-
-  t(key: string): string {
-    return this.#languageService.translate(key);
-  }
 
   onConfirm(): void {
     this.#bottomSheetRef.dismiss(true);

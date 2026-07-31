@@ -24,6 +24,9 @@ module.exports = {
       height: {
         '98': '24.5rem',
       },
+      fontFamily: {
+        amiri: ['Amiri', 'Tahoma', 'Arial', 'sans-serif'],
+      },
     },
   },
   plugins: [require('tailwindcss-rtl')],

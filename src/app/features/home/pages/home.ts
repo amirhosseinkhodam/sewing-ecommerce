@@ -1,10 +1,9 @@
-import { Component, inject } from "@angular/core";
-import { LanguageService } from "../../../shared/services/language";
-
-import { CardComponent } from "../../../shared/components/card";
+import { Component } from "@angular/core";
 import { ButtonComponent } from "../../../shared/components/button";
-import { ThemeToggleComponent } from "../../../shared/components/theme-toggle";
+import { CardComponent } from "../../../shared/components/card";
 import { LanguageToggleComponent } from "../../../shared/components/language-toggle";
+import { ThemeToggleComponent } from "../../../shared/components/theme-toggle";
+import { TranslatePipe } from "../../../shared/pipes/translate";
 
 @Component({
   selector: "app-home",
@@ -14,6 +13,7 @@ import { LanguageToggleComponent } from "../../../shared/components/language-tog
     ButtonComponent,
     ThemeToggleComponent,
     LanguageToggleComponent,
+    TranslatePipe,
   ],
   template: `
     <div class="min-h-screen flex items-center justify-center p-6">
@@ -26,7 +26,7 @@ import { LanguageToggleComponent } from "../../../shared/components/language-tog
 
           <div class="text-center">
             <h1 class="text-2xl font-bold text-slate-900 dark:text-slate-100">
-              {{ t("appName") }}
+              {{ 'appName' | translate }}
             </h1>
             <p class="mt-2 text-sm text-slate-500 dark:text-slate-400">
               Angular 19 + Tailwind + i18n + Dark Mode
@@ -35,10 +35,10 @@ import { LanguageToggleComponent } from "../../../shared/components/language-tog
 
           <div class="flex gap-3">
             <app-button variant="primary" (buttonClick)="onGetStarted()">
-              {{ t("home") }}
+              {{ 'home' | translate }}
             </app-button>
             <app-button variant="secondary" (buttonClick)="onSettings()">
-              {{ t("settings") }}
+              {{ 'settings' | translate }}
             </app-button>
           </div>
         </div>
@@ -47,12 +47,6 @@ import { LanguageToggleComponent } from "../../../shared/components/language-tog
   `,
 })
 export class HomeComponent {
-  readonly #languageService = inject(LanguageService);
-
-  t(key: string): string {
-    return this.#languageService.translate(key);
-  }
-
   onGetStarted(): void {
     // Add your navigation or logic here
   }
