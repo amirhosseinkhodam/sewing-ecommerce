@@ -403,21 +403,21 @@ Only admin can change status. (Phase 8: SMS sent to customer on each transition.
 
 ## 8. Implementation Phases
 
-### Phase 0 — Backend Foundation (3 days)
-- [ ] Initialize NestJS project with Prisma + PostgreSQL
-- [ ] Define all Prisma models + run migrations + seed
-- [ ] Auth module: JWT, bcrypt, Passport strategies
-- [ ] File upload module (Multer)
-- [ ] Global guards, filters, pipes
-- [ ] Swagger/OpenAPI docs
+### Phase 0 — Backend Foundation (3 days) — **DONE**
+- [x] Initialize NestJS project with Prisma + PostgreSQL
+- [x] Define all Prisma models + run migrations + seed
+- [x] Auth module: JWT, bcrypt, Passport strategies
+- [x] File upload module (Multer)
+- [x] Global guards, filters, pipes
+- [x] Swagger/OpenAPI docs
 
-### Phase 1 — Auth Frontend + Layout (3 days)
-- [ ] Shared layout: Navbar (logo, nav links, cart badge, login/profile dropdown), Footer
-- [ ] LoginPage + RegisterPage
-- [ ] AuthStore (SignalStore, `providedIn: 'root'`)
-- [ ] AuthGuard + AdminGuard
-- [ ] AuthInterceptor (attach JWT + handle 401)
-- [ ] ProfilePage
+### Phase 1 — Auth Frontend + Layout (3 days) — **DONE**
+- [x] Shared layout: Navbar (logo, nav links, cart badge, login/profile dropdown), Footer
+- [x] LoginPage + RegisterPage
+- [x] AuthStore (SignalStore, `providedIn: 'root'`)
+- [x] AuthGuard + AdminGuard
+- [x] AuthInterceptor (attach JWT + handle 401)
+- [x] ProfilePage
 
 ### Phase 2 — Products + Categories (4 days)
 - [ ] Backend: Category CRUD

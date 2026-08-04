@@ -1,0 +1,202 @@
+generator client {
+  provider     = "prisma-client"
+  output       = "../src/generated/prisma"
+  runtime      = "nodejs"
+  moduleFormat = "cjs"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum Role {
+  CUSTOMER
+  ADMIN
+}
+
+enum OrderStatus {
+  PENDING
+  CONFIRMED
+  PROCESSING
+  SHIPPED
+  DELIVERED
+  CANCELLED
+}
+
+enum PaymentStatus {
+  PENDING
+  PAID
+  FAILED
+  REFUNDED
+}
+
+enum ShippingMethod {
+  POST
+  COURIER
+}
+
+enum PaymentMethod {
+  ZARINPAL
+  CARD_TO_CARD
+}
+
+model User {
+  id        String   @id @default(uuid())
+  firstName String
+  lastName  String
+  email     String   @unique
+  phone     String   @unique
+  password  String
+  role      Role     @default(CUSTOMER)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  addresses Address[]
+  orders    Order[]
+  cart      Cart?
+}
+
+model Category {
+  id          String   @id @default(uuid())
+  name        String
+  slug        String   @unique
+  description String?
+  image       String?
+  sortOrder   Int      @default(0)
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  products  Product[]
+  portfolio Portfolio[]
+}
+
+model Product {
+  id          String   @id @default(uuid())
+  name        String
+  slug        String   @unique
+  description String?
+  price       Decimal
+  fabric      String?
+  images      Json
+  categoryId  String
+  isActive    Boolean  @default(true)
+  isFeatured  Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  category  Category       @relation(fields: [categoryId], references: [id])
+  variants  ProductVariant[]
+  cartItems CartItem[]
+}
+
+model ProductVariant {
+  id        String   @id @default(uuid())
+  productId String
+  size      String
+  stock     Int      @default(0)
+  price     Decimal?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  product   Product    @relation(fields: [productId], references: [id])
+  cartItems CartItem[]
+}
+
+model Portfolio {
+  id          String   @id @default(uuid())
+  title       String
+  slug        String   @unique
+  description String?
+  images      Json
+  categoryId  String?
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  category Category? @relation(fields: [categoryId], references: [id])
+}
+
+model Cart {
+  id        String   @id @default(uuid())
+  userId    String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user  User       @relation(fields: [userId], references: [id])
+  items CartItem[]
+}
+
+model CartItem {
+  id        String   @id @default(uuid())
+  cartId    String
+  productId String
+  variantId String
+  quantity  Int      @default(1)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  cart     Cart           @relation(fields: [cartId], references: [id], onDelete: Cascade)
+  product  Product        @relation(fields: [productId], references: [id])
+  variant  ProductVariant @relation(fields: [variantId], references: [id])
+}
+
+model Address {
+  id          String   @id @default(uuid())
+  userId      String
+  label       String
+  province    String
+  city        String
+  fullAddress String
+  postalCode  String?
+  phone       String
+  isDefault   Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id])
+}
+
+model Order {
+  id                String          @id @default(uuid())
+  userId            String
+  totalAmount       Decimal
+  status            OrderStatus     @default(PENDING)
+  shippingMethod    ShippingMethod
+  shippingAddressId String
+  paymentMethod     PaymentMethod   @default(CARD_TO_CARD)
+  paymentStatus     PaymentStatus   @default(PENDING)
+  zarinpalAuthority String?
+  trackingCode      String?
+  notes             String?
+  createdAt         DateTime        @default(now())
+  updatedAt         DateTime        @updatedAt
+
+  user  User        @relation(fields: [userId], references: [id])
+  items OrderItem[]
+}
+
+model OrderItem {
+  id           String @id @default(uuid())
+  orderId      String
+  productId    String
+  productName  String
+  productImage String?
+  size         String
+  quantity     Int
+  unitPrice    Decimal
+  totalPrice   Decimal
+
+  order Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
+}
+
+model ContactMessage {
+  id        String   @id @default(uuid())
+  name      String
+  email     String
+  phone     String?
+  message   String
+  isRead    Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}

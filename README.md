@@ -1,108 +1,71 @@
-# Angular Base Template
+# Tailor Ecommerce
 
-A pre-built Angular 19 starter with dark/light mode, i18n (English + Persian), custom element library, Tailwind CSS, and testing — ready to clone and go.
+Persian-first, mobile-responsive tailor shop ecommerce website with guest browsing, customer cart/checkout, and an admin panel for full management. Card-to-card payment (Zarinpal in Phase 8) and SMS notifications (Phase 8) planned.
+
+## Stack
+
+| Layer | Technology |
+|---|---|
+| Frontend | Angular 19 standalone + Tailwind CSS + NgRx SignalStore |
+| Backend | NestJS + Prisma + PostgreSQL (in `backend/`) |
+| Auth | JWT (access + refresh) |
+| Styling | Tailwind CSS + tailwindcss-rtl (RTL ready) |
+| Testing | Jest |
 
 ## Quick Start
 
 ```bash
-# Clone the template
-git clone <repo-url> my-new-project
-cd my-new-project
-
-# Install dependencies
-npm install
-
-# Start dev server
-npm start
-
-# Run tests
-npm test
-
-# Build for production
-npm run build
+npm install            # frontend deps
+npm run dev            # both servers: frontend on localhost:4200 + backend on localhost:3000
 ```
 
-## What's Included
+Backend requires Node 22 (see `.nvmrc`) and a running PostgreSQL with a `sewing_ecommerce` database. First-time setup:
 
-| Feature | Status |
+```bash
+cd backend
+npm install
+npm run prisma:migrate && npm run prisma:seed
+npm run start:dev      # API on localhost:3000, Swagger at /docs
+```
+
+`npm run dev` proxies `/api` and `/uploads` from the Angular dev server to `localhost:3000`.
+
+## Available Scripts
+
+| Command | Action |
 |---|---|
-| Angular 19 standalone components | Done |
-| Dark/light mode (ThemeService) | Done |
-| i18n — English + Persian (LanguageService) | Done |
-| RTL support (tailwindcss-rtl) | Done |
-| Custom element library (10 components) | Done |
-| Design tokens (Tailwind config) | Done |
-| Jest testing setup | Done |
-| ESLint + Prettier | Done |
-| RxJS + @ngrx/signals | Done |
-| Angular Material (dialogs, bottom sheets) | Done |
-| @ng-select (searchable dropdowns) | Done |
+| `npm start` | Frontend dev server on `localhost:4200` |
+| `npm run start:backend` | Backend dev server (`backend/`) on `localhost:3000` |
+| `npm run dev` | Run frontend + backend together (concurrently) |
+| `npm run build` | Production build |
+| `npm run lint` | ESLint — checks `src/**/*.ts`, `tests/**/*.ts` |
+| `npm run format` | Prettier — writes `src`, `tests` |
+| `npm test` | Run all tests |
+| `npm run test:watch` | Watch mode |
+| `npm run test:cov` | Coverage report |
 
-## Custom Components
-
-| Component | Selector | Description |
-|---|---|---|
-| ButtonComponent | `<app-button>` | Multi-variant button (primary, secondary, destructive, ghost, mat-*) |
-| InputComponent | `<app-input>` | Text input with label, error states, CVA |
-| SelectComponent | `<app-select>` | Searchable dropdown via @ng-select |
-| TextareaComponent | `<app-textarea>` | Multi-line input with label |
-| CardComponent | `<app-card>` | Content container with shadow/border variants |
-| FormComponent | `<app-form>` | Reactive form wrapper with layout variants |
-| ConfirmDialogComponent | `<app-confirm-dialog>` | Material dialog for confirmations |
-| ConfirmBottomSheetComponent | `<app-confirm-bottom-sheet>` | Mobile-friendly bottom sheet |
-| ThemeToggleComponent | `<app-theme-toggle>` | Animated dark/light toggle |
-| LanguageToggleComponent | `<app-language-toggle>` | Language switcher |
+Test files live in `tests/`, mirroring the `src/` directory structure. They import source files via relative paths.
 
 ## Project Structure
 
 ```
-src/
-├── main.ts                          # Bootstrap
-├── styles.scss                      # Tailwind + Material + ng-select
-├── app/
-│   ├── app.ts                       # Root component
-│   ├── main.route.ts                # Routes
-│   ├── i18n/                        # Translation files
-│   ├── core/
-│   │   ├── services/               # ApiService (HTTP wrapper)
-│   │   ├── guards/                 # authGuard, adminGuard
-│   │   └── interceptors/           # authInterceptor
-│   ├── shared/
-│   │   ├── components/              # 10 reusable UI components
-│   │   ├── services/                # ThemeService, LanguageService
-│   │   ├── pipes/                   # TranslatePipe, LocalizedDatePipe
-│   │   ├── forms/                   # PasswordFormService
-│   │   ├── const/                   # HTTP_METHODS
-│   │   └── models/                  # Shared types
-│   └── features/
-│       └── home/pages/              # Example page
-tests/
-└── app/shared/
-    ├── services/                    # Theme + Language tests
-    └── pipes/                       # Translate pipe tests
+src/app/
+├── main.ts / app.ts / main.route.ts
+├── core/                 # Guards, interceptors, API service
+├── features/             # Feature modules (auth, home, ...)
+│   ├── <feature>/pages/  # Routed page components
+│   ├── <feature>/store/  # SignalStore state
+│   ├── <feature>/forms/  # Reactive form services
+│   ├── <feature>/models/ # Feature models/interfaces
+│   └── <feature>/services/
+├── i18n/                 # en.json + fa.json (Persian RTL)
+└── shared/               # Custom element library, pipes, services
+backend/                  # NestJS + Prisma backend
 ```
 
-## Commands
+## Current Progress
 
-| Command | Action |
-|---|---|
-| `npm start` | Dev server on localhost:4200 |
-| `npm test` | Run all tests |
-| `npm run test:watch` | Watch mode |
-| `npm run test:cov` | Coverage report |
-| `npm run build` | Production build |
-| `npm run lint` | Lint + fix |
-| `npm run format` | Format with Prettier |
+- **Phase 0 — Backend Foundation**: in progress (`backend/`)
+- **Phase 1 — Auth Frontend + Layout**: done (login, register, profile, guards, interceptor, navbar/footer, AuthStore)
 
-## Adding a New Feature
-
-1. Create `src/app/features/<name>/pages/<name>.ts` for the page component
-2. Create `src/app/features/<name>/models/<name>.ts` for types
-3. Create `src/app/features/<name>/store/<name>.ts` for SignalStore (if needed)
-4. Create `src/app/features/<name>/forms/<name>.form.service.ts` for forms (if needed)
-5. Add route in `src/app/main.route.ts`
-6. Add translation keys in `src/app/i18n/en.json` and `fa.json`
-
-## License
-
-UNLICENSED
+Full roadmap, database schema, API endpoints, and implementation phases: see `PLAN.md`.
