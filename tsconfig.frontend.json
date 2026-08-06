@@ -1,7 +1,8 @@
 {
   "extends": "./tsconfig.json",
+  "compileOnSave": false,
   "compilerOptions": {
-    "outDir": "./out-tsc/app",
+    "outDir": "./dist/out-tsc",
     "strict": true,
     "noImplicitOverride": true,
     "noPropertyAccessFromIndexSignature": true,
@@ -13,7 +14,8 @@
     "importHelpers": true,
     "module": "ES2022",
     "lib": ["ES2022", "dom"],
-    "types": []
-  },
-  "files": ["src/main.ts"]
+    "paths": {
+      "@shared/*": ["shared/*"]
+    }
+  }
 }

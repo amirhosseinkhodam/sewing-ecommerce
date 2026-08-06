@@ -181,7 +181,7 @@ Admin (admin role)
 ## 5. Frontend Feature Tree
 
 ```
-src/app/
+frontend/src/app/
 ├── main.ts / app.ts / main.route.ts
 │
 ├── core/
@@ -545,7 +545,6 @@ Breadcrumbs: `home, products, portfolio, about, contact, cart, checkout, orders,
 | State management | SignalStore for Auth only | Everything else fetched via API service |
 | Responsive | Tailwind sm/md/lg breakpoints | Mobile-first design |
 | RTL | tailwindcss-rtl plugin | Already configured |
-| Testing | Jest (frontend + backend) | Same framework both sides |
 
 ---
 
@@ -574,7 +573,7 @@ Breadcrumbs: `home, products, portfolio, about, contact, cart, checkout, orders,
 
 **Week 5**
 - Day 1-2: i18n complete pass, SEO meta tags, error/loading/empty states
-- Day 3: Testing critical paths (checkout, admin CRUD)
+- Day 3: Manual QA pass of critical paths (checkout, admin CRUD)
 - Day 4: Build + deploy
 
 **Week 6**

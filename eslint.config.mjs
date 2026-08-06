@@ -5,16 +5,20 @@ import globals from 'globals';
 import tseslint from 'typescript-eslint';
 
 export default tseslint.config(
-  { ignores: ['eslint.config.mjs'] },
+  { ignores: ['eslint.config.mjs', 'frontend/**', 'backend/src/generated/**'] },
   eslint.configs.recommended,
   ...tseslint.configs.recommended,
   eslintPluginPrettierRecommended,
-  // Frontend: ES modules + browser globals
+  // Backend: type-checked rules + Node.js globals
+  ...tseslint.configs.recommendedTypeChecked.map((config) => ({
+    ...config,
+    files: ['backend/src/**/*.ts', 'backend/prisma/**/*.ts'],
+  })),
   {
-    files: ['src/**/*.ts', 'tests/**/*.ts'],
+    files: ['backend/src/**/*.ts', 'backend/prisma/**/*.ts'],
     languageOptions: {
-      globals: { ...globals.browser },
-      sourceType: 'module',
+      globals: { ...globals.node },
+      sourceType: 'commonjs',
       parserOptions: {
         projectService: true,
         tsconfigRootDir: import.meta.dirname,
@@ -30,10 +34,9 @@ export default tseslint.config(
       '@typescript-eslint/no-unsafe-call': 'off',
       '@typescript-eslint/no-unsafe-member-access': 'off',
       '@typescript-eslint/no-unsafe-assignment': 'off',
+      '@typescript-eslint/no-unsafe-return': 'warn',
       'prettier/prettier': ['error', { endOfLine: 'auto' }],
-      // DRY: Ban duplicate imports from the same module
       'no-duplicate-imports': 'error',
-      // Ban `private` keyword — use `#` prefix instead
       'no-restricted-syntax': [
         'error',
         {
@@ -52,10 +55,8 @@ export default tseslint.config(
             'Use a # class field + parameter assignment instead of a constructor private parameter.',
         },
       ],
-      // Enforce immutable patterns
       'prefer-const': 'error',
       'no-var': 'error',
-      // Prevent duplicate variable/function names in same scope
       'no-shadow': 'off',
       '@typescript-eslint/no-shadow': 'warn',
     },

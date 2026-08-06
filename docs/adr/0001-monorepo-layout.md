@@ -1,6 +1,6 @@
 # ADR-0001 — Backend lives in the same repository
 
-**Status:** accepted
+**Status:** superseded by ADR-0005
 
 ## Context
 

@@ -1,4 +1,4 @@
-import { Component, inject } from "@angular/core";
+import { Component } from "@angular/core";
 import { RouterLink } from "@angular/router";
 import { HugeiconsIconComponent } from "@hugeicons/angular";
 import { MapPinIcon, TelephoneIcon } from "@hugeicons/core-free-icons";

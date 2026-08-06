@@ -20,10 +20,6 @@ lerna-debug.log*
 # OS
 .DS_Store
 
-# Tests
-/coverage
-/.nyc_output
-
 # IDEs and editors
 /.idea
 .project
@@ -69,6 +65,7 @@ pnpm-lock.yaml
 # Build artifacts
 *.min.js
 dist-esbuild
-coverage/
-.nyc_output/
 *.map
+
+# Generated Prisma client
+/backend/src/generated

@@ -11,30 +11,25 @@ Persian-first, mobile-responsive tailor shop ecommerce website with guest browsi
 | Command | Action |
 |---|---|
 | `npm start` | Frontend dev server on `localhost:4200` |
-| `npm run start:backend` | Backend dev server (`backend/`) on `localhost:3000` |
+| `npm run start:backend` | Backend dev server on `localhost:3000` |
 | `npm run dev` | Frontend + backend together (concurrently) |
-| `npm run build` | Production build |
-| `npm run lint` | ESLint — checks `src/**/*.ts`, `tests/**/*.ts` |
-| `npm run format` | Prettier — writes `src`, `tests` |
-| `npm test` | Run all tests |
-| `npm run test:watch` | Watch mode |
-| `npm run test:cov` | Coverage report |
+| `npm run build` | Production build (backend then frontend) |
+| `npm run lint` | ESLint — checks `frontend/src/**/*.ts` `backend/src/**/*.ts` |
+| `npm run format` | Prettier — writes both halves |
 
-Backend commands run from `backend/` (`npm --prefix backend run <script>` from root): `start:dev`, `build`, `lint`, `prisma:migrate`, `prisma:seed`, `prisma:generate`, `prisma:studio`.
+All backend commands run from the root (single `package.json`): `npm run prisma:migrate`, `npm run prisma:seed`, `npm run prisma:generate`, `npm run prisma:studio`.
 
-**Node version:** backend requires Node ≥ 22 (`.nvmrc`). Frontend works with Node 18.19+ / 20.11+ / 22+.
-
-Test files live in `tests/`, mirroring the `src/` directory structure. They import source files via relative paths.
+**Node version:** Node ≥ 22 for the whole repo (`.nvmrc`).
 
 ## Architecture
 
 - **Frontend**: Angular 19 standalone (no `NgModule`). Uses `bootstrapApplication` with `provideHttpClient()` and `provideRouter()`.
 - **Backend**: NestJS + Prisma + PostgreSQL, in `backend/` (same repo).
+- **Shared**: Cross-half code lives in `shared/` (types, models), importable via `@shared/*`.
 - **Styling**: Tailwind CSS with custom design tokens in `tailwind.config.js`. No CSS/SCSS in components.
-- **i18n**: English (`en`) and Persian (`fa`, RTL). Translation files in `src/app/i18n/`.
+- **i18n**: English (`en`) and Persian (`fa`, RTL). Translation files in `frontend/src/app/i18n/`.
 - **Dark mode**: ThemeService with signal-based state, persists to localStorage.
 - **State management**: `@ngrx/signals` (`signalStore`) for feature state.
-- **Testing**: Jest with `jest-preset-angular`. Zoneless test environment.
 
 > Full detail (stack, DB schema, API endpoints, routes, workflows, i18n keys, technical decisions, day-by-day) is in `PLAN.md`.
 

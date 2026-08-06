@@ -10,22 +10,19 @@ Persian-first, mobile-responsive tailor shop ecommerce website with guest browsi
 | Backend | NestJS + Prisma + PostgreSQL (in `backend/`) |
 | Auth | JWT (access + refresh) |
 | Styling | Tailwind CSS + tailwindcss-rtl (RTL ready) |
-| Testing | Jest |
 
 ## Quick Start
 
 ```bash
-npm install            # frontend deps
+npm install            # all deps (frontend + backend)
 npm run dev            # both servers: frontend on localhost:4200 + backend on localhost:3000
 ```
 
-Backend requires Node 22 (see `.nvmrc`) and a running PostgreSQL with a `sewing_ecommerce` database. First-time setup:
+Requires Node ≥ 22 and a running PostgreSQL with a `sewing_ecommerce` database. First-time setup:
 
 ```bash
-cd backend
-npm install
 npm run prisma:migrate && npm run prisma:seed
-npm run start:dev      # API on localhost:3000, Swagger at /docs
+npm run start:backend  # API on localhost:3000, Swagger at /docs
 ```
 
 `npm run dev` proxies `/api` and `/uploads` from the Angular dev server to `localhost:3000`.
@@ -35,21 +32,16 @@ npm run start:dev      # API on localhost:3000, Swagger at /docs
 | Command | Action |
 |---|---|
 | `npm start` | Frontend dev server on `localhost:4200` |
-| `npm run start:backend` | Backend dev server (`backend/`) on `localhost:3000` |
+| `npm run start:backend` | Backend dev server on `localhost:3000` |
 | `npm run dev` | Run frontend + backend together (concurrently) |
-| `npm run build` | Production build |
-| `npm run lint` | ESLint — checks `src/**/*.ts`, `tests/**/*.ts` |
-| `npm run format` | Prettier — writes `src`, `tests` |
-| `npm test` | Run all tests |
-| `npm run test:watch` | Watch mode |
-| `npm run test:cov` | Coverage report |
-
-Test files live in `tests/`, mirroring the `src/` directory structure. They import source files via relative paths.
+| `npm run build` | Production build (backend then frontend) |
+| `npm run lint` | ESLint — checks `frontend/src/**/*.ts` `backend/src/**/*.ts` |
+| `npm run format` | Prettier — writes both halves |
 
 ## Project Structure
 
 ```
-src/app/
+frontend/src/app/
 ├── main.ts / app.ts / main.route.ts
 ├── core/                 # Guards, interceptors, API service
 ├── features/             # Feature modules (auth, home, ...)
@@ -61,11 +53,12 @@ src/app/
 ├── i18n/                 # en.json + fa.json (Persian RTL)
 └── shared/               # Custom element library, pipes, services
 backend/                  # NestJS + Prisma backend
+shared/                   # Cross-half shared types (importable via @shared/*)
 ```
 
 ## Current Progress
 
-- **Phase 0 — Backend Foundation**: in progress (`backend/`)
+- **Phase 0 — Backend Foundation**: done (NestJS 11 + Prisma 7 + PostgreSQL in `backend/`)
 - **Phase 1 — Auth Frontend + Layout**: done (login, register, profile, guards, interceptor, navbar/footer, AuthStore)
 
-Full roadmap, database schema, API endpoints, and implementation phases: see `PLAN.md`.
+Full roadmap, database schema, API endpoints, and implementation phases: see `PLAN.md`. Beginner-friendly walkthrough of the code: see `docs/code-guide.md`.
