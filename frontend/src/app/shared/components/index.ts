@@ -1,11 +1,11 @@
 export { ButtonComponent } from "./button";
 export { CardComponent } from "./card";
-export { ConfirmBottomSheetComponent } from "./confirm-bottom-sheet";
-export { ConfirmDialogComponent } from "./confirm-dialog";
+export { ModalComponent } from './modal';
 export { FooterComponent } from "./footer";
 export { FormComponent } from "./form";
 export { InputComponent } from "./input";
 export { LanguageToggleComponent } from "./language-toggle";
+export { LoadingSpinnerComponent } from "./loading-spinner";
 export { NavbarComponent } from "./navbar";
 export { NotificationComponent } from "./notification";
 export { SelectComponent, type SelectOption } from "./select";

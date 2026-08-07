@@ -95,13 +95,10 @@ import { AuthStore } from "../store/auth";
             <app-button
               type="submit"
               variant="primary"
-              [disabled]="store.loading()"
+              [loading]="store.loading()"
+              cssClass="mx-auto w-full"
             >
-              @if (store.loading()) {
-                {{ 'loading' | translate }}
-              } @else {
-                {{ 'register' | translate }}
-              }
+              {{ 'register' | translate }}
             </app-button>
           </form>
 

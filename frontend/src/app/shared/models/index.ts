@@ -5,3 +5,4 @@ export interface ApiErrorResponse {
   readonly message: string | string[];
   readonly error: string;
 }
+export type { ModalDataModel } from './modal';

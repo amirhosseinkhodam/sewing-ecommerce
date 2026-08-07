@@ -1,23 +1,31 @@
 import { Component, input, output } from "@angular/core";
+import { LoadingSpinnerComponent } from "./loading-spinner";
 
 @Component({
   selector: "app-button",
   standalone: true,
+  imports: [LoadingSpinnerComponent],
   template: `
     <button
       [type]="type()"
-      [disabled]="disabled()"
+      [disabled]="disabled() || loading()"
       [class]="computedClasses()"
       (click)="onClick()"
       (keydown.enter)="onEnter($event)"
     >
-      <ng-content></ng-content>
+      <span [class]="loading() ? 'invisible' : ''">
+        <ng-content></ng-content>
+      </span>
+      @if (loading()) {
+        <app-loading-spinner [size]="size()" class="absolute" />
+      }
     </button>
   `,
 })
 export class ButtonComponent {
   readonly type = input<"button" | "submit" | "reset">("button");
   readonly disabled = input<boolean>(false);
+  readonly loading = input<boolean>(false);
   readonly cssClass = input<string>();
   readonly variant = input<
     | "primary"
@@ -34,21 +42,21 @@ export class ButtonComponent {
     | "mat-stroked"
     | "mat-text"
   >("secondary");
-  readonly color = input<"primary" | "accent" | "warn" | "basic">("primary");
+  readonly color = input<"primary" | "accent" | "warn" | "success" | "basic">("primary");
   readonly size = input<"sm" | "md" | "lg">("md");
   readonly focusRing = input<boolean>(false);
 
   readonly click = output<void>({ alias: "buttonClick" });
 
   onClick() {
-    if (!this.disabled()) {
+    if (!this.disabled() && !this.loading()) {
       this.click.emit();
     }
   }
 
   onEnter(event: KeyboardEvent) {
     event.preventDefault();
-    if (!this.disabled()) {
+    if (!this.disabled() && !this.loading()) {
       this.click.emit();
     }
   }
@@ -57,7 +65,7 @@ export class ButtonComponent {
     const focusClasses = this.focusRing()
       ? "focus:ring-2 focus:ring-slate-500 focus:ring-offset-2"
       : "focus:outline-none";
-    const base = `inline-flex items-center justify-center rounded-lg px-4 py-2 text-sm font-medium transition-colors ${focusClasses} disabled:cursor-not-allowed disabled:opacity-50`;
+    const base = `inline-flex items-center justify-center relative rounded-lg px-4 py-2 text-sm font-medium transition-colors ${focusClasses} disabled:cursor-not-allowed disabled:opacity-50`;
 
     const sizes = {
       sm: "px-3 py-1.5 text-xs min-h-9",
@@ -103,6 +111,11 @@ export class ButtonComponent {
           hover: "hover:bg-red-700 dark:hover:bg-red-600",
           focus: "focus:ring-red-500",
         },
+        success: {
+          base: "bg-green-600 dark:bg-green-500 text-white",
+          hover: "hover:bg-green-700 dark:hover:bg-green-600",
+          focus: "focus:ring-green-500",
+        },
         basic: {
           base: "bg-slate-600 dark:bg-slate-500 text-white",
           hover: "hover:bg-slate-700 dark:hover:bg-slate-600",
@@ -121,6 +134,7 @@ export class ButtonComponent {
           c.focus,
           "shadow-sm hover:shadow",
           this.cssClass(),
+          this.#deriveHover(this.cssClass()),
         ]
           .filter(Boolean)
           .join(" ");
@@ -133,6 +147,8 @@ export class ButtonComponent {
           accent:
             "border-pink-600 dark:border-pink-500 text-pink-600 dark:text-pink-500 hover:bg-pink-50 dark:hover:bg-pink-900/20",
           warn: "border-red-600 dark:border-red-500 text-red-600 dark:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20",
+          success:
+            "border-green-600 dark:border-green-500 text-green-600 dark:text-green-500 hover:bg-green-50 dark:hover:bg-green-900/20",
           basic:
             "border-slate-600 dark:border-slate-500 text-slate-600 dark:text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-900/20",
         };
@@ -142,6 +158,7 @@ export class ButtonComponent {
           strokeColors[color],
           c.focus,
           this.cssClass(),
+          this.#deriveHover(this.cssClass()),
         ]
           .filter(Boolean)
           .join(" ");
@@ -150,6 +167,7 @@ export class ButtonComponent {
       if (appearance === "mat-text") {
         const hoverBg = {
           primary: "hover:bg-blue-100 dark:hover:bg-blue-900/20",
+          success: "hover:bg-green-100 dark:hover:bg-green-900/20",
           accent: "hover:bg-pink-100 dark:hover:bg-pink-900/20",
           warn: "hover:bg-red-100 dark:hover:bg-red-900/20",
           basic: "hover:bg-slate-100 dark:hover:bg-slate-900/20",
@@ -175,13 +193,60 @@ export class ButtonComponent {
         c.focus,
         "shadow-sm hover:shadow",
         this.cssClass(),
+        this.#deriveHover(this.cssClass()),
       ]
         .filter(Boolean)
         .join(" ");
     }
 
-    return [base, sizes[this.size()], variants[this.variant()], this.cssClass()]
+    return [
+      base,
+      sizes[this.size()],
+      variants[this.variant()],
+      this.cssClass(),
+      this.#deriveHover(this.cssClass()),
+    ]
       .filter(Boolean)
       .join(" ");
   };
+
+  readonly #shades = [
+    "50", "100", "200", "300", "400", "500", "600", "700", "800", "900", "950",
+  ];
+
+  #nextShade(shade: string): string {
+    const idx = this.#shades.indexOf(shade);
+    return idx >= 0 && idx < this.#shades.length - 1
+      ? this.#shades[idx + 1]
+      : shade;
+  }
+
+  #deriveHover(cssClass: string | undefined): string {
+    if (!cssClass) return "";
+    const classes = cssClass.split(/\s+/);
+    const hoverClasses: string[] = [];
+
+    for (const cls of classes) {
+      const bgMatch = cls.match(
+        /^(bg-)([\w]+)-(\d+)$/,
+      );
+      if (bgMatch) {
+        const [, prefix, color, shade] = bgMatch;
+        const next = this.#nextShade(shade);
+        hoverClasses.push(`!${prefix}${color}-${next}`);
+        continue;
+      }
+
+      const darkBgMatch = cls.match(
+        /^(dark:bg-)([\w]+)-(\d+)$/,
+      );
+      if (darkBgMatch) {
+        const [, prefix, color, shade] = darkBgMatch;
+        const next = this.#nextShade(shade);
+        hoverClasses.push(`!dark:${prefix}${color}-${next}`);
+      }
+    }
+
+    return hoverClasses.join(" ");
+  }
 }

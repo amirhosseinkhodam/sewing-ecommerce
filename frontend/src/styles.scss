@@ -1,4 +1,4 @@
-@import "@angular/material/prebuilt-themes/indigo-pink.css";
+@import '@angular/material/prebuilt-themes/indigo-pink.css';
 
 @tailwind base;
 @tailwind components;
@@ -14,9 +14,23 @@ html.dark {
   font-family: 'Amiri', Tahoma, Arial, sans-serif;
 }
 
-html[dir="rtl"] input,
-html[dir="rtl"] textarea,
-html[dir="rtl"] select {
+/* Angular Material dark mode overrides */
+html.dark {
+  --mat-bottom-sheet-container-background-color: white;
+  --mat-bottom-sheet-container-text-color: rgb(15 23 42);
+  --mat-dialog-container-background-color: white;
+  --mat-dialog-container-text-color: rgb(15 23 42);
+}
+
+/* Angular Material font — override only components we use */
+html {
+  --mat-bottom-sheet-container-text-font: 'Amiri', Tahoma, Arial, sans-serif;
+  --mat-dialog-container-text-font: 'Amiri', Tahoma, Arial, sans-serif;
+}
+
+html[dir='rtl'] input,
+html[dir='rtl'] textarea,
+html[dir='rtl'] select {
   @apply text-right;
 }
 
