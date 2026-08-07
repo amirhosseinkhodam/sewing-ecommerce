@@ -1,5 +1,6 @@
 export { ButtonComponent } from "./button";
 export { CardComponent } from "./card";
+export { FormFieldComponent } from "./form-field";
 export { ModalComponent } from './modal';
 export { FooterComponent } from "./footer";
 export { FormComponent } from "./form";

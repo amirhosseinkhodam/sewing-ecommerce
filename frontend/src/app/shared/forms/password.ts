@@ -1,17 +1,9 @@
 import { inject, Injectable } from "@angular/core";
+import { FormBuilder, Validators } from "@angular/forms";
 import {
-  AbstractControl,
-  FormBuilder,
-  ValidationErrors,
-  Validators,
-} from "@angular/forms";
-
-function matchPasswords(control: AbstractControl): ValidationErrors | null {
-  const group = control as import("@angular/forms").FormGroup;
-  const newPw = group.get("newPassword")?.value;
-  const confirmPw = group.get("confirmPassword")?.value;
-  return newPw === confirmPw ? null : { passwordsMismatch: true };
-}
+  strongPasswordValidator,
+  passwordMatchValidator,
+} from "../validators";
 
 @Injectable({ providedIn: "root" })
 export class PasswordFormService {
@@ -19,10 +11,10 @@ export class PasswordFormService {
   readonly #form = this.#fb.nonNullable.group(
     {
       currentPassword: [""],
-      newPassword: ["", [Validators.required, Validators.minLength(6)]],
+      newPassword: ["", [Validators.required, strongPasswordValidator()]],
       confirmPassword: ["", [Validators.required]],
     },
-    { validators: matchPasswords },
+    { validators: passwordMatchValidator("newPassword", "confirmPassword") },
   );
 
   resetForm() {

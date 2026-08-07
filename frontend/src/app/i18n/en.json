@@ -56,5 +56,18 @@
   "aboutUs": "We are a professional team in design and tailoring. With years of experience, we deliver the best quality to you.",
   "address": "Tehran, Vali-e-Asr Street",
   "phoneNumber": "021-12345678",
-  "allRightsReserved": "All rights reserved."
+  "allRightsReserved": "All rights reserved.",
+  "validation": {
+    "required": "This field is required",
+    "email": "Please enter a valid email address",
+    "minlength": "Must be at least {{required}} characters",
+    "invalidChars": "Name can only contain letters and spaces",
+    "invalidPhone": "Please enter a valid Iranian phone number (09XXXXXXXXX)",
+    "invalidNationalCode": "Please enter a valid 10-digit national code",
+    "weakPasswordMinLength": "Password must be at least 8 characters",
+    "weakPasswordUppercase": "Password must contain at least one uppercase letter",
+    "weakPasswordLowercase": "Password must contain at least one lowercase letter",
+    "weakPasswordNumber": "Password must contain at least one number",
+    "passwordsMismatch": "Passwords do not match"
+  }
 }

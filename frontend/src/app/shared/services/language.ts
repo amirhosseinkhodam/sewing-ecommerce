@@ -11,7 +11,7 @@ export interface LanguageOptionModel {
   rtl: boolean;
 }
 
-const translations: Record<Language, Record<string, string>> = { en, fa };
+const translations: Record<Language, Record<string, unknown>> = { en, fa };
 
 @Injectable({ providedIn: "root" })
 export class LanguageService {
@@ -38,7 +38,25 @@ export class LanguageService {
 
   translate(key: string): string {
     const lang = this.currentLanguage();
-    return translations[lang]?.[key] ?? translations["en"]?.[key] ?? key;
+    const value = this.#getNestedValue(translations[lang], key);
+    if (value !== undefined && typeof value === "string") return value;
+    const fallback = this.#getNestedValue(translations["en"], key);
+    if (fallback !== undefined && typeof fallback === "string") return fallback;
+    return key;
+  }
+
+  #getNestedValue(
+    obj: Record<string, unknown> | undefined,
+    path: string,
+  ): unknown {
+    if (!obj) return undefined;
+    const keys = path.split(".");
+    let current: unknown = obj;
+    for (const key of keys) {
+      if (current === null || current === undefined) return undefined;
+      current = (current as Record<string, unknown>)[key];
+    }
+    return current;
   }
 
   toggle(): void {

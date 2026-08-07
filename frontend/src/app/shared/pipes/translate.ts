@@ -26,7 +26,16 @@ export class TranslatePipe implements PipeTransform {
     destroyRef.onDestroy(() => e.destroy());
   }
 
-  transform(key: string): string {
-    return this.#languageService.translate(key);
+  transform(key: string, params?: Record<string, unknown>): string {
+    let result = this.#languageService.translate(key);
+    if (params) {
+      for (const [paramKey, paramValue] of Object.entries(params)) {
+        result = result.replace(
+          new RegExp(`\\{\\{${paramKey}\\}\\}`, "g"),
+          String(paramValue),
+        );
+      }
+    }
+    return result;
   }
 }

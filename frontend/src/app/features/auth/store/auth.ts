@@ -116,6 +116,11 @@ export const AuthStore = signalStore(
           ),
         ),
       ),
+      setToken: (accessToken: string, refreshToken: string) => {
+        localStorage.setItem("accessToken", accessToken);
+        localStorage.setItem("refreshToken", refreshToken);
+        patchState(store, { token: accessToken, refreshToken });
+      },
       logout: () => {
         localStorage.removeItem("accessToken");
         localStorage.removeItem("refreshToken");
