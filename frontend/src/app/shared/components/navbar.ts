@@ -1,4 +1,11 @@
-import { Component, inject, signal } from "@angular/core";
+import {
+  Component,
+  ElementRef,
+  HostListener,
+  inject,
+  signal,
+  viewChild,
+} from "@angular/core";
 import { NgClass } from "@angular/common";
 import { RouterLink } from "@angular/router";
 import { HugeiconsIconComponent } from "@hugeicons/angular";
@@ -90,7 +97,7 @@ import { AuthStore } from "../../features/auth/store/auth";
             </a>
 
             @if (store.isLoggedIn()) {
-              <div class="relative">
+              <div class="relative" #dropdownContainer>
                 <button
                   type="button"
                   class="flex items-center gap-2 p-2 text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white transition-colors rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800"
@@ -105,7 +112,7 @@ import { AuthStore } from "../../features/auth/store/auth";
 
                 @if (profileDropdownOpen()) {
                   <div
-                    class="absolute right-0 mt-2 w-48 bg-white dark:bg-slate-800 rounded-lg shadow-lg border border-slate-200 dark:border-slate-700 py-1 z-50"
+                    class="absolute end-0 mt-2 w-48 bg-white dark:bg-slate-800 rounded-lg shadow-lg border border-slate-200 dark:border-slate-700 py-1 z-50"
                     (click)="profileDropdownOpen.set(false)"
                   >
                     @if (store.user(); as user) {
@@ -147,7 +154,7 @@ import { AuthStore } from "../../features/auth/store/auth";
                     <hr class="my-1 border-slate-200 dark:border-slate-700" />
                     <button
                       type="button"
-                      class="w-full text-left px-4 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors"
+                      class="w-full text-start px-4 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors"
                       (click)="store.logout()"
                     >
                       {{ 'logout' | translate }}
@@ -302,9 +309,21 @@ export class NavbarComponent {
   readonly profileDropdownOpen = signal(false);
   readonly cartCount = signal(0);
 
+  readonly dropdownContainer =
+    viewChild<ElementRef<HTMLDivElement>>("dropdownContainer");
+
   readonly userInitials = () => {
     const user = this.store.user();
     if (!user) return "";
     return `${user.firstName[0]}${user.lastName[0]}`;
   };
+
+  @HostListener("document:click", ["$event"])
+  onDocumentClick(event: Event) {
+    if (!this.profileDropdownOpen()) return;
+    const container = this.dropdownContainer();
+    if (container && !container.nativeElement.contains(event.target as Node)) {
+      this.profileDropdownOpen.set(false);
+    }
+  }
 }
