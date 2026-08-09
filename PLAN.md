@@ -316,6 +316,20 @@ frontend/src/app/
 
 ## 7. Key Workflows
 
+### Roles & access
+
+- **Guest** — no account; browses everything public (catalog, product detail, portfolio, about, contact).
+- **Customer** — logged-in `CUSTOMER`; cart, checkout, orders, addresses, profile.
+- **Admin** — `ADMIN` role; manages the shop from `/admin` (products, categories, orders, portfolio, customers, messages, settings).
+
+### Profile
+
+- Customer visits `/profile` → `GET /api/auth/me` shows account info; edits via `PATCH /api/auth/profile`. Changes persist server-side.
+
+### Contact
+
+- `/contact` → `POST /api/contact` submits name/email/phone/message; stored as a `ContactMessage` the admin reads in the admin panel (mark read / delete).
+
 ### Guest browsing -> Add to cart -> Checkout
 
 1. Guest visits `/products` -> `GET /api/products?page=1`
@@ -536,8 +550,10 @@ Breadcrumbs: `home, products, portfolio, about, contact, cart, checkout, orders,
 
 | Decision | Choice | Why |
 |----------|--------|-----|
+| Repo layout | Single-package monorepo (one root `package.json`, `node_modules`, ESLint/Prettier config) | One install/lockfile, one toolchain, `@shared/*` works across halves; see `AGENTS.md` |
 | ORM | Prisma | Type-safe, auto-generated types, migrations, TypeScript-native |
 | Auth tokens | JWT (access 15min + refresh 7d) | Standard, stateless, secure |
+| Refresh tokens | Stateless signed JWT with **separate secret**, no DB table/rotation/revocation for MVP | Simpler auth module; a stolen token stays valid until expiry — acceptable for MVP |
 | Cart | Server-side (PostgreSQL) | Persists across devices, no data loss |
 | Image upload | Local + Multer (MVP) | Simple for now, upgrade to CDN later |
 | Pagination | Offset-based | Simple, sufficient for this scale |

@@ -61,4 +61,4 @@ shared/                   # Cross-half shared types (importable via @shared/*)
 - **Phase 0 — Backend Foundation**: done (NestJS 11 + Prisma 7 + PostgreSQL in `backend/`)
 - **Phase 1 — Auth Frontend + Layout**: done (login, register, profile, guards, interceptor, navbar/footer, AuthStore)
 
-Full roadmap, database schema, API endpoints, and implementation phases: see `PLAN.md`. Beginner-friendly walkthrough of the code: see `docs/code-guide.md`.
+Full roadmap, database schema, API endpoints, and implementation phases: see `PLAN.md`. How the code is organized and how it runs: see `AGENTS.md` (Code Guide section).
