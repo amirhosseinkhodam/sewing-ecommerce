@@ -1,13 +1,13 @@
-import { HttpErrorResponse, HttpInterceptorFn } from "@angular/common/http";
-import { inject } from "@angular/core";
-import { catchError, switchMap, throwError } from "rxjs";
-import { AuthStore } from "../../features/auth/store/auth";
-import { AuthService } from "../../features/auth/services/auth";
+import { HttpErrorResponse, HttpInterceptorFn } from '@angular/common/http';
+import { inject } from '@angular/core';
+import { catchError, switchMap, throwError } from 'rxjs';
+import { AuthStore } from '../../features/auth/store/auth';
+import { AuthService } from '../../features/auth/services/auth';
 
 export const authInterceptor: HttpInterceptorFn = (req, next) => {
   const auth = inject(AuthStore);
 
-  if (req.url.includes("/api/auth/refresh")) {
+  if (req.url.includes('/api/auth/refresh')) {
     return next(req);
   }
 

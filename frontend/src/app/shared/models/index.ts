@@ -1,4 +1,4 @@
-export type { NotificationType, NotificationModel } from "./notification";
+export type { NotificationType, NotificationModel } from './notification';
 
 export interface ApiErrorResponse {
   readonly statusCode: number;

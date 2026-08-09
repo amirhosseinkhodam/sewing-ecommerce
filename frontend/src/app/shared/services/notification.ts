@@ -1,10 +1,10 @@
-import { Injectable, signal } from "@angular/core";
+import { Injectable, signal } from '@angular/core';
 import type {
   NotificationModel,
   NotificationType,
-} from "../models/notification";
+} from '../models/notification';
 
-@Injectable({ providedIn: "root" })
+@Injectable({ providedIn: 'root' })
 export class NotificationService {
   readonly #notification = signal<NotificationModel | null>(null);
   readonly #timer = signal<ReturnType<typeof setTimeout> | null>(null);

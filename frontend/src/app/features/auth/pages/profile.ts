@@ -1,12 +1,12 @@
-import { Component, inject } from "@angular/core";
-import { RouterLink } from "@angular/router";
-import { TranslatePipe } from "../../../shared/pipes/translate";
-import { CardComponent } from "../../../shared/components/card";
-import { ButtonComponent } from "../../../shared/components/button";
-import { AuthStore } from "../store/auth";
+import { Component, inject } from '@angular/core';
+import { RouterLink } from '@angular/router';
+import { TranslatePipe } from '../../../shared/pipes/translate';
+import { CardComponent } from '../../../shared/components/card';
+import { ButtonComponent } from '../../../shared/components/button';
+import { AuthStore } from '../store/auth';
 
 @Component({
-  selector: "app-profile",
+  selector: 'app-profile',
   standalone: true,
   imports: [RouterLink, CardComponent, ButtonComponent, TranslatePipe],
   template: `
@@ -90,7 +90,9 @@ import { AuthStore } from "../store/auth";
         </app-card>
       } @else if (store.loading()) {
         <div class="flex items-center justify-center py-20">
-          <p class="text-slate-500 dark:text-slate-400">{{ 'loading' | translate }}</p>
+          <p class="text-slate-500 dark:text-slate-400">
+            {{ 'loading' | translate }}
+          </p>
         </div>
       } @else {
         <div class="flex flex-col items-center justify-center py-20 gap-4">

@@ -1,17 +1,17 @@
-import { Component, inject } from "@angular/core";
-import { RouterLink } from "@angular/router";
-import { ReactiveFormsModule } from "@angular/forms";
-import { TranslatePipe } from "../../../shared/pipes/translate";
-import { CardComponent } from "../../../shared/components/card";
-import { ButtonComponent } from "../../../shared/components/button";
-import { InputComponent } from "../../../shared/components/input";
-import { FormComponent } from "../../../shared/components/form";
-import { FormFieldComponent } from "../../../shared/components/form-field";
-import { RegisterFormService } from "../forms/register";
-import { AuthStore } from "../store/auth";
+import { Component, inject } from '@angular/core';
+import { RouterLink } from '@angular/router';
+import { ReactiveFormsModule } from '@angular/forms';
+import { TranslatePipe } from '../../../shared/pipes/translate';
+import { CardComponent } from '../../../shared/components/card';
+import { ButtonComponent } from '../../../shared/components/button';
+import { InputComponent } from '../../../shared/components/input';
+import { FormComponent } from '../../../shared/components/form';
+import { FormFieldComponent } from '../../../shared/components/form-field';
+import { RegisterFormService } from '../forms/register';
+import { AuthStore } from '../store/auth';
 
 @Component({
-  selector: "app-register",
+  selector: 'app-register',
   standalone: true,
   imports: [
     RouterLink,
@@ -28,16 +28,14 @@ import { AuthStore } from "../store/auth";
       <app-card variant="bordered" [cssClass]="'max-w-md w-full'">
         <div class="flex flex-col gap-6">
           <div class="text-center">
-            <h1
-              class="text-2xl font-bold text-slate-900 dark:text-slate-100"
-            >
+            <h1 class="text-2xl font-bold text-slate-900 dark:text-slate-100">
               {{ 'createAccount' | translate }}
             </h1>
           </div>
 
           @if (
-            registerForm.form.errors?.["passwordsMismatch"] &&
-            registerForm.form.get("confirmPassword")?.touched
+            registerForm.form.errors?.['passwordsMismatch'] &&
+            registerForm.form.get('confirmPassword')?.touched
           ) {
             <div
               class="p-3 text-sm text-red-700 dark:text-red-400 bg-red-50 dark:bg-red-900/30 rounded-lg"
@@ -84,9 +82,7 @@ import { AuthStore } from "../store/auth";
                 [placeholder]="'email' | translate"
                 autocomplete="email"
               />
-              <app-form-field
-                [control]="registerForm.form.get('email')!"
-              />
+              <app-form-field [control]="registerForm.form.get('email')!" />
             </div>
 
             <div>
@@ -97,9 +93,7 @@ import { AuthStore } from "../store/auth";
                 [placeholder]="'phone' | translate"
                 autocomplete="tel"
               />
-              <app-form-field
-                [control]="registerForm.form.get('phone')!"
-              />
+              <app-form-field [control]="registerForm.form.get('phone')!" />
             </div>
 
             <div>
@@ -110,9 +104,7 @@ import { AuthStore } from "../store/auth";
                 [placeholder]="'password' | translate"
                 autocomplete="new-password"
               />
-              <app-form-field
-                [control]="registerForm.form.get('password')!"
-              />
+              <app-form-field [control]="registerForm.form.get('password')!" />
             </div>
 
             <div>
@@ -138,9 +130,7 @@ import { AuthStore } from "../store/auth";
             </app-button>
           </app-form>
 
-          <div
-            class="text-center text-sm text-slate-500 dark:text-slate-400"
-          >
+          <div class="text-center text-sm text-slate-500 dark:text-slate-400">
             {{ 'alreadyHaveAccount' | translate }}
             <a
               routerLink="/login"

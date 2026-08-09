@@ -5,22 +5,22 @@ import {
   inject,
   signal,
   viewChild,
-} from "@angular/core";
-import { NgClass } from "@angular/common";
-import { RouterLink } from "@angular/router";
-import { HugeiconsIconComponent } from "@hugeicons/angular";
+} from '@angular/core';
+import { NgClass } from '@angular/common';
+import { RouterLink } from '@angular/router';
+import { HugeiconsIconComponent } from '@hugeicons/angular';
 import {
   ShoppingCart01Icon,
   Cancel01Icon,
   Menu01Icon,
-} from "@hugeicons/core-free-icons";
-import { TranslatePipe } from "../pipes/translate";
-import { ThemeToggleComponent } from "./theme-toggle";
-import { LanguageToggleComponent } from "./language-toggle";
-import { AuthStore } from "../../features/auth/store/auth";
+} from '@hugeicons/core-free-icons';
+import { TranslatePipe } from '../pipes/translate';
+import { ThemeToggleComponent } from './theme-toggle';
+import { LanguageToggleComponent } from './language-toggle';
+import { AuthStore } from '../../features/auth/store/auth';
 
 @Component({
-  selector: "app-navbar",
+  selector: 'app-navbar',
   standalone: true,
   imports: [
     NgClass,
@@ -91,7 +91,7 @@ import { AuthStore } from "../../features/auth/store/auth";
                 <span
                   class="absolute -top-1 -right-1 flex items-center justify-center w-5 h-5 text-xs font-bold text-white bg-red-500 rounded-full"
                 >
-                  {{ cartCount() > 99 ? "99+" : cartCount() }}
+                  {{ cartCount() > 99 ? '99+' : cartCount() }}
                 </span>
               }
             </a>
@@ -310,15 +310,15 @@ export class NavbarComponent {
   readonly cartCount = signal(0);
 
   readonly dropdownContainer =
-    viewChild<ElementRef<HTMLDivElement>>("dropdownContainer");
+    viewChild<ElementRef<HTMLDivElement>>('dropdownContainer');
 
   readonly userInitials = () => {
     const user = this.store.user();
-    if (!user) return "";
+    if (!user) return '';
     return `${user.firstName[0]}${user.lastName[0]}`;
   };
 
-  @HostListener("document:click", ["$event"])
+  @HostListener('document:click', ['$event'])
   onDocumentClick(event: Event) {
     if (!this.profileDropdownOpen()) return;
     const container = this.dropdownContainer();

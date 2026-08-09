@@ -1,11 +1,12 @@
-import { Component, inject } from "@angular/core";
-import { HugeiconsIconComponent } from "@hugeicons/angular";
-import { TranslateIcon } from "@hugeicons/core-free-icons";
-import { LanguageService, LanguageOptionModel } from "../services/language";
-import { ThemeService } from "../services/theme";
+import { Component, inject } from '@angular/core';
+import { HugeiconsIconComponent } from '@hugeicons/angular';
+import { TranslateIcon } from '@hugeicons/core-free-icons';
+import { LanguageService } from '../services/language';
+import { LanguageOptionModel } from '../models/language';
+import { ThemeService } from '../services/theme';
 
 @Component({
-  selector: "app-language-toggle",
+  selector: 'app-language-toggle',
   standalone: true,
   imports: [HugeiconsIconComponent],
   template: `

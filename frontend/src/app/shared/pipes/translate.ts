@@ -5,10 +5,10 @@ import {
   PipeTransform,
   effect,
   inject,
-} from "@angular/core";
-import { LanguageService } from "../services/language";
+} from '@angular/core';
+import { LanguageService } from '../services/language';
 
-@Pipe({ name: "translate", standalone: true, pure: false })
+@Pipe({ name: 'translate', standalone: true, pure: false })
 export class TranslatePipe implements PipeTransform {
   readonly #languageService = inject(LanguageService);
   #lastLang = this.#languageService.currentLanguage();
@@ -31,7 +31,7 @@ export class TranslatePipe implements PipeTransform {
     if (params) {
       for (const [paramKey, paramValue] of Object.entries(params)) {
         result = result.replace(
-          new RegExp(`\\{\\{${paramKey}\\}\\}`, "g"),
+          new RegExp(`\\{\\{${paramKey}\\}\\}`, 'g'),
           String(paramValue),
         );
       }

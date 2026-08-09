@@ -1,11 +1,11 @@
-import { Component } from "@angular/core";
-import { RouterLink } from "@angular/router";
-import { HugeiconsIconComponent } from "@hugeicons/angular";
-import { MapPinIcon, TelephoneIcon } from "@hugeicons/core-free-icons";
-import { TranslatePipe } from "../pipes/translate";
+import { Component } from '@angular/core';
+import { RouterLink } from '@angular/router';
+import { HugeiconsIconComponent } from '@hugeicons/angular';
+import { MapPinIcon, TelephoneIcon } from '@hugeicons/core-free-icons';
+import { TranslatePipe } from '../pipes/translate';
 
 @Component({
-  selector: "app-footer",
+  selector: 'app-footer',
   standalone: true,
   imports: [RouterLink, HugeiconsIconComponent, TranslatePipe],
   template: `

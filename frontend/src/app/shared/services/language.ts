@@ -1,25 +1,17 @@
-import { Injectable, signal, effect } from "@angular/core";
-import en from "../../i18n/en.json";
-import fa from "../../i18n/fa.json";
-
-export type Language = "en" | "fa";
-
-export interface LanguageOptionModel {
-  code: Language;
-  name: string;
-  nativeName: string;
-  rtl: boolean;
-}
+import { Injectable, signal, effect } from '@angular/core';
+import en from '../../i18n/en.json';
+import fa from '../../i18n/fa.json';
+import { Language, LanguageOptionModel } from '../models/language';
 
 const translations: Record<Language, Record<string, unknown>> = { en, fa };
 
-@Injectable({ providedIn: "root" })
+@Injectable({ providedIn: 'root' })
 export class LanguageService {
-  readonly #STORAGE_KEY = "app-language";
+  readonly #STORAGE_KEY = 'app-language';
 
   readonly languages: LanguageOptionModel[] = [
-    { code: "en", name: "English", nativeName: "English", rtl: false },
-    { code: "fa", name: "Persian", nativeName: "فارسی", rtl: true },
+    { code: 'en', name: 'English', nativeName: 'English', rtl: false },
+    { code: 'fa', name: 'Persian', nativeName: 'فارسی', rtl: true },
   ];
 
   currentLanguage = signal<Language>(this.#loadLanguage());
@@ -30,7 +22,7 @@ export class LanguageService {
       const option = this.languages.find((l) => l.code === lang);
       if (option) {
         document.documentElement.lang = lang;
-        document.documentElement.dir = option.rtl ? "rtl" : "ltr";
+        document.documentElement.dir = option.rtl ? 'rtl' : 'ltr';
         localStorage.setItem(this.#STORAGE_KEY, lang);
       }
     });
@@ -39,9 +31,9 @@ export class LanguageService {
   translate(key: string): string {
     const lang = this.currentLanguage();
     const value = this.#getNestedValue(translations[lang], key);
-    if (value !== undefined && typeof value === "string") return value;
-    const fallback = this.#getNestedValue(translations["en"], key);
-    if (fallback !== undefined && typeof fallback === "string") return fallback;
+    if (value !== undefined && typeof value === 'string') return value;
+    const fallback = this.#getNestedValue(translations['en'], key);
+    if (fallback !== undefined && typeof fallback === 'string') return fallback;
     return key;
   }
 
@@ -50,7 +42,7 @@ export class LanguageService {
     path: string,
   ): unknown {
     if (!obj) return undefined;
-    const keys = path.split(".");
+    const keys = path.split('.');
     let current: unknown = obj;
     for (const key of keys) {
       if (current === null || current === undefined) return undefined;
@@ -80,10 +72,10 @@ export class LanguageService {
       const option = this.languages.find((l) => l.code === saved);
       if (option) {
         document.documentElement.lang = saved;
-        document.documentElement.dir = option.rtl ? "rtl" : "ltr";
+        document.documentElement.dir = option.rtl ? 'rtl' : 'ltr';
       }
       return saved;
     }
-    return "en";
+    return 'en';
   }
 }

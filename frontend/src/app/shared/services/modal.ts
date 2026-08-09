@@ -14,9 +14,7 @@ export class ModalService {
 
   open(data: ModalDataModel): Observable<boolean> {
     if (this.#breakpointObserver.isMatched('(max-width: 767px)')) {
-      return this.#bottomSheet
-        .open(ModalComponent, { data })
-        .afterDismissed();
+      return this.#bottomSheet.open(ModalComponent, { data }).afterDismissed();
     }
     return this.#dialog.open(ModalComponent, { data }).afterClosed();
   }

@@ -7,31 +7,31 @@ import {
   input,
   OnInit,
   signal,
-} from "@angular/core";
-import { AbstractControl, ValidationErrors } from "@angular/forms";
-import { merge } from "rxjs";
-import { TranslatePipe } from "../pipes/translate";
+} from '@angular/core';
+import { AbstractControl, ValidationErrors } from '@angular/forms';
+import { merge } from 'rxjs';
+import { TranslatePipe } from '../pipes/translate';
 
 const ERROR_TO_TRANSLATION: Record<string, string> = {
-  required: "validation.required",
-  email: "validation.email",
-  minlength: "validation.minlength",
-  invalidChars: "validation.invalidChars",
-  invalidPhone: "validation.invalidPhone",
-  invalidNationalCode: "validation.invalidNationalCode",
-  weakPassword: "validation.weakPasswordMinLength",
-  passwordsMismatch: "validation.passwordsMismatch",
+  required: 'validation.required',
+  email: 'validation.email',
+  minlength: 'validation.minlength',
+  invalidChars: 'validation.invalidChars',
+  invalidPhone: 'validation.invalidPhone',
+  invalidNationalCode: 'validation.invalidNationalCode',
+  weakPassword: 'validation.weakPasswordMinLength',
+  passwordsMismatch: 'validation.passwordsMismatch',
 };
 
 const ERROR_PRIORITY = [
-  "required",
-  "email",
-  "minlength",
-  "invalidChars",
-  "invalidPhone",
-  "invalidNationalCode",
-  "weakPassword",
-  "passwordsMismatch",
+  'required',
+  'email',
+  'minlength',
+  'invalidChars',
+  'invalidPhone',
+  'invalidNationalCode',
+  'weakPassword',
+  'passwordsMismatch',
 ];
 
 interface ErrorMessage {
@@ -40,7 +40,7 @@ interface ErrorMessage {
 }
 
 @Component({
-  selector: "app-form-field",
+  selector: 'app-form-field',
   standalone: true,
   imports: [TranslatePipe],
   template: `
@@ -108,7 +108,7 @@ export class FormFieldComponent implements OnInit, DoCheck {
     for (const errorKey of ERROR_PRIORITY) {
       if (validationErrors[errorKey]) {
         if (
-          errorKey === "weakPassword" &&
+          errorKey === 'weakPassword' &&
           Array.isArray(validationErrors[errorKey])
         ) {
           for (const subError of validationErrors[errorKey] as string[]) {
@@ -118,10 +118,7 @@ export class FormFieldComponent implements OnInit, DoCheck {
           }
         } else {
           const translationKey = ERROR_TO_TRANSLATION[errorKey];
-          const params = this.#getParams(
-            errorKey,
-            validationErrors[errorKey],
-          );
+          const params = this.#getParams(errorKey, validationErrors[errorKey]);
           messages.push({ key: translationKey, params });
         }
       }
@@ -135,8 +132,8 @@ export class FormFieldComponent implements OnInit, DoCheck {
     errorValue: unknown,
   ): Record<string, unknown> | undefined {
     if (
-      errorKey === "minlength" &&
-      typeof errorValue === "object" &&
+      errorKey === 'minlength' &&
+      typeof errorValue === 'object' &&
       errorValue !== null
     ) {
       return {

@@ -4,7 +4,7 @@ export interface AuthUserModel {
   readonly lastName: string;
   readonly email: string;
   readonly phone: string;
-  readonly role: "CUSTOMER" | "ADMIN";
+  readonly role: 'CUSTOMER' | 'ADMIN';
 }
 
 export interface AuthPayloadModel {

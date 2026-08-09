@@ -6,7 +6,9 @@ export function persianNameValidator(): ValidatorFn {
     if (!value) return null;
 
     if (value.trim().length < 2) {
-      return { minlength: { requiredLength: 2, actualLength: value.trim().length } };
+      return {
+        minlength: { requiredLength: 2, actualLength: value.trim().length },
+      };
     }
 
     const nameRegex = /^[\u0600-\u06FFa-zA-Z\s]+$/;
@@ -45,7 +47,8 @@ export function nationalCodeValidator(): ValidatorFn {
     const sum = digits
       .slice(0, 9)
       .reduce(
-        (acc: number, digit: number, index: number) => acc + digit * (10 - index),
+        (acc: number, digit: number, index: number) =>
+          acc + digit * (10 - index),
         0,
       );
     const remainder = sum % 11;

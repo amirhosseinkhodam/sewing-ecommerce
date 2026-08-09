@@ -1,17 +1,17 @@
-import { Component, inject } from "@angular/core";
-import { RouterLink } from "@angular/router";
-import { ReactiveFormsModule } from "@angular/forms";
-import { TranslatePipe } from "../../../shared/pipes/translate";
-import { CardComponent } from "../../../shared/components/card";
-import { ButtonComponent } from "../../../shared/components/button";
-import { InputComponent } from "../../../shared/components/input";
-import { FormComponent } from "../../../shared/components/form";
-import { FormFieldComponent } from "../../../shared/components/form-field";
-import { LoginFormService } from "../forms/login";
-import { AuthStore } from "../store/auth";
+import { Component, inject } from '@angular/core';
+import { RouterLink } from '@angular/router';
+import { ReactiveFormsModule } from '@angular/forms';
+import { TranslatePipe } from '../../../shared/pipes/translate';
+import { CardComponent } from '../../../shared/components/card';
+import { ButtonComponent } from '../../../shared/components/button';
+import { InputComponent } from '../../../shared/components/input';
+import { FormComponent } from '../../../shared/components/form';
+import { FormFieldComponent } from '../../../shared/components/form-field';
+import { LoginFormService } from '../forms/login';
+import { AuthStore } from '../store/auth';
 
 @Component({
-  selector: "app-login",
+  selector: 'app-login',
   standalone: true,
   imports: [
     RouterLink,
@@ -28,9 +28,7 @@ import { AuthStore } from "../store/auth";
       <app-card variant="bordered" [cssClass]="'max-w-md w-full'">
         <div class="flex flex-col gap-6">
           <div class="text-center">
-            <h1
-              class="text-2xl font-bold text-slate-900 dark:text-slate-100"
-            >
+            <h1 class="text-2xl font-bold text-slate-900 dark:text-slate-100">
               {{ 'signInToAccount' | translate }}
             </h1>
           </div>
@@ -48,9 +46,7 @@ import { AuthStore } from "../store/auth";
                 [placeholder]="'email' | translate"
                 autocomplete="email"
               />
-              <app-form-field
-                [control]="loginForm.form.get('email')!"
-              />
+              <app-form-field [control]="loginForm.form.get('email')!" />
             </div>
 
             <div>
@@ -61,9 +57,7 @@ import { AuthStore } from "../store/auth";
                 [placeholder]="'password' | translate"
                 autocomplete="current-password"
               />
-              <app-form-field
-                [control]="loginForm.form.get('password')!"
-              />
+              <app-form-field [control]="loginForm.form.get('password')!" />
             </div>
 
             <app-button
@@ -76,9 +70,7 @@ import { AuthStore } from "../store/auth";
             </app-button>
           </app-form>
 
-          <div
-            class="text-center text-sm text-slate-500 dark:text-slate-400"
-          >
+          <div class="text-center text-sm text-slate-500 dark:text-slate-400">
             {{ 'dontHaveAccount' | translate }}
             <a
               routerLink="/register"

@@ -1,23 +1,23 @@
-import { HttpErrorResponse } from "@angular/common/http";
-import { inject } from "@angular/core";
-import { Router } from "@angular/router";
-import { tapResponse } from "@ngrx/operators";
+import { HttpErrorResponse } from '@angular/common/http';
+import { inject } from '@angular/core';
+import { Router } from '@angular/router';
+import { tapResponse } from '@ngrx/operators';
 import {
   patchState,
   signalStore,
   withHooks,
   withMethods,
   withState,
-} from "@ngrx/signals";
-import { rxMethod } from "@ngrx/signals/rxjs-interop";
-import { pipe, switchMap, tap } from "rxjs";
-import { NotificationService } from "../../../shared/services/notification";
+} from '@ngrx/signals';
+import { rxMethod } from '@ngrx/signals/rxjs-interop';
+import { pipe, switchMap, tap } from 'rxjs';
+import { NotificationService } from '../../../shared/services/notification';
 import {
   AuthPayloadModel,
   AuthUserModel,
   RegisterPayloadModel,
-} from "../models/auth";
-import { AuthService } from "../services/auth";
+} from '../models/auth';
+import { AuthService } from '../services/auth';
 
 interface AuthState {
   token: string | null;
@@ -27,14 +27,14 @@ interface AuthState {
 }
 
 const initialState: AuthState = {
-  token: localStorage.getItem("accessToken"),
-  refreshToken: localStorage.getItem("refreshToken"),
+  token: localStorage.getItem('accessToken'),
+  refreshToken: localStorage.getItem('refreshToken'),
   user: null,
   loading: false,
 };
 
 export const AuthStore = signalStore(
-  { providedIn: "root" },
+  { providedIn: 'root' },
   withState(initialState),
   withMethods(
     (
@@ -44,7 +44,7 @@ export const AuthStore = signalStore(
       notification = inject(NotificationService),
     ) => ({
       isLoggedIn: () => store.token() !== null,
-      isAdmin: () => store.user()?.role === "ADMIN",
+      isAdmin: () => store.user()?.role === 'ADMIN',
       login: rxMethod<AuthPayloadModel>(
         pipe(
           tap(() => patchState(store, { loading: true })),
@@ -52,21 +52,21 @@ export const AuthStore = signalStore(
             authService.login(payload).pipe(
               tapResponse({
                 next: (res) => {
-                  localStorage.setItem("accessToken", res.accessToken);
-                  localStorage.setItem("refreshToken", res.refreshToken);
+                  localStorage.setItem('accessToken', res.accessToken);
+                  localStorage.setItem('refreshToken', res.refreshToken);
                   patchState(store, {
                     token: res.accessToken,
                     refreshToken: res.refreshToken,
                     user: res.user,
                     loading: false,
                   });
-                  router.navigateByUrl("/");
+                  router.navigateByUrl('/');
                 },
                 error: (err: HttpErrorResponse) => {
                   patchState(store, { loading: false });
                   notification.show(
-                    "error",
-                    err.error?.message ?? "login failed",
+                    'error',
+                    err.error?.message ?? 'login failed',
                   );
                 },
               }),
@@ -81,21 +81,21 @@ export const AuthStore = signalStore(
             authService.register(payload).pipe(
               tapResponse({
                 next: (res) => {
-                  localStorage.setItem("accessToken", res.accessToken);
-                  localStorage.setItem("refreshToken", res.refreshToken);
+                  localStorage.setItem('accessToken', res.accessToken);
+                  localStorage.setItem('refreshToken', res.refreshToken);
                   patchState(store, {
                     token: res.accessToken,
                     refreshToken: res.refreshToken,
                     user: res.user,
                     loading: false,
                   });
-                  router.navigateByUrl("/");
+                  router.navigateByUrl('/');
                 },
                 error: (err: HttpErrorResponse) => {
                   patchState(store, { loading: false });
                   notification.show(
-                    "error",
-                    err.error?.message ?? "registration failed",
+                    'error',
+                    err.error?.message ?? 'registration failed',
                   );
                 },
               }),
@@ -117,19 +117,19 @@ export const AuthStore = signalStore(
         ),
       ),
       setToken: (accessToken: string, refreshToken: string) => {
-        localStorage.setItem("accessToken", accessToken);
-        localStorage.setItem("refreshToken", refreshToken);
+        localStorage.setItem('accessToken', accessToken);
+        localStorage.setItem('refreshToken', refreshToken);
         patchState(store, { token: accessToken, refreshToken });
       },
       logout: () => {
-        localStorage.removeItem("accessToken");
-        localStorage.removeItem("refreshToken");
+        localStorage.removeItem('accessToken');
+        localStorage.removeItem('refreshToken');
         patchState(store, {
           token: null,
           refreshToken: null,
           user: null,
         });
-        router.navigateByUrl("/");
+        router.navigateByUrl('/');
       },
     }),
   ),

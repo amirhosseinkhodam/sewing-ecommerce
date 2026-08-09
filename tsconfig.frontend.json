@@ -17,5 +17,7 @@
     "paths": {
       "@shared/*": ["shared/*"]
     }
-  }
+  },
+  "include": ["frontend/src/**/*.ts", "shared/**/*.ts"],
+  "exclude": ["node_modules", "dist"]
 }

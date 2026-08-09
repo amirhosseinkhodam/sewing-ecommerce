@@ -5,10 +5,29 @@ import globals from 'globals';
 import tseslint from 'typescript-eslint';
 
 export default tseslint.config(
-  { ignores: ['eslint.config.mjs', 'frontend/**', 'backend/src/generated/**'] },
+  {
+    ignores: [
+      'eslint.config.mjs',
+      'dist/**',
+      'node_modules/**',
+      'backend/src/generated/**',
+    ],
+  },
   eslint.configs.recommended,
   ...tseslint.configs.recommended,
   eslintPluginPrettierRecommended,
+  // Frontend: ES modules + browser globals
+  {
+    files: ['frontend/**/*.ts'],
+    languageOptions: {
+      globals: { ...globals.browser },
+      sourceType: 'module',
+      parserOptions: {
+        projectService: true,
+        tsconfigRootDir: import.meta.dirname,
+      },
+    },
+  },
   // Backend: type-checked rules + Node.js globals
   ...tseslint.configs.recommendedTypeChecked.map((config) => ({
     ...config,
@@ -37,6 +56,10 @@ export default tseslint.config(
       '@typescript-eslint/no-unsafe-return': 'warn',
       'prettier/prettier': ['error', { endOfLine: 'auto' }],
       'no-duplicate-imports': 'error',
+      '@typescript-eslint/no-unused-vars': [
+        'error',
+        { ignoreRestSiblings: true },
+      ],
       'no-restricted-syntax': [
         'error',
         {

@@ -1,17 +1,17 @@
-import { inject, Injectable } from "@angular/core";
-import { HttpClient } from "@angular/common/http";
-import { Observable } from "rxjs";
+import { inject, Injectable } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { Observable } from 'rxjs';
 import {
   AuthPayloadModel,
   AuthResponseModel,
   AuthUserModel,
   RegisterPayloadModel,
-} from "../models/auth";
+} from '../models/auth';
 
-@Injectable({ providedIn: "root" })
+@Injectable({ providedIn: 'root' })
 export class AuthService {
   readonly #http = inject(HttpClient);
-  readonly #baseUrl = "/api/auth";
+  readonly #baseUrl = '/api/auth';
 
   login(payload: AuthPayloadModel): Observable<AuthResponseModel> {
     return this.#http.post<AuthResponseModel>(

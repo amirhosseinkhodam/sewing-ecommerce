@@ -1,11 +1,11 @@
-import { Component } from "@angular/core";
-import { RouterOutlet } from "@angular/router";
-import { FooterComponent } from "./shared/components/footer";
-import { NavbarComponent } from "./shared/components/navbar";
-import { NotificationComponent } from "./shared/components/notification";
+import { Component } from '@angular/core';
+import { RouterOutlet } from '@angular/router';
+import { FooterComponent } from './shared/components/footer';
+import { NavbarComponent } from './shared/components/navbar';
+import { NotificationComponent } from './shared/components/notification';
 
 @Component({
-  selector: "app-root",
+  selector: 'app-root',
   standalone: true,
   imports: [
     RouterOutlet,
