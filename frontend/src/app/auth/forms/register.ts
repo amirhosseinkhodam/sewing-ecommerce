@@ -5,7 +5,7 @@ import {
   iranianPhoneValidator,
   strongPasswordValidator,
   passwordMatchValidator,
-} from '../../../shared/validators';
+} from '@shared/validators/validators';
 
 @Injectable({ providedIn: 'root' })
 export class RegisterFormService {

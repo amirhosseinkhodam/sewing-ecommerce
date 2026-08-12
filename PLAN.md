@@ -193,13 +193,14 @@ frontend/src/app/
 │   └── services/
 │       └── api.service.ts (exists)
 │
+├── auth/
+│   ├── pages/login.ts, register.ts, profile.ts
+│   ├── store/auth.ts
+│   ├── forms/login.ts, register.ts
+│   ├── models/auth.ts
+│   └── services/auth.ts
+│
 ├── features/
-│   ├── auth/
-│   │   ├── pages/login.ts, register.ts
-│   │   ├── store/auth.ts
-│   │   ├── forms/login.ts, register.ts
-│   │   ├── models/auth.ts
-│   │   └── services/auth.ts
 │   ├── products/
 │   │   ├── pages/catalog.ts, product-detail.ts
 │   │   ├── models/product.ts
@@ -234,14 +235,13 @@ frontend/src/app/
 │   └── fa.json (~150 keys)
 │
 └── shared/
-    ├── index.ts (exists)
     ├── components/ (10 exist: button, card, input, select, textarea, form, confirm-dialog, confirm-bottom-sheet, theme-toggle, language-toggle)
     │   └── NEW: navbar.ts, footer.ts, breadcrumbs.ts, quantity-selector.ts, image-gallery.ts, skeleton.ts, back-to-top.ts
     ├── services/theme.ts, language.ts (exist)
     ├── pipes/translate.ts, localized-date.ts (exist)
     ├── forms/password.ts (exist)
     ├── const/http-methods.ts (exist)
-    └── models/index.ts (exists — ApiErrorResponse)
+    └── models/ (exists)
 ```
 
 ---

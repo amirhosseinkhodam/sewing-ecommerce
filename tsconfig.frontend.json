@@ -13,10 +13,7 @@
     "resolveJsonModule": true,
     "importHelpers": true,
     "module": "ES2022",
-    "lib": ["ES2022", "dom"],
-    "paths": {
-      "@shared/*": ["shared/*"]
-    }
+    "lib": ["ES2022", "dom"]
   },
   "include": ["frontend/src/**/*.ts", "shared/**/*.ts"],
   "exclude": ["node_modules", "dist"]

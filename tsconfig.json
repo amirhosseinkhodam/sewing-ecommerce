@@ -10,7 +10,10 @@
     "strict": true,
     "target": "ES2022",
     "paths": {
-      "@shared/*": ["shared/*"]
+      "@core/*": ["frontend/src/app/core/*"],
+      "@shared/*": ["frontend/src/app/shared/*"],
+      "@i18n/*": ["frontend/src/app/i18n/*"],
+      "@auth/*": ["frontend/src/app/auth/*"]
     }
   }
 }

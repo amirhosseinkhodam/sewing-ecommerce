@@ -1,12 +1,12 @@
 import { Component, inject } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { ReactiveFormsModule } from '@angular/forms';
-import { TranslatePipe } from '../../../shared/pipes/translate';
-import { CardComponent } from '../../../shared/components/card';
-import { ButtonComponent } from '../../../shared/components/button';
-import { InputComponent } from '../../../shared/components/input';
-import { FormComponent } from '../../../shared/components/form';
-import { FormFieldComponent } from '../../../shared/components/form-field';
+import { TranslatePipe } from '@shared/pipes/translate';
+import { CardComponent } from '@shared/components/card';
+import { ButtonComponent } from '@shared/components/button';
+import { InputComponent } from '@shared/components/input';
+import { FormComponent } from '@shared/components/form';
+import { FormFieldComponent } from '@shared/components/form-field';
 import { LoginFormService } from '../forms/login';
 import { AuthStore } from '../store/auth';
 

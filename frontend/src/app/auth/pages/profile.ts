@@ -1,8 +1,8 @@
 import { Component, inject } from '@angular/core';
 import { RouterLink } from '@angular/router';
-import { TranslatePipe } from '../../../shared/pipes/translate';
-import { CardComponent } from '../../../shared/components/card';
-import { ButtonComponent } from '../../../shared/components/button';
+import { TranslatePipe } from '@shared/pipes/translate';
+import { CardComponent } from '@shared/components/card';
+import { ButtonComponent } from '@shared/components/button';
 import { AuthStore } from '../store/auth';
 
 @Component({

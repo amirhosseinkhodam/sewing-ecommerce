@@ -44,16 +44,17 @@ npm run start:backend  # API on localhost:3000, Swagger at /docs
 frontend/src/app/
 ├── main.ts / app.ts / main.route.ts
 ├── core/                 # Guards, interceptors, API service
-├── features/             # Feature modules (auth, home, ...)
+├── auth/                 # Auth feature (store, services, forms, pages)
+├── features/             # Feature modules (home, products, ...)
 │   ├── <feature>/pages/  # Routed page components
 │   ├── <feature>/store/  # SignalStore state
 │   ├── <feature>/forms/  # Reactive form services
 │   ├── <feature>/models/ # Feature models/interfaces
 │   └── <feature>/services/
 ├── i18n/                 # en.json + fa.json (Persian RTL)
-└── shared/               # Custom element library, pipes, services
+└── shared/               # Custom element library, pipes, services (import via @shared/*)
 backend/                  # NestJS + Prisma backend
-shared/                   # Cross-half shared types (importable via @shared/*)
+shared/                   # Cross-half shared types (root, backend-importable)
 ```
 
 ## Current Progress

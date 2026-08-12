@@ -17,7 +17,7 @@ import {
 import { TranslatePipe } from '../pipes/translate';
 import { ThemeToggleComponent } from './theme-toggle';
 import { LanguageToggleComponent } from './language-toggle';
-import { AuthStore } from '../../features/auth/store/auth';
+import { AuthStore } from '@auth/store/auth';
 
 @Component({
   selector: 'app-navbar',

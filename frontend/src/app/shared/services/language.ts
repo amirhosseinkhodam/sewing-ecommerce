@@ -1,6 +1,6 @@
 import { Injectable, signal, effect } from '@angular/core';
-import en from '../../i18n/en.json';
-import fa from '../../i18n/fa.json';
+import en from '@i18n/en.json';
+import fa from '@i18n/fa.json';
 import { Language, LanguageOptionModel } from '../models/language';
 
 const translations: Record<Language, Record<string, unknown>> = { en, fa };

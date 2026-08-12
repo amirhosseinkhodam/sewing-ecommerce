@@ -11,7 +11,7 @@ import {
 } from '@ngrx/signals';
 import { rxMethod } from '@ngrx/signals/rxjs-interop';
 import { pipe, switchMap, tap } from 'rxjs';
-import { NotificationService } from '../../../shared/services/notification';
+import { NotificationService } from '@shared/services/notification';
 import {
   AuthPayloadModel,
   AuthUserModel,

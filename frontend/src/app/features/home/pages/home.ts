@@ -1,9 +1,9 @@
 import { Component } from '@angular/core';
-import { ButtonComponent } from '../../../shared/components/button';
-import { CardComponent } from '../../../shared/components/card';
-import { LanguageToggleComponent } from '../../../shared/components/language-toggle';
-import { ThemeToggleComponent } from '../../../shared/components/theme-toggle';
-import { TranslatePipe } from '../../../shared/pipes/translate';
+import { ButtonComponent } from '@shared/components/button';
+import { CardComponent } from '@shared/components/card';
+import { LanguageToggleComponent } from '@shared/components/language-toggle';
+import { ThemeToggleComponent } from '@shared/components/theme-toggle';
+import { TranslatePipe } from '@shared/pipes/translate';
 
 @Component({
   selector: 'app-home',

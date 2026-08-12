@@ -1,6 +1,6 @@
 import { inject, Injectable } from '@angular/core';
 import { FormBuilder, Validators } from '@angular/forms';
-import { strongPasswordValidator } from 'frontend/src/app/shared';
+import { strongPasswordValidator } from '@shared/validators/validators';
 
 @Injectable({ providedIn: 'root' })
 export class LoginFormService {

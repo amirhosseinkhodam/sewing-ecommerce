@@ -10,18 +10,18 @@ export const routes: Routes = [
   {
     path: 'login',
     loadComponent: () =>
-      import('./features/auth/pages/login').then((m) => m.LoginComponent),
+      import('./auth/pages/login').then((m) => m.LoginComponent),
   },
   {
     path: 'register',
     loadComponent: () =>
-      import('./features/auth/pages/register').then((m) => m.RegisterComponent),
+      import('./auth/pages/register').then((m) => m.RegisterComponent),
   },
   {
     path: 'profile',
     canActivate: [authGuard],
     loadComponent: () =>
-      import('./features/auth/pages/profile').then((m) => m.ProfileComponent),
+      import('./auth/pages/profile').then((m) => m.ProfileComponent),
   },
   { path: '**', redirectTo: '' },
 ];

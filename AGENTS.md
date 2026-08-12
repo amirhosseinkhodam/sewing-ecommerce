@@ -25,7 +25,7 @@ All backend commands run from the root (single `package.json`): `npm run prisma:
 
 - **Frontend**: Angular 19 standalone (no `NgModule`). Uses `bootstrapApplication` with `provideHttpClient()` and `provideRouter()`.
 - **Backend**: NestJS + Prisma + PostgreSQL, in `backend/` (same repo).
-- **Shared**: Cross-half code lives in `shared/` (types, models), importable via `@shared/*`.
+- **Shared**: Cross-half code lives in root `shared/` (types, models). Frontend app code lives in `frontend/src/app/`, imported via path aliases — `@core/*`, `@shared/*`, `@i18n/*`, `@auth/*` — so cross-directory imports never use `../..` (e.g. `@shared/components/button`). No `index.ts` barrel files.
 - **Styling**: Tailwind CSS with custom design tokens in `tailwind.config.js`. No CSS/SCSS in components.
 - **i18n**: English (`en`) and Persian (`fa`, RTL). Translation files in `frontend/src/app/i18n/`.
 - **Dark mode**: ThemeService with signal-based state, persists to localStorage.
@@ -48,7 +48,7 @@ All backend commands run from the root (single `package.json`): `npm run prisma:
 - `core/interceptors/auth.interceptor.ts` — skips the refresh endpoint; attaches `Authorization: Bearer <token>`; on 401 retries once after `AuthService.refresh()`, else `auth.logout()` (clears storage, redirects home).
 - `core/guards/auth.guard.ts` — `authGuard` allows if logged in else `/login`; `adminGuard` allows only when logged in **and** `role === 'ADMIN'` else `/`.
 
-### `features/auth/` — the reference feature
+### `auth/` — the reference feature
 
 Read this feature before building others; it demonstrates every project convention. Files split as `pages/`, `store/`, `services/`, `forms/`, `models/`.
 
