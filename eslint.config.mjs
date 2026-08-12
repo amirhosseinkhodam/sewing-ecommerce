@@ -44,6 +44,17 @@ export default tseslint.config(
       },
     },
   },
+  // Shared cross-half code: ES modules, type-checked like the rest
+  {
+    files: ['shared/**/*.ts'],
+    languageOptions: {
+      sourceType: 'module',
+      parserOptions: {
+        projectService: true,
+        tsconfigRootDir: import.meta.dirname,
+      },
+    },
+  },
   // Shared rules for all TypeScript files
   {
     rules: {

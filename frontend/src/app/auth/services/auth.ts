@@ -1,10 +1,10 @@
 import { inject, Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import type { UserModel } from '@domain/models/user';
 import {
   AuthPayloadModel,
   AuthResponseModel,
-  AuthUserModel,
   RegisterPayloadModel,
 } from '../models/auth';
 
@@ -33,11 +33,11 @@ export class AuthService {
     });
   }
 
-  me(): Observable<AuthUserModel> {
-    return this.#http.get<AuthUserModel>(`${this.#baseUrl}/me`);
+  me(): Observable<UserModel> {
+    return this.#http.get<UserModel>(`${this.#baseUrl}/me`);
   }
 
-  updateProfile(payload: Partial<AuthUserModel>): Observable<AuthUserModel> {
-    return this.#http.patch<AuthUserModel>(`${this.#baseUrl}/profile`, payload);
+  updateProfile(payload: Partial<UserModel>): Observable<UserModel> {
+    return this.#http.patch<UserModel>(`${this.#baseUrl}/profile`, payload);
   }
 }

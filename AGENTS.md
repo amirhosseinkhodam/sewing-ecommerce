@@ -14,7 +14,7 @@ Persian-first, mobile-responsive tailor shop ecommerce website with guest browsi
 | `npm run start:backend` | Backend dev server on `localhost:3000` |
 | `npm run dev` | Frontend + backend together (concurrently) |
 | `npm run build` | Production build (backend then frontend) |
-| `npm run lint` | ESLint — checks `frontend/src/**/*.ts` `backend/src/**/*.ts` |
+| `npm run lint` | ESLint — checks `frontend/src/**/*.ts` `backend/src/**/*.ts` `shared/**/*.ts` |
 | `npm run format` | Prettier — writes both halves |
 
 All backend commands run from the root (single `package.json`): `npm run prisma:migrate`, `npm run prisma:seed`, `npm run prisma:generate`, `npm run prisma:studio`.
@@ -25,7 +25,7 @@ All backend commands run from the root (single `package.json`): `npm run prisma:
 
 - **Frontend**: Angular 19 standalone (no `NgModule`). Uses `bootstrapApplication` with `provideHttpClient()` and `provideRouter()`.
 - **Backend**: NestJS + Prisma + PostgreSQL, in `backend/` (same repo).
-- **Shared**: Cross-half code lives in root `shared/` (types, models). Frontend app code lives in `frontend/src/app/`, imported via path aliases — `@core/*`, `@shared/*`, `@i18n/*`, `@auth/*` — so cross-directory imports never use `../..` (e.g. `@shared/components/button`). No `index.ts` barrel files.
+- **Shared**: Cross-half code lives in root `shared/` (types, models, const) and is imported via the `@domain/*` path alias (`@domain/models/user`, `@domain/const/user-roles`) defined in `tsconfig.json`. Note: the global convention names the cross-half alias `@shared/*`, but this project overrides it to `@domain/*` because `@shared/*` is already taken by the Angular app's UI-shared folder (`frontend/src/app/shared/*`). Frontend app code uses path aliases — `@core/*`, `@shared/*`, `@i18n/*`, `@auth/*`, `@domain/*` — so cross-directory imports never use `../..` (e.g. `@shared/components/button`). Backend imports `shared/` via relative paths because path aliases are not rewritten in emitted JS. No `index.ts` barrel files.
 - **Styling**: Tailwind CSS with custom design tokens in `tailwind.config.js`. No CSS/SCSS in components.
 - **i18n**: English (`en`) and Persian (`fa`, RTL). Translation files in `frontend/src/app/i18n/`.
 - **Dark mode**: ThemeService with signal-based state, persists to localStorage.
@@ -69,7 +69,7 @@ Read this feature before building others; it demonstrates every project conventi
 
 - `app.module.ts` — `ConfigModule` (global, reads `.env`), `ServeStaticModule` (serves `uploads/`), `PrismaModule`, `AuthModule`, `UploadModule`, `AppController` (`GET /api/health`).
 - `common/` — `prisma.service.ts` (`@Global()`, pg driver via `DATABASE_URL`, connects on init / disconnects on destroy), `JwtAuthGuard`, `RolesGuard` + `@Roles()` decorator, `@CurrentUser()` decorator, `HttpExceptionFilter`.
-- `auth/` — controller (`POST /register`, `/login`, `/refresh`, `GET /me`, `PATCH /profile`); service (bcrypt, `#signTokens` issues access 15m / refresh 7d with **separate secrets** from `.env`, `#toUserResponse` strips `password`); `jwt.strategy.ts` → `request.user = { id, email, role }`; `dto/` class-validator DTOs (Iranian mobile regex `^09\d{9}$`).
+- `auth/` — controller (`POST /register`, `/login`, `/refresh`, `GET /me`, `PATCH /profile`); service (bcrypt, `#signTokens` issues access 15m / refresh 7d with **separate secrets** from `.env`, all responses use Prisma `omit` to strip `password`/timestamps, response shape typed as shared `UserModel`); `jwt.strategy.ts` → `request.user = { id, email, role }`; `dto/` class-validator DTOs (Iranian mobile regex `^09\d{9}$`).
 - `upload/` — Multer `diskStorage` into `uploads/` with `randomUUID()` filenames; `POST /upload` and `POST /upload/multiple`.
 - `backend/prisma/schema.prisma` — 11 models + enums; generated client committed in `backend/src/generated/prisma/`.
 

@@ -1,13 +1,4 @@
-import { UserRole } from '@shared/const/user-roles';
-
-export interface AuthUserModel {
-  readonly id: string;
-  readonly firstName: string;
-  readonly lastName: string;
-  readonly email: string;
-  readonly phone: string;
-  readonly role: UserRole;
-}
+import type { UserModel } from '@domain/models/user';
 
 export interface AuthPayloadModel {
   readonly email: string;
@@ -25,5 +16,5 @@ export interface RegisterPayloadModel {
 export interface AuthResponseModel {
   readonly accessToken: string;
   readonly refreshToken: string;
-  readonly user: AuthUserModel;
+  readonly user: UserModel;
 }

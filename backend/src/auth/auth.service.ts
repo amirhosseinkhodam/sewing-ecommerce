@@ -8,11 +8,18 @@ import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 import type { SignOptions } from 'jsonwebtoken';
 import { Prisma, User } from '../generated/prisma/client';
+import type { UserModel } from '../../../shared/models/user';
 import { PrismaService } from '../common/prisma/prisma.service';
 import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
 import { UpdateProfileDto } from './dto/update-profile.dto';
 import { JwtPayload } from './jwt.strategy';
+
+const USER_OMIT = {
+  password: true,
+  createdAt: true,
+  updatedAt: true,
+} as const;
 
 interface TokenPair {
   readonly accessToken: string;
@@ -41,18 +48,13 @@ export class AuthService {
 
     const password = await bcrypt.hash(dto.password, 10);
     const user = await this.#prisma.user.create({
-      data: {
-        firstName: dto.firstName,
-        lastName: dto.lastName,
-        email: dto.email,
-        phone: dto.phone,
-        password,
-      },
+      data: { ...dto, password },
+      omit: USER_OMIT,
     });
 
     return {
       ...(await this.#signTokens(user)),
-      user: this.#toUserResponse(user),
+      user,
     };
   }
 
@@ -69,9 +71,10 @@ export class AuthService {
       throw new UnauthorizedException('Invalid credentials');
     }
 
+    const { password, createdAt, updatedAt, ...publicUser } = user;
     return {
       ...(await this.#signTokens(user)),
-      user: this.#toUserResponse(user),
+      user: publicUser,
     };
   }
 
@@ -82,28 +85,35 @@ export class AuthService {
       });
       const user = await this.#prisma.user.findUnique({
         where: { id: payload.sub },
+        omit: USER_OMIT,
       });
       if (!user) {
         throw new UnauthorizedException('Invalid refresh token');
       }
       return {
         ...(await this.#signTokens(user)),
-        user: this.#toUserResponse(user),
+        user,
       };
     } catch {
       throw new UnauthorizedException('Invalid refresh token');
     }
   }
 
-  async me(userId: string) {
-    const user = await this.#prisma.user.findUnique({ where: { id: userId } });
+  async me(userId: string): Promise<UserModel> {
+    const user = await this.#prisma.user.findUnique({
+      where: { id: userId },
+      omit: USER_OMIT,
+    });
     if (!user) {
       throw new UnauthorizedException('User not found');
     }
-    return this.#toUserResponse(user);
+    return user;
   }
 
-  async updateProfile(userId: string, dto: UpdateProfileDto) {
+  async updateProfile(
+    userId: string,
+    dto: UpdateProfileDto,
+  ): Promise<UserModel> {
     const data: Prisma.UserUpdateInput = { ...dto };
     if (dto.password) {
       data.password = await bcrypt.hash(dto.password, 10);
@@ -112,11 +122,14 @@ export class AuthService {
     const user = await this.#prisma.user.update({
       where: { id: userId },
       data,
+      omit: USER_OMIT,
     });
-    return this.#toUserResponse(user);
+    return user;
   }
 
-  async #signTokens(user: User): Promise<TokenPair> {
+  async #signTokens(
+    user: Pick<User, 'id' | 'email' | 'role'>,
+  ): Promise<TokenPair> {
     const payload: JwtPayload = {
       sub: user.id,
       email: user.email,
@@ -139,16 +152,5 @@ export class AuthService {
       }),
     ]);
     return { accessToken, refreshToken };
-  }
-
-  #toUserResponse(user: User) {
-    return {
-      id: user.id,
-      firstName: user.firstName,
-      lastName: user.lastName,
-      email: user.email,
-      phone: user.phone,
-      role: user.role,
-    };
   }
 }

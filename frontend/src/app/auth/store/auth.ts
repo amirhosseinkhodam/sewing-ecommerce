@@ -12,18 +12,15 @@ import {
 import { rxMethod } from '@ngrx/signals/rxjs-interop';
 import { pipe, switchMap, tap } from 'rxjs';
 import { NotificationService } from '@shared/services/notification';
-import { USER_ROLES } from '@shared/const/user-roles';
-import {
-  AuthPayloadModel,
-  AuthUserModel,
-  RegisterPayloadModel,
-} from '../models/auth';
+import { USER_ROLES } from '@domain/const/user-roles';
+import type { UserModel } from '@domain/models/user';
+import { AuthPayloadModel, RegisterPayloadModel } from '../models/auth';
 import { AuthService } from '../services/auth';
 
 interface AuthState {
   accessToken: string | null;
   refreshToken: string | null;
-  user: AuthUserModel | null;
+  user: UserModel | null;
   loading: boolean;
 }
 

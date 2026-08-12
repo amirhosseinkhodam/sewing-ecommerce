@@ -170,7 +170,7 @@ Note the private field pattern (`readonly #auth`) — NestJS DI happens through 
 - **`login`**: looks up by email, compares bcrypt hashes, throws `UnauthorizedException` (→ 401) on failure.
 - **`refresh`**: verifies the *refresh* token with a **separate secret** (`JWT_REFRESH_SECRET`), reloads the user, issues a fresh token pair.
 - **`#signTokens`**: issues an **access token (15 min)** and a **refresh token (7 days)**, signed with *different* secrets and expiries so a leaked access token can't mint new tokens. It's `async` with `Promise.all`.
-- **`#toUserResponse`**: strips `password` before the user object ever leaves the service. This is why your frontend never sees a `password` field.
+- **Prisma `omit`**: every query that returns a user uses `omit: { password, createdAt, updatedAt }` (shared `USER_OMIT` const) so `password` never leaves the service. `login` fetches the password for the bcrypt check, then strips it via destructuring before returning. The response shape is the shared `UserModel` (from `shared/models/user.ts`) — this is why your frontend never sees a `password` field.
 
 ### How a token becomes a user: `jwt.strategy.ts`
 
@@ -426,7 +426,7 @@ export interface AuthPayloadModel {   // = LoginDto
 export interface AuthResponseModel {  // = login() return value
   readonly accessToken: string;
   readonly refreshToken: string;
-  readonly user: AuthUserModel;       // = your #toUserResponse()
+  readonly user: UserModel;           // = shared/models/user.ts
 }
 ```
 
@@ -488,7 +488,7 @@ export class LoginFormService {
 
 - **`#` private fields** (same rule as backend — `readonly #http = inject(HttpClient)`), never `private`.
 - **Models**: `interface XxxModel` with `readonly` properties, in `models/` directories only. Field names match the backend DTOs.
-- **Files match their primary export**: `auth.ts` exports `AuthService`/`AuthStore`/`AuthUserModel` depending on folder (`services/`, `store/`, `models/`).
+- **Files match their primary export**: `auth.ts` exports `AuthService`/`AuthStore`/`UserModel` depending on folder (`services/`, `store/`, `models/`).
 - **String/enum values are camelCase** client-side (`'superAdmin'`) — but note the *API* enums from Prisma are uppercase (`'ADMIN'`); the frontend compares against `'ADMIN'` because that's what the backend sends.
 - **Components are single `.ts` files with inline `template:`** — no external HTML files.
 - **Standalone everywhere** — components import their own dependencies; no `NgModule`.
@@ -516,8 +516,8 @@ Current live endpoints (Swagger at `/docs`). Shapes match DTO ⇄ model.
 | POST | `/api/auth/register` | — | `RegisterDto` `{firstName, lastName, email, password, phone}` | `{accessToken, refreshToken, user}` |
 | POST | `/api/auth/login` | — | `LoginDto` `{email, password}` | `{accessToken, refreshToken, user}` |
 | POST | `/api/auth/refresh` | — | `RefreshDto` `{refreshToken}` | `{accessToken, refreshToken, user}` |
-| GET | `/api/auth/me` | Bearer | — | `AuthUserModel` `{id, firstName, lastName, email, phone, role}` |
-| PATCH | `/api/auth/profile` | Bearer | `UpdateProfileDto` (all optional) | `AuthUserModel` |
+| GET | `/api/auth/me` | Bearer | — | `UserModel` `{id, firstName, lastName, email, phone, role}` |
+| PATCH | `/api/auth/profile` | Bearer | `UpdateProfileDto` (all optional) | `UserModel` |
 
 `role` ∈ `'CUSTOMER' | 'ADMIN'` (Prisma `Role` enum, sent uppercase).
 
