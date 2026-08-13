@@ -1,6 +1,6 @@
 # Backend Code Explaination
 
-A cross-discipline "translation guide" for the Tailor Ecommerce monorepo.
+A cross-discipline "translation guide" for the Sewing Ecommerce monorepo.
 
 This document explains the **backend** to a **frontend developer**, and the **frontend** to a **backend developer**. It focuses on the *how* (what each piece of code does) and the *why* (the reasoning behind the architecture), using the real files in this repository. It assumes you already know your own side of the stack.
 
@@ -203,6 +203,20 @@ readonly phone: string;
 
 The global `ValidationPipe` runs these rules, and on failure returns a 400 with the message(s). **Important**: because `whitelist: true`, any field *not* decorated is stripped. So when the frontend sends a body, it must match the DTO field-for-field or extra fields will be dropped silently.
 
+## A5b. Products + Categories — the catalog modules
+
+`backend/src/products/` and `backend/src/categories/` follow the same module/controller/service/dto shape as auth, split into **public** and **admin** controllers:
+
+- `products.controller.ts` — public, no auth: `GET /api/products` (filterable list) + `GET /api/products/:slug` (detail).
+- `admin-products.controller.ts` — `@UseGuards(JwtAuthGuard, RolesGuard)` + `@Roles(Role.ADMIN)`: create / update / delete.
+- Same pattern for `categories` (public list vs admin CRUD).
+- `dto/create-product.dto.ts` — `@ValidateNested` + `@Type(() => CreateVariantDto)` for the `variants` array, so Prisma receives typed variant data.
+- `products.service.ts` — every read includes `category` and ordered `variants` via Prisma `include`; writes upsert variants (`upsert` by `id`) so editing replaces variant stock/sizes cleanly; deletion cascades via the Prisma schema.
+- **Deleting a category that still has products → 409** (`ConflictException`, checked with `product.count()` first) — mirrors the duplicate-email 409 pattern.
+- `common/utils/slugify.ts` — generates a URL-safe slug from the name. It **transliterates Persian → Latin** (`جلیقه چرم` → `jlyghh-chrm`) so Persian product names get readable (non-empty) slugs, with a `randomUUID()` fallback for names that produce nothing.
+
+**List filtering** (`GET /api/products`) reads `search`, `category` (slug), `minPrice`, `maxPrice`, `sort` (`newest | priceAsc | priceDesc`), `page`, `pageSize` from the query string and returns `{ items, total, page, pageSize, totalPages }`.
+
 ## A6. Uploads
 
 `backend/src/upload/upload.controller.ts` uses Multer with `diskStorage`:
@@ -290,8 +304,10 @@ frontend/src/app/
 │   ├── guards/auth.guard.ts
 │   ├── interceptors/auth.interceptor.ts
 │   └── services/api.service.ts
-├── features/             # one folder per feature (auth today, products/... next)
-│   └── auth/
+├── features/             # one folder per feature (auth, products, admin, ...)
+│   ├── auth/             # login/register/profile (reference feature)
+│   ├── products/         # public catalog + detail
+│   └── admin/            # admin panel (categories, products) under /admin
 │       ├── pages/        # routed components (login, register, profile)
 │       ├── store/        # AuthStore (SignalStore)
 │       ├── forms/        # form services (login.ts, register.ts)
@@ -398,7 +414,33 @@ Key ideas for a backend dev:
 - **`tapResponse`** is the RxJS equivalent of a try/catch that distinguishes success/error cleanly — like `async`/`await` in your services but with automatic cancellation on re-entry.
 - **`withHooks.onInit`** = `OnModuleInit`-style bootstrapping: if a token exists, re-fetch `/api/auth/me` to restore the user object.
 - Components inject the store and **read state as signals**: `store.loading()`, `store.isAdmin()`. Backend parallel: a shared in-memory cache with reactive reads.
-- Rule of thumb from the plan: **only auth is global state**. Future features fetch via API services and keep local component state, so don't expect a store for every feature.
+- Rule of thumb from the plan: **only auth is global state**. Feature state (catalog, admin lists) lives in **component-scoped** SignalStores — provided at the component (`providers: [CatalogStore]`) so each visit gets a fresh store that dies with the route.
+
+### SignalStore cross-method calls
+
+When a store method needs to call another store method (e.g. `removeProduct` reloads the list via `loadProducts`), the two live in **separate `withMethods` blocks**:
+
+```ts
+withMethods((store, svc = inject(Svc)) => ({
+  loadProducts: rxMethod<void>(/* ... */),   // block 1: the loaders
+})),
+withMethods((store) => ({
+  removeProduct: rxMethod<string>(pipe(       // block 2: the mutators
+    switchMap((id) => svc.remove(id).pipe(
+      tapResponse({ next: () => store.loadProducts(), /* ... */ }),
+    )),
+  )),
+})),
+```
+
+Within a single `withMethods` block the `store` type does **not** include sibling methods yet — calling `store.loadProducts()` inside the same object literal is a compile error. Splitting blocks makes sibling calls type-safe (the error the compiler gives is a signal to split).
+
+### Catalog + admin stores
+
+- `features/products/store/catalog.ts` — **component-scoped** (`providers: [CatalogStore]`): state `{ products, categories, total, totalPages, query, loading, ... }`. `patchQuery`/`setPage`/`clearFilters` patch the query then call `store.loadProducts()` (second `withMethods` block).
+- `features/admin/store/product.ts` / `category.ts` — same pattern; `removeProduct`/`removeCategory` show a success toast then reload via `store.loadProducts()`.
+- `features/admin/store/product-form.ts` — loads categories, loads the product being edited, and `save` routes to `/admin/products` on success.
+- Pages inject the store, bind `store.xxx()` signals in the template, and call store methods from event handlers — components never touch `HttpClient`.
 
 ## B6. The auth feature — a complete data flow
 
@@ -521,6 +563,29 @@ Current live endpoints (Swagger at `/docs`). Shapes match DTO ⇄ model.
 
 `role` ∈ `'CUSTOMER' | 'ADMIN'` (Prisma `Role` enum, sent uppercase).
 
+### Categories
+
+| Method | Path | Auth | Request body | Response |
+|---|---|---|---|---|
+| GET | `/api/categories` | — | — | `CategoryModel[]` |
+| POST | `/api/admin/categories` | Admin | `CreateCategoryDto` | `CategoryModel` |
+| PATCH | `/api/admin/categories/:id` | Admin | `UpdateCategoryDto` | `CategoryModel` |
+| DELETE | `/api/admin/categories/:id` | Admin | — | 200 (409 if it still has products) |
+
+`CategoryModel` = `{id, name, slug, description?, image?, sortOrder, isActive, ...}`.
+
+### Products
+
+| Method | Path | Auth | Request body | Response |
+|---|---|---|---|---|
+| GET | `/api/products` | — | query: `search, category, minPrice, maxPrice, sort, page, pageSize` | `{items: ProductModel[], total, page, pageSize, totalPages}` |
+| GET | `/api/products/:slug` | — | — | `ProductModel` (with `variants`) |
+| POST | `/api/admin/products` | Admin | `CreateProductDto` (incl. `variants[]`) | `ProductModel` |
+| PATCH | `/api/admin/products/:id` | Admin | `UpdateProductDto` | `ProductModel` |
+| DELETE | `/api/admin/products/:id` | Admin | — | 200 |
+
+`ProductModel` = `{id, name, slug, description?, price (string), fabric?, images: string[], categoryId, category?, isActive, isFeatured, variants[]}`. `sort` ∈ `newest | priceAsc | priceDesc`. `price` arrives as a **string** (Prisma Decimal).
+
 ### Upload
 
 | Method | Path | Auth | Body | Response |
@@ -542,4 +607,4 @@ Every failure is `{ "statusCode": number, "message": string }` (see [A7](#a7-err
 
 ### Planned (schema-ready, frontend routes already in the navbar)
 
-`/api/categories`, `/api/products`, `/api/cart`, `/api/orders`, `/api/addresses`, `/api/payment/*`, `/api/portfolio`, `/api/contact`, and the `/api/admin/*` group. Full endpoint list: `PLAN.md` §6.
+`/api/cart`, `/api/orders`, `/api/addresses`, `/api/payment/*`, `/api/portfolio`, `/api/contact`, and the remaining `/api/admin/*` group. Full endpoint list: `PLAN.md` §6.

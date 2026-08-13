@@ -1,10 +1,10 @@
-# Tailor Ecommerce — AGENTS.md
+# Sewing Ecommerce — AGENTS.md
 
 > General conventions (naming, styling, components, forms, i18n, state management, custom elements, modern Angular syntax, DRY, etc.) are in `~/.config/opencode/AGENTS.md`. This file only contains project-specific details.
 
 ## Overview
 
-Persian-first, mobile-responsive tailor shop ecommerce website with guest browsing, customer cart/checkout, admin panel for full management, card-to-card payment (Zarinpal in Phase 8), and SMS notifications (Phase 8).
+Persian-first, mobile-responsive sewing shop ecommerce website with guest browsing, customer cart/checkout, admin panel for full management, card-to-card payment (Zarinpal in Phase 8), and SMS notifications (Phase 8).
 
 ## Quick commands
 
@@ -93,6 +93,6 @@ Testing infrastructure has been removed from this project (no `tests/`, no jest 
 
 - **Phase 0 — Backend Foundation** — done (NestJS 11 + Prisma 7 + PostgreSQL in `backend/`: auth, upload, Swagger)
 - **Phase 1 — Auth Frontend + Layout** — done (guards, interceptor, navbar/footer, login/register, AuthStore, profile)
-- **Phase 2 — Products + Categories** — next
+- **Phase 2 — Products + Categories** — done (backend CRUD + seed; public catalog/detail; admin category/product management; Persian-aware slugify)
 
 Phase checklists live in **`PLAN.md` §8** — update them there, never duplicate here.

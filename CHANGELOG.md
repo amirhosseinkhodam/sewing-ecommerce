@@ -1,5 +1,23 @@
 # Logs
 
+## [0.1.0] - 2026-08-13
+
+### Added
+- **Phase 2 — Products + Categories** (backend + frontend + admin)
+- Backend: Category CRUD + Product CRUD (variants, image upload) in `backend/src/categories` and `backend/src/products`, registered in `app.module.ts`; seed data (3 categories, 5 products)
+- Backend: `slugify` util with Persian→Latin transliteration + random fallback (`backend/src/common/utils/slugify.ts`)
+- Frontend: public catalog (`/products`) with grid, search (debounced), category/sort/price filters, pagination
+- Frontend: product detail (`/products/:slug`) with image gallery, size selector, stock display, add-to-cart (login-gated)
+- Frontend: admin panel (`/admin`, adminGuard) — category list + product list (search, pagination) + product form (variants, images, toggles, category select)
+- Shared: `ImageGalleryComponent`, `ToggleComponent`, `LocalizedNumberPipe`, `UploadService`, `UploadResponseModel`
+- i18n: Phase-2 keys added to `en.json` + `fa.json`
+
+### Updated
+- `main.route.ts` — `/products`, `/products/:slug`, `/admin` (with children: products, products/new, products/:id/edit, categories)
+- `button.ts` — added `ariaLabel` input
+- `forms/product.ts` — nonNullable arrays, typed `payload` getter
+- SignalStore patterns — methods that reload after mutations live in a second `withMethods` block (type-safe sibling calls)
+
 ## [0.0.2] - 2026-07-26
 
 ### Updated

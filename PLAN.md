@@ -1,8 +1,8 @@
-# Tailor Ecommerce — Complete Plan
+# Sewing Ecommerce — Complete Plan
 
 ## Overview
 
-A Persian-first, mobile-responsive tailor shop ecommerce website with guest browsing, customer cart/checkout, admin panel for full management, card-to-card payment (Zarinpal in Phase 8), and SMS notifications (Phase 8).
+A Persian-first, mobile-responsive sewing shop ecommerce website with guest browsing, customer cart/checkout, admin panel for full management, card-to-card payment (Zarinpal in Phase 8), and SMS notifications (Phase 8).
 
 ---
 
@@ -433,13 +433,13 @@ Only admin can change status. (Phase 8: SMS sent to customer on each transition.
 - [x] AuthInterceptor (attach JWT + handle 401)
 - [x] ProfilePage
 
-### Phase 2 — Products + Categories (4 days)
-- [ ] Backend: Category CRUD
-- [ ] Backend: Product CRUD + variants + image upload
-- [ ] Admin: CategoryListPage
-- [ ] Admin: ProductListPage + ProductFormPage
-- [ ] Public: CatalogPage (grid, filters, pagination, search)
-- [ ] Public: ProductDetailPage (gallery, sizes, add-to-cart)
+### Phase 2 — Products + Categories (4 days) — **DONE**
+- [x] Backend: Category CRUD
+- [x] Backend: Product CRUD + variants + image upload
+- [x] Admin: CategoryListPage
+- [x] Admin: ProductListPage + ProductFormPage
+- [x] Public: CatalogPage (grid, filters, pagination, search)
+- [x] Public: ProductDetailPage (gallery, sizes, add-to-cart)
 
 ### Phase 3 — Cart + Checkout (4 days)
 - [ ] Backend: Cart CRUD

@@ -9,6 +9,7 @@ import { LoadingSpinnerComponent } from './loading-spinner';
     <button
       [type]="type()"
       [disabled]="disabled() || loading()"
+      [attr.aria-label]="ariaLabel()"
       [class]="computedClasses()"
       (click)="onClick()"
       (keydown.enter)="onEnter($event)"
@@ -47,6 +48,7 @@ export class ButtonComponent {
   );
   readonly size = input<'sm' | 'md' | 'lg'>('md');
   readonly focusRing = input<boolean>(false);
+  readonly ariaLabel = input<string>();
 
   readonly click = output<void>({ alias: 'buttonClick' });
 

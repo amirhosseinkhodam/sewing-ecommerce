@@ -1,5 +1,5 @@
-import { NestFactory } from '@nestjs/core';
 import { ValidationPipe } from '@nestjs/common';
+import { NestFactory } from '@nestjs/core';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { mkdirSync } from 'fs';
@@ -18,13 +18,15 @@ async function bootstrap() {
   app.useGlobalFilters(new HttpExceptionFilter());
 
   const swaggerConfig = new DocumentBuilder()
-    .setTitle('Tailor Ecommerce API')
-    .setDescription('REST API for the tailor shop ecommerce.')
+    .setTitle('Sewing Ecommerce API')
+    .setDescription('REST API for the sewing shop ecommerce.')
     .setVersion('1.0')
     .addBearerAuth()
     .build();
   const document = SwaggerModule.createDocument(app, swaggerConfig);
-  SwaggerModule.setup('docs', app, document);
+  SwaggerModule.setup('docs', app, document, {
+    swaggerOptions: { tagsSorter: 'alpha', operationsSorter: 'alpha' },
+  });
 
   const port = process.env.PORT ?? 3000;
   await app.listen(port);
