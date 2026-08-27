@@ -1,5 +1,5 @@
 import { Component, inject } from '@angular/core';
-import { RouterLink } from '@angular/router';
+import { ActivatedRoute, RouterLink } from '@angular/router';
 import { ReactiveFormsModule } from '@angular/forms';
 import { TranslatePipe } from '@shared/pipes/translate';
 import { CardComponent } from '@shared/components/card';
@@ -88,7 +88,13 @@ export class LoginComponent {
   readonly loginForm = inject(LoginFormService);
   readonly store = inject(AuthStore);
 
+  readonly #route = inject(ActivatedRoute);
+
   onSubmit(): void {
-    this.store.login(this.loginForm.form.getRawValue());
+    this.store.login({
+      payload: this.loginForm.form.getRawValue(),
+      returnUrl:
+        this.#route.snapshot.queryParamMap.get('returnUrl') ?? undefined,
+    });
   }
 }

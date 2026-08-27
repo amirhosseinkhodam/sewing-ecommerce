@@ -2,6 +2,7 @@ import {
   Component,
   ElementRef,
   HostListener,
+  effect,
   inject,
   signal,
   viewChild,
@@ -18,6 +19,7 @@ import { TranslatePipe } from '../pipes/translate';
 import { ThemeToggleComponent } from './theme-toggle';
 import { LanguageToggleComponent } from './language-toggle';
 import { AuthStore } from '@auth/store/auth';
+import { CartStore } from '../../features/cart/store/cart';
 
 @Component({
   selector: 'app-navbar',
@@ -87,11 +89,13 @@ import { AuthStore } from '@auth/store/auth';
                 color="currentColor"
                 [strokeWidth]="1.5"
               />
-              @if (store.isLoggedIn() && cartCount() > 0) {
+              @if (store.isLoggedIn() && cartStore.totalItems() > 0) {
                 <span
                   class="absolute -top-1 -right-1 flex items-center justify-center w-5 h-5 text-xs font-bold text-white bg-red-500 rounded-full"
                 >
-                  {{ cartCount() > 99 ? '99+' : cartCount() }}
+                  {{
+                    cartStore.totalItems() > 99 ? '99+' : cartStore.totalItems()
+                  }}
                 </span>
               }
             </a>
@@ -302,12 +306,12 @@ import { AuthStore } from '@auth/store/auth';
 })
 export class NavbarComponent {
   readonly store = inject(AuthStore);
+  readonly cartStore = inject(CartStore);
 
   readonly icons = { ShoppingCart01Icon, Cancel01Icon, Menu01Icon };
 
   readonly mobileMenuOpen = signal(false);
   readonly profileDropdownOpen = signal(false);
-  readonly cartCount = signal(0);
 
   readonly dropdownContainer =
     viewChild<ElementRef<HTMLDivElement>>('dropdownContainer');
@@ -317,6 +321,16 @@ export class NavbarComponent {
     if (!user) return '';
     return `${user.firstName[0]}${user.lastName[0]}`;
   };
+
+  constructor() {
+    effect(() => {
+      if (this.store.accessToken()) {
+        this.cartStore.load();
+      } else {
+        this.cartStore.clearLocal();
+      }
+    });
+  }
 
   @HostListener('document:click', ['$event'])
   onDocumentClick(event: Event) {

@@ -1,6 +1,8 @@
 # Sewing Ecommerce — AGENTS.md
 
 > General conventions (naming, styling, components, forms, i18n, state management, custom elements, modern Angular syntax, DRY, etc.) are in `~/.config/opencode/AGENTS.md`. This file only contains project-specific details.
+>
+> **Canonical project knowledge** (architecture, flows, auth, DB, API contracts, decisions & why): `PROJECT_KNOWLEDGE.md` — keep it updated automatically when a task changes the system. This file documents conventions; that file explains how the system works.
 
 ## Overview
 
@@ -94,5 +96,6 @@ Testing infrastructure has been removed from this project (no `tests/`, no jest 
 - **Phase 0 — Backend Foundation** — done (NestJS 11 + Prisma 7 + PostgreSQL in `backend/`: auth, upload, Swagger)
 - **Phase 1 — Auth Frontend + Layout** — done (guards, interceptor, navbar/footer, login/register, AuthStore, profile)
 - **Phase 2 — Products + Categories** — done (backend CRUD + seed; public catalog/detail; admin category/product management; Persian-aware slugify)
+- **Phase 3 — Cart + Checkout** — done (`cart/`, `addresses/`, `orders/` backend modules; CartStore root SignalStore; CartPage, AddressManagementPage + shared AddressFormComponent, multi-step CheckoutPage; navbar badge via CartStore; add-to-cart with `returnUrl`/`autoAdd` login-return flow)
 
 Phase checklists live in **`PLAN.md` §8** — update them there, never duplicate here.

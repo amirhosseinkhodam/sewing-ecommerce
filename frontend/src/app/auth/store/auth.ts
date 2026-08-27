@@ -14,7 +14,7 @@ import { pipe, switchMap, tap } from 'rxjs';
 import { NotificationService } from '@shared/services/notification';
 import { USER_ROLES } from '@domain/const/user-roles';
 import type { UserModel } from '@domain/models/user';
-import { AuthPayloadModel, RegisterPayloadModel } from '../models/auth';
+import { LoginRequestModel, RegisterPayloadModel } from '../models/auth';
 import { AuthService } from '../services/auth';
 
 interface AuthState {
@@ -43,10 +43,10 @@ export const AuthStore = signalStore(
     ) => ({
       isLoggedIn: () => store.accessToken() !== null,
       isAdmin: () => store.user()?.role === USER_ROLES.ADMIN,
-      login: rxMethod<AuthPayloadModel>(
+      login: rxMethod<LoginRequestModel>(
         pipe(
           tap(() => patchState(store, { loading: true })),
-          switchMap((payload: AuthPayloadModel) =>
+          switchMap(({ payload, returnUrl }: LoginRequestModel) =>
             authService.login(payload).pipe(
               tapResponse({
                 next: ({ accessToken, refreshToken, user }) => {
@@ -58,7 +58,7 @@ export const AuthStore = signalStore(
                     user,
                     loading: false,
                   });
-                  router.navigateByUrl('/');
+                  router.navigateByUrl(returnUrl ?? '/');
                 },
                 error: (err: HttpErrorResponse) => {
                   patchState(store, { loading: false });

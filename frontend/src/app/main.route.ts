@@ -22,6 +22,28 @@ export const routes: Routes = [
       ),
   },
   {
+    path: 'cart',
+    canActivate: [authGuard],
+    loadComponent: () =>
+      import('./features/cart/pages/cart').then((m) => m.CartComponent),
+  },
+  {
+    path: 'checkout',
+    canActivate: [authGuard],
+    loadComponent: () =>
+      import('./features/orders/pages/checkout').then(
+        (m) => m.CheckoutComponent,
+      ),
+  },
+  {
+    path: 'addresses',
+    canActivate: [authGuard],
+    loadComponent: () =>
+      import('./features/addresses/pages/addresses').then(
+        (m) => m.AddressesComponent,
+      ),
+  },
+  {
     path: 'login',
     loadComponent: () =>
       import('./auth/pages/login').then((m) => m.LoginComponent),

@@ -18,3 +18,8 @@ export interface AuthResponseModel {
   readonly refreshToken: string;
   readonly user: UserModel;
 }
+
+export interface LoginRequestModel {
+  readonly payload: AuthPayloadModel;
+  readonly returnUrl?: string;
+}

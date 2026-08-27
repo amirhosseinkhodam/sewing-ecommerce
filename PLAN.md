@@ -441,16 +441,17 @@ Only admin can change status. (Phase 8: SMS sent to customer on each transition.
 - [x] Public: CatalogPage (grid, filters, pagination, search)
 - [x] Public: ProductDetailPage (gallery, sizes, add-to-cart)
 
-### Phase 3 — Cart + Checkout (4 days)
-- [ ] Backend: Cart CRUD
-- [ ] Backend: Address CRUD
-- [ ] Frontend: AddressManagementPage
-- [ ] Frontend: CartPage
-- [ ] Frontend: CheckoutPage (multi-step stepper)
-- [ ] Cart count badge in navbar
+### Phase 3 — Cart + Checkout (4 days) — **DONE**
+- [x] Backend: Cart CRUD
+- [x] Backend: Address CRUD
+- [x] Frontend: AddressManagementPage
+- [x] Frontend: CartPage
+- [x] Frontend: CheckoutPage (multi-step stepper)
+- [x] Cart count badge in navbar
+- [x] (pulled forward from Phase 4) Backend: `POST /api/orders` — order creation from cart in one transaction (snapshot items, decrement stock, clear cart) so checkout is functional end-to-end
 
 ### Phase 4 — Orders (3 days)
-- [ ] Backend: Order creation from cart
+- [x] Backend: Order creation from cart (done in Phase 3 — see note above)
 - [ ] Frontend: OrderHistoryPage + OrderDetailPage
 - [ ] Admin: OrderListPage + status management + tracking
 - [ ] Card-to-card payment receipt upload flow

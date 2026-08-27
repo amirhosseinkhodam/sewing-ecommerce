@@ -1,0 +1,10 @@
+export const ORDER_STATUSES = {
+  PENDING: 'PENDING',
+  CONFIRMED: 'CONFIRMED',
+  PROCESSING: 'PROCESSING',
+  SHIPPED: 'SHIPPED',
+  DELIVERED: 'DELIVERED',
+  CANCELLED: 'CANCELLED',
+} as const;
+
+export type OrderStatus = (typeof ORDER_STATUSES)[keyof typeof ORDER_STATUSES];

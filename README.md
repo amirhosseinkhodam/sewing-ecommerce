@@ -62,5 +62,6 @@ shared/                   # Cross-half shared types (root, backend-importable)
 - **Phase 0 — Backend Foundation**: done (NestJS 11 + Prisma 7 + PostgreSQL in `backend/`)
 - **Phase 1 — Auth Frontend + Layout**: done (login, register, profile, guards, interceptor, navbar/footer, AuthStore)
 - **Phase 2 — Products + Categories**: done (public catalog + product detail with gallery/sizes, admin category/product management with image upload)
+- **Phase 3 — Cart + Checkout**: done (cart/address/order backend modules; CartPage, AddressManagementPage, multi-step CheckoutPage; navbar cart badge; add-to-cart with login-return flow)
 
-Full roadmap, database schema, API endpoints, and implementation phases: see `PLAN.md`. How the code is organized and how it runs: see `AGENTS.md` (Code Guide section).
+Full roadmap, database schema, API endpoints, and implementation phases: see `PLAN.md`. How the system works (architecture, flows, auth, DB, decisions & why): see `PROJECT_KNOWLEDGE.md` — the canonical living knowledge guide, kept up to date automatically.

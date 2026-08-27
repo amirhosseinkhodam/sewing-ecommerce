@@ -1,4 +1,11 @@
-import { Component, DestroyRef, inject, OnInit, signal } from '@angular/core';
+import {
+  Component,
+  DestroyRef,
+  effect,
+  inject,
+  OnInit,
+  signal,
+} from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ButtonComponent } from '@shared/components/button';
@@ -12,6 +19,7 @@ import { LanguageService } from '@shared/services/language';
 import { AuthStore } from '@auth/store/auth';
 import type { ProductVariantModel } from '../models/product';
 import { SizeSelectorComponent } from '../components/size-selector';
+import { CartStore } from '../../cart/store/cart';
 import { ProductDetailStore } from '../store/product-detail';
 
 @Component({
@@ -158,9 +166,39 @@ export class ProductDetailComponent implements OnInit {
   readonly #route = inject(ActivatedRoute);
   readonly #router = inject(Router);
   readonly #auth = inject(AuthStore);
+  readonly #cartStore = inject(CartStore);
   readonly #notification = inject(NotificationService);
   readonly #languageService = inject(LanguageService);
   readonly #destroyRef = inject(DestroyRef);
+
+  constructor() {
+    effect(() => {
+      const product = this.store.product();
+      if (!product) return;
+      const query = this.#route.snapshot.queryParamMap;
+      if (query.get('autoAdd') !== '1' || !this.#auth.isLoggedIn()) return;
+
+      const variantId = query.get('variantId');
+      const variant = product.variants.find((v) => v.id === variantId);
+      if (variant) this.selectedVariant.set(variant);
+
+      if (product.variants.length === 0 || !this.selectedVariant()) return;
+      this.#cartStore.addItem({
+        productId: product.id,
+        variantId: this.selectedVariant()!.id,
+        quantity: 1,
+      });
+      this.#notification.show(
+        'success',
+        this.#languageService.translate('addedToCart'),
+      );
+      this.#router.navigate([], {
+        relativeTo: this.#route,
+        queryParams: {},
+        replaceUrl: true,
+      });
+    });
+  }
 
   ngOnInit() {
     this.#route.paramMap
@@ -177,7 +215,7 @@ export class ProductDetailComponent implements OnInit {
   readonly hasNoStock = () => {
     const product = this.store.product();
     if (!product) return true;
-    if (product.variants.length === 0) return false;
+    if (product.variants.length === 0) return true;
     return product.variants.every((variant) => variant.stock === 0);
   };
 
@@ -200,9 +238,22 @@ export class ProductDetailComponent implements OnInit {
         'error',
         this.#languageService.translate('loginToAddToCart'),
       );
-      this.#router.navigate(['/login']);
+      const variant = this.selectedVariant();
+      this.#router.navigate(['/login'], {
+        queryParams: {
+          returnUrl: this.#router.url,
+          ...(variant ? { variantId: variant.id, autoAdd: '1' } : {}),
+        },
+      });
       return;
     }
+    const variant = this.selectedVariant();
+    if (!variant) return;
+    this.#cartStore.addItem({
+      productId: product.id,
+      variantId: variant.id,
+      quantity: 1,
+    });
     this.#notification.show(
       'success',
       this.#languageService.translate('addedToCart'),
