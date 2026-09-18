@@ -18,7 +18,7 @@ export default tseslint.config(
   eslintPluginPrettierRecommended,
   // Frontend: ES modules + browser globals
   {
-    files: ['frontend/**/*.ts'],
+    files: ['frontend/**/*.ts', 'frontend-next/src/**/*.ts'],
     languageOptions: {
       globals: { ...globals.browser },
       sourceType: 'module',
@@ -26,6 +26,12 @@ export default tseslint.config(
         projectService: true,
         tsconfigRootDir: import.meta.dirname,
       },
+    },
+  },
+  {
+    files: ['frontend-next/src/**/*.spec.ts'],
+    languageOptions: {
+      globals: { ...globals.vitest },
     },
   },
   // Backend: type-checked rules + Node.js globals

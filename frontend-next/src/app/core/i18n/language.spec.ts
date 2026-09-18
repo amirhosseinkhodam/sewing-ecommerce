@@ -8,16 +8,17 @@ describe('LanguageService', () => {
     TestBed.configureTestingModule({});
   });
 
-  it('defaults to English with ltr direction', () => {
+  it('defaults to Persian with rtl direction', () => {
     const i18n = TestBed.inject(LanguageService);
 
-    expect(i18n.language()).toBe('en');
-    expect(document.documentElement.dir).toBe('ltr');
+    expect(i18n.language()).toBe('fa');
+    expect(document.documentElement.dir).toBe('rtl');
   });
 
   it('switches to Persian and sets rtl on <html>', () => {
     const i18n = TestBed.inject(LanguageService);
 
+    i18n.set('en');
     i18n.set('fa');
 
     expect(i18n.language()).toBe('fa');
@@ -28,6 +29,7 @@ describe('LanguageService', () => {
 
   it('translates a key per active language', () => {
     const i18n = TestBed.inject(LanguageService);
+    i18n.set('en');
 
     expect(i18n.translate('cart')).toBe('Cart');
 
@@ -38,16 +40,16 @@ describe('LanguageService', () => {
 
   it('resolves dotted keys from the nested validation group', () => {
     const i18n = TestBed.inject(LanguageService);
+    i18n.set('en');
 
     expect(i18n.translate('validation.required')).toBe('This field is required');
   });
 
   it('interpolates parameters', () => {
     const i18n = TestBed.inject(LanguageService);
+    i18n.set('en');
 
-    expect(i18n.translate('validation.minlength', { required: 8 })).toContain(
-      '8',
-    );
+    expect(i18n.translate('validation.minlength', { required: 8 })).toContain('8');
   });
 
   it('falls back to English, then to the key itself', () => {

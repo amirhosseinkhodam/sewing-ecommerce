@@ -1,6 +1,6 @@
 # 001 — Foundation: Workspace, Styling, Providers, i18n
 
-**Status**: Accepted · **Depends on**: [000](000-architecture.md)
+**Status**: In progress — infrastructure verified; toolbar/footer pending · **Depends on**: [000](000-architecture.md)
 
 ## 1. Intent
 
@@ -71,7 +71,6 @@ export const appConfig: ApplicationConfig = {
     provideBrowserGlobalErrorListeners(),
     provideRouter(routes, withViewTransitions(), withComponentInputBinding()),
     provideHttpClient(withInterceptors([authInterceptor])),
-    provideAnimationsAsync(),
     provideTanStackQuery(new QueryClient({ /* see 002 */ })),
   ],
 };
@@ -81,6 +80,7 @@ export const appConfig: ApplicationConfig = {
 - `withComponentInputBinding()` — lets routed pages take route params as signal `input()`s instead of injecting `ActivatedRoute`.
 - `withViewTransitions()` — `route-animations.md`, native View Transitions API.
 - Zoneless is the default; no change-detection provider is added.
+- Material 22 uses native animations. Do not register `provideAnimationsAsync()` or import the legacy animations package: the temporary workspace can otherwise resolve Angular 19 animations from the parent installation.
 
 ## 6. i18n
 
@@ -88,11 +88,13 @@ Existing mechanism reused in shape (en/fa JSON dictionaries + a `translate` pipe
 
 **Current defect**: `TranslatePipe` is `pure: false`, so `transform` re-runs for every interpolation on every change detection cycle, plus it holds an `effect` and a manual `markForCheck`.
 
-**Target**: a **pure** pipe that reads the language `signal` inside `transform`. Signal reads in a template expression register the template as a reactive consumer, so switching language re-renders exactly the affected bindings, with no impure-pipe cost and no manual change detection. `pipes.md` prefers pure pipes; best practices warn against `effect` for state propagation.
+**Target**: a **pure** pipe with an explicit language argument: `key | translate: i18n.language(): params`. Reading a signal only inside `transform` does not invalidate Angular's cached pure-pipe result when its arguments are unchanged. The language argument makes the dependency part of the cache key. A rendered-template regression test must verify switching both ways, including inside control-flow blocks. `pipes.md` prefers pure pipes; best practices warn against `effect` for state propagation.
 
 `LanguageService` → `@Service()`, exposing `readonly language = signal<Language>()`, and setting `<html lang>`/`<html dir>`. Writing to `document` is genuine DOM-sync side-effect work, which `effects.md` lists as a valid `effect` use — it stays, unlike the state-propagating effects being removed.
 
 `ThemeService` → `@Service()`, same pattern, `.dark` class on `<html>`, persisted to `app-theme`.
+
+Both preferences are initialized at application startup, before the first component renders. New visitors default to Persian/RTL; valid stored language choices take precedence.
 
 ## 7. Root shell
 
@@ -100,14 +102,20 @@ Existing mechanism reused in shape (en/fa JSON dictionaries + a `translate` pipe
 
 ## 8. Acceptance criteria
 
-- [ ] `ng build` succeeds; `ng test` runs; `ng version` reports Angular 22.1.x
-- [ ] No `tailwind.config.js`; `styles.css` uses `@import 'tailwindcss'`, never `@tailwind` directives
-- [ ] `.postcssrc.json` registers `@tailwindcss/postcss`
+- [x] `ng build` succeeds; `ng test` runs; `ng version` reports Angular 22.1.x
+- [x] No `tailwind.config.js`; `styles.css` uses `@import 'tailwindcss'`, never `@tailwind` directives
+- [x] `.postcssrc.json` registers `@tailwindcss/postcss`
 - [ ] No `tailwindcss-rtl`; RTL achieved with logical properties, verified in fa and en
 - [ ] Dark mode toggles via `.dark` on `<html>`, persists to `app-theme`, and restyles Material and Tailwind surfaces consistently
-- [ ] `<html lang>` and `<html dir>` track the selected language; choice persists to `app-language`
-- [ ] `TranslatePipe` is pure; changing language updates all visible text
-- [ ] Missing key falls back to English, then to the key itself (current behavior preserved)
-- [ ] en/fa dictionaries have identical key sets
-- [ ] `LanguageService` and `ThemeService` use `@Service()` and expose readonly signals
-- [ ] Amiri font and the card/control/container radii are available as theme tokens
+- [x] `<html lang>` and `<html dir>` track the selected language; choice persists to `app-language`
+- [x] `TranslatePipe` is pure; changing language updates all visible text
+- [x] Missing key falls back to English, then to the key itself (current behavior preserved)
+- [x] en/fa dictionaries have identical key sets
+- [x] `LanguageService` and `ThemeService` use `@Service()` and expose readonly signals
+- [x] Amiri font and the card/control/container radii are available as theme tokens
+
+## 9. Verification checkpoint — 2026-09-18
+
+The temporary workspace has Angular framework/Material/CDK/Aria 22.1.7, CLI/build 22.1.8, NgRx 22.0.1 and TypeScript 6.0.3 installed without invalid direct dependencies (`npm ls --depth=0`). No dependency upgrade or workspace regeneration is needed for this slice. Root Angular 19 dependencies intentionally remain until cutover (000 §8).
+
+The production build and Vitest suite verify providers, stored preferences, dictionary parity and language changes in rendered templates. Theme/RTL visual verification remains pending with the real shell and pages. The root ESLint configuration now includes `frontend-next/src` and its Vitest globals; run it without `--fix` for verification.

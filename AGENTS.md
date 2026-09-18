@@ -1,14 +1,110 @@
-# Sewing Ecommerce — AGENTS.md
+# AGENTS.md — Universal Agent Workflow
 
-> General conventions (naming, styling, components, forms, i18n, state management, custom elements, modern Angular syntax, DRY, etc.) are in `~/.config/opencode/AGENTS.md`. This file only contains project-specific details.
+> This file defines the workflow rules that every AI coding agent must follow when working on this project. It is provider- and model-independent: whether the task is performed by Claude, OpenCode, GapCode, or any future agent, the same rules apply.
 >
-> **Canonical project knowledge** (architecture, flows, auth, DB, API contracts, decisions & why): `PROJECT_KNOWLEDGE.md` — keep it updated automatically when a task changes the system. This file documents conventions; that file explains how the system works.
+> Provider-specific configuration (model selection, tool-specific commands, hooks, skills) belongs in that provider's own config files — not here.
 
-## Overview
+---
+
+## 1. Before starting work
+
+Every agent must read these files before making any changes:
+
+| File | Purpose |
+|---|---|
+| `AGENTS.md` | This file — universal workflow rules + permanent project context |
+| `CURRENT.md` | Current state of the project (what's done, in progress, known issues, next steps) |
+| `DECISIONS.md` | Important project decisions and their reasoning |
+| `PROJECT_KNOWLEDGE.md` | Comprehensive project knowledge (architecture, flows, API contracts, conventions) |
+
+Additionally:
+
+- Read existing code and understand the project context before making changes.
+- Follow existing architectural and technical decisions recorded in `DECISIONS.md`.
+
+## 2. While working
+
+- Do not unnecessarily introduce new patterns, abstractions, libraries, or dependencies.
+- Prefer simple, maintainable solutions over clever or complex ones.
+- Preserve existing behavior unless the task explicitly requires changing it.
+- Keep changes within the requested scope. If a wider change is required, explain why and change the smallest related set of files.
+- Follow the project's existing code conventions and patterns.
+
+## 3. Before considering a task complete
+
+- Review your own changes. Verify they are correct, complete, and consistent.
+- Run the relevant checks, tests, or build commands when appropriate.
+- Never claim something was tested if it was not actually tested.
+- If you cannot run tests or verification, state what was skipped and why.
+
+## 4. After completing a task
+
+### 4.1 Update `CURRENT.md`
+
+Update `CURRENT.md` to reflect the state of the project **after** the task is completed. This includes:
+
+- What has been completed
+- What is currently in progress
+- Known issues or blockers
+- Important unfinished work
+- The next relevant task or context
+
+Only update if the task meaningfully changes the project state. Do not update for trivial changes.
+
+### 4.2 Update `DECISIONS.md`
+
+Update `DECISIONS.md` when a task introduces, changes, or invalidates an important decision:
+
+- Architectural decisions
+- Technical decisions
+- Workflow decisions
+- Dependency or tooling decisions
+- Project conventions
+
+Do not record trivial implementation details. If nothing meaningful changed, do not modify this file.
+
+If an existing decision changes, update the existing entry rather than creating contradictory duplicates.
+
+### 4.3 Do not wait for explicit requests
+
+Agents must NOT wait for the user to explicitly request updates to `CURRENT.md` or `DECISIONS.md`. These updates are part of the task completion workflow.
+
+## 5. Do not undo existing decisions
+
+Do not undo or revert an existing decision recorded in `DECISIONS.md` without documenting the reason for the change in the same file.
+
+## 6. State files are local coordination
+
+`CURRENT.md` and `DECISIONS.md` are local agent coordination files. They are:
+
+- **Ignored by Git** (listed in `.gitignore`)
+- **Not committed** to the repository
+- **Local to each developer's working copy**
+
+This means different agents or developers may have different local states, which is expected. The files coordinate work within a single working copy, not across a team.
+
+---
+
+## Project context
+
+### Overview
 
 Persian-first, mobile-responsive sewing shop ecommerce website with guest browsing, customer cart/checkout, admin panel for full management, card-to-card payment (Zarinpal in Phase 8), and SMS notifications (Phase 8).
 
-## Quick commands
+### Technology stack
+
+| Layer | Technology |
+|---|---|
+| Frontend | Angular 19 standalone (no `NgModule`). Uses `bootstrapApplication` with `provideHttpClient()` and `provideRouter()`. |
+| Backend | NestJS 11 + Prisma 7 + PostgreSQL, in `backend/` (same repo). |
+| Shared | Cross-half code lives in root `shared/` (types, models, const) imported via `@domain/*` path alias. |
+| Styling | Tailwind CSS with custom design tokens in `tailwind.config.js`. No CSS/SCSS in components. |
+| i18n | English (`en`) and Persian (`fa`, RTL). Translation files in `frontend/src/app/i18n/`. |
+| Dark mode | ThemeService with signal-based state, persists to localStorage. |
+| State management | `@ngrx/signals` (`signalStore`) for feature state. |
+| Node version | Node ≥ 22 for the whole repo (`.nvmrc`). |
+
+### Quick commands
 
 | Command | Action |
 |---|---|
@@ -21,63 +117,26 @@ Persian-first, mobile-responsive sewing shop ecommerce website with guest browsi
 
 All backend commands run from the root (single `package.json`): `npm run prisma:migrate`, `npm run prisma:seed`, `npm run prisma:generate`, `npm run prisma:studio`.
 
-**Node version:** Node ≥ 22 for the whole repo (`.nvmrc`).
+### Architecture principles
 
-## Architecture
+- **Single-package monorepo**: One root `package.json`/lockfile/toolchain; `frontend/` + `backend/` are folders; cross-half code in root `shared/`.
+- **Path aliases**: Frontend uses `@core/*`, `@shared/*`, `@i18n/*`, `@auth/*`, `@domain/*`. Backend uses relative paths for `shared/`.
+- **No barrel files**: No `index.ts` re-exports — import files directly.
+- **Reference feature**: Read `auth/` before building other features — it demonstrates every project convention.
+- **Entry points**: `frontend/src/main.ts` (bootstrap), `frontend/src/app/main.route.ts` (routes), `backend/src/main.ts` (NestJS bootstrap).
 
-- **Frontend**: Angular 19 standalone (no `NgModule`). Uses `bootstrapApplication` with `provideHttpClient()` and `provideRouter()`.
-- **Backend**: NestJS + Prisma + PostgreSQL, in `backend/` (same repo).
-- **Shared**: Cross-half code lives in root `shared/` (types, models, const) and is imported via the `@domain/*` path alias (`@domain/models/user`, `@domain/const/user-roles`) defined in `tsconfig.json`. Note: the global convention names the cross-half alias `@shared/*`, but this project overrides it to `@domain/*` because `@shared/*` is already taken by the Angular app's UI-shared folder (`frontend/src/app/shared/*`). Frontend app code uses path aliases — `@core/*`, `@shared/*`, `@i18n/*`, `@auth/*`, `@domain/*` — so cross-directory imports never use `../..` (e.g. `@shared/components/button`). Backend imports `shared/` via relative paths because path aliases are not rewritten in emitted JS. No `index.ts` barrel files.
-- **Styling**: Tailwind CSS with custom design tokens in `tailwind.config.js`. No CSS/SCSS in components.
-- **i18n**: English (`en`) and Persian (`fa`, RTL). Translation files in `frontend/src/app/i18n/`.
-- **Dark mode**: ThemeService with signal-based state, persists to localStorage.
-- **State management**: `@ngrx/signals` (`signalStore`) for feature state.
+### Important conventions
 
-> Full detail (stack, DB schema, API endpoints, routes, workflows, i18n keys, technical decisions, day-by-day) is in `PLAN.md`.
-
-## Code Guide — how the code is organized
-
-### Entry points
-
-- **Frontend `frontend/src/main.ts`** — `bootstrapApplication(AppComponent, ...)` wires `provideRouter` (routes from `frontend/src/app/main.route.ts`), `provideHttpClient`, `provideAnimationsAsync`, and `ThemeService`.
-- **Frontend `frontend/src/app/app.ts`** — root shell that never changes: `<app-navbar />`, `<router-outlet />`, `<app-footer />`, `<app-notification />` (global toast).
-- **Frontend `frontend/src/app/main.route.ts`** — all routes, every page lazy-loaded via `loadComponent`. Implemented: `/`, `/login`, `/register`, `/profile` (`authGuard`), `**` → `/`. Full planned route map in `PLAN.md` §4.
-- **Backend `backend/src/main.ts`** — NestJS bootstrap: global prefix `api`, CORS, global `ValidationPipe({ whitelist: true, transform: true })`, global `HttpExceptionFilter` (normalizes every error to `{ statusCode, message }`), Swagger at `/docs`, port `PORT ?? 3000`.
-
-### Frontend `core/` — app-wide plumbing
-
-- `core/services/api.service.ts` — thin typed `HttpClient` wrapper (`get/post/put/patch/delete`) prefixing `/api`. Feature services use this, never `HttpClient` directly.
-- `core/interceptors/auth.interceptor.ts` — skips the refresh endpoint; attaches `Authorization: Bearer <token>`; on 401 retries once after `AuthService.refresh()`, else `auth.logout()` (clears storage, redirects home).
-- `core/guards/auth.guard.ts` — `authGuard` allows if logged in else `/login`; `adminGuard` allows only when logged in **and** `role === 'ADMIN'` else `/`.
-
-### `auth/` — the reference feature
-
-Read this feature before building others; it demonstrates every project convention. Files split as `pages/`, `store/`, `services/`, `forms/`, `models/`.
-
-**Login data flow:** `LoginPage` → `store.login(form.getRawValue())` → `AuthStore` (rxMethod + `tapResponse`) → `AuthService.login()` → `ApiService` → `POST /api/auth/login`. On success tokens + user persist to localStorage and state, then navigate to `/`.
-
-- `store/auth.ts` — `AuthStore`, NgRx `signalStore` with `{ providedIn: 'root' }`; state `{ token, refreshToken, user, loading }` seeded from localStorage; `withHooks.onInit` re-fetches the profile when a token already exists (page refresh restores the session).
-- `services/auth.ts` — `login`, `register`, `refresh`, `me`, `updateProfile`, each a typed call to `/api/auth/*`.
-- `forms/login.ts`, `forms/register.ts` — form **services** (`get form()` getter, `resetForm()`), never component-local.
-- `pages/*` — presentational; bind shared custom elements, use `{{ 'key' | translate }}`.
-
-### Frontend `shared/` — reusable building blocks
-
-- `components/` — standalone **dumb** custom elements: `app-button`, `app-input`, `app-textarea`, `app-select`, `app-card`, `app-form`, navbar, footer, notification, theme/language toggles, confirm dialog/bottom sheet. CVAs (`input`, `textarea`, `select`) work with `formControlName`. No store/service injection.
-- `services/` — `ThemeService` (adds/removes `dark` class on `<html>`, localStorage), `LanguageService` (loads en/fa, sets `lang`/`dir`, `translate(key)`), `NotificationService` (signal-based toast).
-- `pipes/` — `translate` (impure, re-renders on language change), `localized-date` (date-fns for Gregorian, date-fns-jalali for Persian).
-
-### Backend `backend/src/`
-
-- `app.module.ts` — `ConfigModule` (global, reads `.env`), `ServeStaticModule` (serves `uploads/`), `PrismaModule`, `AuthModule`, `UploadModule`, `AppController` (`GET /api/health`).
-- `common/` — `prisma.service.ts` (`@Global()`, pg driver via `DATABASE_URL`, connects on init / disconnects on destroy), `JwtAuthGuard`, `RolesGuard` + `@Roles()` decorator, `@CurrentUser()` decorator, `HttpExceptionFilter`.
-- `auth/` — controller (`POST /register`, `/login`, `/refresh`, `GET /me`, `PATCH /profile`); service (bcrypt, `#signTokens` issues access 15m / refresh 7d with **separate secrets** from `.env`, all responses use Prisma `omit` to strip `password`/timestamps, response shape typed as shared `UserModel`); `jwt.strategy.ts` → `request.user = { id, email, role }`; `dto/` class-validator DTOs (Iranian mobile regex `^09\d{9}$`).
-- `upload/` — Multer `diskStorage` into `uploads/` with `randomUUID()` filenames; `POST /upload` and `POST /upload/multiple`.
-- `backend/prisma/schema.prisma` — 11 models + enums; generated client committed in `backend/src/generated/prisma/`.
-
-### Request path (end to end)
-
-`Browser → Angular dev server (4200) → proxy.conf.json (/api + /uploads → 3000) → ValidationPipe + HttpExceptionFilter → controller → service → PrismaService → PostgreSQL`. Production would use a reverse proxy instead.
+- **Error body shape**: `{ statusCode, message }` — frontend reads `err.error?.message`.
+- **Refresh contract**: `POST /api/auth/refresh` returns `{ accessToken, refreshToken, user }`.
+- **localStorage keys**: `accessToken`, `refreshToken`, `app-theme`, `app-language`.
+- **Field-name contract**: camelCase model fields mirror DTOs 1:1.
+- **Uppercase enum values**: `'ADMIN'`, `'PENDING'` etc. — compare via `shared/const/*` objects, never inline literals.
+- **Decimal-as-string, UUID-as-string, images-as-array**: Boundary rules — see `PROJECT_KNOWLEDGE.md §6`.
+- **Upload URLs**: Always relative `/uploads/...` served by backend.
+- **i18n**: Every user-facing string is a key in both `en.json` and `fa.json`.
+- **Private fields**: Use `#private` fields everywhere (never TS `private`).
+- **Controllers delegate, services own logic**: One dto file per body shape.
 
 ### Roles (access control)
 
@@ -89,13 +148,37 @@ Auth is JWT: short-lived access token + 7-day refresh token. On a 401 the fronte
 
 ### Testing
 
-Testing infrastructure has been removed from this project (no `tests/`, no jest config, no test scripts). If re-added, document the setup here.
+Testing infrastructure has been removed from the Angular 19 app (no `tests/`, no jest config, no test scripts). The Angular 22 workspace in `frontend-next/` uses Vitest. Verification = `npm run lint` + `npm run build` + manual testing.
 
-## Current Progress
+---
 
-- **Phase 0 — Backend Foundation** — done (NestJS 11 + Prisma 7 + PostgreSQL in `backend/`: auth, upload, Swagger)
-- **Phase 1 — Auth Frontend + Layout** — done (guards, interceptor, navbar/footer, login/register, AuthStore, profile)
-- **Phase 2 — Products + Categories** — done (backend CRUD + seed; public catalog/detail; admin category/product management; Persian-aware slugify)
-- **Phase 3 — Cart + Checkout** — done (`cart/`, `addresses/`, `orders/` backend modules; CartStore root SignalStore; CartPage, AddressManagementPage + shared AddressFormComponent, multi-step CheckoutPage; navbar badge via CartStore; add-to-cart with `returnUrl`/`autoAdd` login-return flow)
+## Provider/model independence
 
-Phase checklists live in **`PLAN.md` §8** — update them there, never duplicate here.
+This file must NOT contain:
+
+- Provider-specific commands or configurations
+- Model-specific behavior or limitations
+- Tool-specific features or hooks
+- Anything that would only apply to one AI coding assistant
+
+Provider-specific configuration remains in that provider's own config files:
+
+```
+AGENTS.md
+    ↓
+Universal project workflow + permanent context
+    ↓
+┌──────────────┬──────────────┬──────────────┐
+│ Claude       │ OpenCode     │ GapCode      │
+│ config       │ config       │ config       │
+└──────────────┴──────────────┴──────────────┘
+```
+
+## Quick reference
+
+| Action | File | Committed? |
+|---|---|---|
+| Universal workflow + project context | `AGENTS.md` | Yes |
+| Current project state | `CURRENT.md` | No (gitignored) |
+| Project decisions | `DECISIONS.md` | No (gitignored) |
+| Comprehensive project knowledge | `PROJECT_KNOWLEDGE.md` | Varies |

@@ -33,12 +33,12 @@ Skills build verified in use: `~/.claude/skills/BUILD_INFO` — `8576f161` (2026
 | Spec | Scope | Status |
 |---|---|---|
 | [000-architecture.md](000-architecture.md) | Target architecture, stack, migration strategy, conventions | Accepted |
-| [001-foundation.md](001-foundation.md) | Workspace scaffold, Tailwind v4, Material, providers, i18n | Accepted |
-| [002-core-auth.md](002-core-auth.md) | HTTP layer, interceptor, guards, auth session + forms | Accepted |
-| [003-catalog.md](003-catalog.md) | Product catalog, filters, product detail | Accepted |
-| [004-cart-checkout.md](004-cart-checkout.md) | Cart, addresses, checkout wizard, order placement | Accepted |
-| [005-admin.md](005-admin.md) | Admin shell, product/category management | Accepted |
-| [006-testing.md](006-testing.md) | Vitest strategy, critical-path coverage | Accepted |
+| [001-foundation.md](001-foundation.md) | Workspace scaffold, Tailwind v4, Material, providers, i18n | In progress; shell pending |
+| [002-core-auth.md](002-core-auth.md) | HTTP layer, interceptor, guards, auth session + forms | In progress; transport verification, then pages |
+| 003-catalog.md | Product catalog, filters, product detail | Planned; spec not yet written |
+| 004-cart-checkout.md | Cart, addresses, checkout wizard, order placement | Planned; spec not yet written |
+| 005-admin.md | Admin shell, product/category management | Planned; spec not yet written |
+| 006-testing.md | Vitest strategy, critical-path coverage | Planned; critical tests added alongside each implemented slice |
 
 ## Decisions taken by the project owner
 

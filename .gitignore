@@ -72,3 +72,7 @@ dist-esbuild
 
 # Generated Prisma client
 /backend/src/generated
+
+# Agent coordination files (local state, not committed)
+CURRENT.md
+DECISIONS.md

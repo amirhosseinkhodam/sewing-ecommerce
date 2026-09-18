@@ -22,10 +22,7 @@ const STORAGE_KEY = 'app-language';
  * dotted keys such as `validation.required`. Flattening once at module load
  * keeps those keys working while making every lookup a plain map hit.
  */
-function flatten(
-  source: Record<string, unknown>,
-  prefix = '',
-): Record<string, string> {
+function flatten(source: Record<string, unknown>, prefix = ''): Record<string, string> {
   const flat: Record<string, string> = {};
   for (const [key, value] of Object.entries(source)) {
     const path = prefix ? `${prefix}.${key}` : key;
@@ -73,9 +70,12 @@ export class LanguageService {
    * Resolves a key for the active language. Falls back to English, then to the
    * key itself, preserving the previous implementation's behavior.
    */
-  translate(key: string, params?: Record<string, string | number>): string {
-    const template =
-      DICTIONARIES[this.#language()][key] ?? DICTIONARIES.en[key] ?? key;
+  translate(
+    key: string,
+    params?: Record<string, string | number>,
+    language: Language = this.#language(),
+  ): string {
+    const template = DICTIONARIES[language][key] ?? DICTIONARIES.en[key] ?? key;
     return params ? interpolate(template, params) : template;
   }
 
@@ -86,10 +86,7 @@ export class LanguageService {
   }
 }
 
-function interpolate(
-  template: string,
-  params: Record<string, string | number>,
-): string {
+function interpolate(template: string, params: Record<string, string | number>): string {
   return Object.entries(params).reduce(
     (text, [key, value]) => text.replaceAll(`{{${key}}}`, String(value)),
     template,
@@ -98,5 +95,5 @@ function interpolate(
 
 function readStoredLanguage(): Language {
   const stored = localStorage.getItem(STORAGE_KEY);
-  return stored === 'en' || stored === 'fa' ? stored : 'en';
+  return stored === 'en' || stored === 'fa' ? stored : 'fa';
 }

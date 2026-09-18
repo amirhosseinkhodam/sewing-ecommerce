@@ -1,5 +1,7 @@
 # Sewing Ecommerce
 
+Angular 22 modernization is in progress in `frontend-next/`; the root commands still run the Angular 19 reference app until feature parity. Follow `specs/README.md` for the current checkpoint. Verify the new workspace with `npm --prefix frontend-next run build`, `npm --prefix frontend-next test -- --watch=false`, and `npx --no-install eslint 'frontend-next/src/**/*.ts'`.
+
 Persian-first, mobile-responsive sewing shop ecommerce website with guest browsing, customer cart/checkout, and an admin panel for full management. Card-to-card payment (Zarinpal in Phase 8) and SMS notifications (Phase 8) planned.
 
 ## Stack

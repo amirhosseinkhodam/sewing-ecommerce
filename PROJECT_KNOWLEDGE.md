@@ -360,4 +360,14 @@ Also note the two 401/403 semantics (401 triggers the client auto-refresh; 403 m
 
 ## 15. Current state & next steps
 
+### Angular 22 modernization — 2026-09-18
+
+The modernization plan lives in `specs/README.md` and specs 000–002. The Angular 19 app described elsewhere in this document remains the running feature-complete reference. `frontend-next/` is a temporary Angular 22.1 workspace; its separate package/lockfile will be merged back into the root single-package layout at parity. Backend and shared wire contracts remain unchanged.
+
+Foundation infrastructure is implemented (Tailwind v4, Material 22, zoneless Vitest, language/theme services). Bootstrap restores preferences, defaulting to Persian/RTL. Translation is a pure pipe with an explicit language argument: `key | translate: i18n.language(): params`; reading a signal only inside a pure pipe does not invalidate its cached result. Material uses native animations without the old animation provider.
+
+The auth transport slice is wired and tested: `AuthSessionStore` owns tokens/user, `AuthApi` owns HTTP calls, functional guards protect routes, and injector-scoped `AuthRefresh` coordinates concurrent refreshes. Tokens attach only to relative `/api/` calls other than login/register/refresh. Retries are bounded to one, and stale refresh responses cannot resurrect a cleared/replaced session. TanStack Query is configured for server state (`retry: 1`, 30-second staleness, no window-focus refetch, no mutation retries).
+
+The auth shell, login/register/profile pages, Signal Forms, Material fields and lazy routes now build. Still pending: shared TanStack mutation definitions, query-owned profile restoration (including waiting before restored-admin role checks), password-match coverage, catalog, cart/checkout, admin, and final cutover. Specs 003–006 are planned, not written. Continue spec 002; do not regenerate the scaffold. Validate with `npm --prefix frontend-next run build`, `npm --prefix frontend-next test -- --watch=false`, and `npx --no-install eslint 'frontend-next/src/**/*.ts'` from the root.
+
 Done: Phases 0–3 (backend foundation, auth frontend + layout, products/categories with admin panel, cart/addresses/checkout + order creation). Next per `PLAN.md §8`: Phase 4 (order history/admin order management, receipt upload), Phase 5 (portfolio/contact), Phase 6 (dashboard/customers/messages/settings), Phase 7 (polish/SEO/error states), Phase 8 (Zarinpal + SMS). Update this file — not PLAN.md — when those land.
