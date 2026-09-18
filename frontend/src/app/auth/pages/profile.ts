@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, ChangeDetectionStrategy } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { TranslatePipe } from '@shared/pipes/translate';
 import { CardComponent } from '@shared/components/card';
@@ -9,6 +9,7 @@ import { AuthStore } from '../store/auth';
   selector: 'app-profile',
   standalone: true,
   imports: [RouterLink, CardComponent, ButtonComponent, TranslatePipe],
+  changeDetection: ChangeDetectionStrategy.Eager,
   template: `
     <div class="max-w-2xl mx-auto px-4 py-8">
       @if (store.user(); as user) {

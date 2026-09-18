@@ -1,4 +1,9 @@
-import { Component, input, signal } from '@angular/core';
+import {
+  Component,
+  input,
+  signal,
+  ChangeDetectionStrategy,
+} from '@angular/core';
 import { HugeiconsIconComponent } from '@hugeicons/angular';
 import { Image01Icon } from '@hugeicons/core-free-icons';
 
@@ -6,6 +11,7 @@ import { Image01Icon } from '@hugeicons/core-free-icons';
   selector: 'app-image-gallery',
   standalone: true,
   imports: [HugeiconsIconComponent],
+  changeDetection: ChangeDetectionStrategy.Eager,
   template: `
     <div class="flex flex-col gap-3">
       <div

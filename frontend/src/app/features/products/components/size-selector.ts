@@ -1,4 +1,11 @@
-import { Component, effect, input, output, signal } from '@angular/core';
+import {
+  Component,
+  effect,
+  input,
+  output,
+  signal,
+  ChangeDetectionStrategy,
+} from '@angular/core';
 import { TranslatePipe } from '@shared/pipes/translate';
 import type { ProductVariantModel } from '../models/product';
 
@@ -6,6 +13,7 @@ import type { ProductVariantModel } from '../models/product';
   selector: 'app-size-selector',
   standalone: true,
   imports: [TranslatePipe],
+  changeDetection: ChangeDetectionStrategy.Eager,
   template: `
     <div class="flex flex-wrap gap-2">
       @for (variant of variants(); track variant.id) {

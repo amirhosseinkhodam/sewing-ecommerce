@@ -1,4 +1,9 @@
-import { Component, inject, OnInit } from '@angular/core';
+import {
+  Component,
+  inject,
+  OnInit,
+  ChangeDetectionStrategy,
+} from '@angular/core';
 import { Router } from '@angular/router';
 import { HugeiconsIconComponent } from '@hugeicons/angular';
 import {
@@ -30,6 +35,7 @@ import { AdminProductStore } from '../store/product';
     TranslatePipe,
   ],
   providers: [AdminProductStore],
+  changeDetection: ChangeDetectionStrategy.Eager,
   template: `
     <div class="flex flex-col gap-6">
       <div class="flex flex-wrap items-center justify-between gap-4">

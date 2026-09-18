@@ -1,4 +1,9 @@
-import { Component, input, output } from '@angular/core';
+import {
+  Component,
+  input,
+  output,
+  ChangeDetectionStrategy,
+} from '@angular/core';
 import { HugeiconsIconComponent } from '@hugeicons/angular';
 import { Image01Icon } from '@hugeicons/core-free-icons';
 import type { ProductModel } from '../models/product';
@@ -15,6 +20,7 @@ import { TranslatePipe } from '@shared/pipes/translate';
     LocalizedNumberPipe,
     TranslatePipe,
   ],
+  changeDetection: ChangeDetectionStrategy.Eager,
   template: `
     <app-card
       variant="bordered"

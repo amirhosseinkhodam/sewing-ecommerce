@@ -1,8 +1,9 @@
-import { Component, input } from '@angular/core';
+import { Component, input, ChangeDetectionStrategy } from '@angular/core';
 
 @Component({
   selector: 'app-loading-spinner',
   standalone: true,
+  changeDetection: ChangeDetectionStrategy.Eager,
   template: `
     <span [class]="containerClasses()">
       <span [class]="dotClasses()" style="animation-delay: -0.32s"></span>

@@ -1,4 +1,9 @@
-import { Component, inject, OnInit } from '@angular/core';
+import {
+  Component,
+  inject,
+  OnInit,
+  ChangeDetectionStrategy,
+} from '@angular/core';
 import { Router } from '@angular/router';
 import { ButtonComponent } from '@shared/components/button';
 import { LoadingSpinnerComponent } from '@shared/components/loading-spinner';
@@ -19,6 +24,7 @@ import { CatalogStore } from '../store/catalog';
     TranslatePipe,
   ],
   providers: [CatalogStore],
+  changeDetection: ChangeDetectionStrategy.Eager,
   template: `
     <div class="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
       <h1 class="text-2xl font-bold text-slate-900 dark:text-slate-100">

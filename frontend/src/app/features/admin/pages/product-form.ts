@@ -5,6 +5,7 @@ import {
   inject,
   OnInit,
   signal,
+  ChangeDetectionStrategy,
 } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ReactiveFormsModule } from '@angular/forms';
@@ -50,6 +51,7 @@ import { ProductFormStore } from '../store/product-form';
     TranslatePipe,
   ],
   providers: [ProductFormStore],
+  changeDetection: ChangeDetectionStrategy.Eager,
   template: `
     <div class="flex flex-col gap-6">
       <div class="flex items-center justify-between">
@@ -279,7 +281,7 @@ import { ProductFormStore } from '../store/product-form';
                         [icon]="icons.Delete01Icon"
                         [size]="18"
                         color="currentColor"
-                        [strokeWidth="1.5"]
+                        [strokeWidth]="1.5"
                       />
                     </app-button>
                   </div>

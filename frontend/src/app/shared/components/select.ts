@@ -1,4 +1,11 @@
-import { Component, input, output, forwardRef, signal } from '@angular/core';
+import {
+  Component,
+  input,
+  output,
+  forwardRef,
+  signal,
+  ChangeDetectionStrategy,
+} from '@angular/core';
 import {
   FormsModule,
   ControlValueAccessor,
@@ -35,6 +42,7 @@ import { SelectOption } from '../models/select';
       [searchable]="searchable()"
     />
   `,
+  changeDetection: ChangeDetectionStrategy.Eager,
   providers: [
     {
       provide: NG_VALUE_ACCESSOR,

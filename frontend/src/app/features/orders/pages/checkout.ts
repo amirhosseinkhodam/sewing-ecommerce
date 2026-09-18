@@ -1,4 +1,11 @@
-import { Component, computed, effect, inject, signal } from '@angular/core';
+import {
+  Component,
+  computed,
+  effect,
+  inject,
+  signal,
+  ChangeDetectionStrategy,
+} from '@angular/core';
 import { Router } from '@angular/router';
 import { NgClass } from '@angular/common';
 import type { AddressModel, AddressPayloadModel } from '@domain/models/address';
@@ -27,6 +34,7 @@ import { CheckoutStore } from '../store/checkout';
     TranslatePipe,
   ],
   providers: [CheckoutStore],
+  changeDetection: ChangeDetectionStrategy.Eager,
   template: `
     <div class="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
       <h1 class="text-2xl font-bold text-slate-900 dark:text-slate-100 mb-6">
@@ -237,7 +245,7 @@ import { CheckoutStore } from '../store/checkout';
                             {{ item.productName }} ({{ item.size }}) ×
                             {{ item.quantity }} =
                             {{
-                              item.quantity * Number(item.unitPrice)
+                              item.quantity * toNumber(item.unitPrice)
                                 | localizedNumber
                             }}
                             {{ 'currencyToman' | translate }}
@@ -265,7 +273,9 @@ import { CheckoutStore } from '../store/checkout';
                         {{ 'shippingMethod' | translate }}
                       </h3>
                       <p class="text-sm text-slate-700 dark:text-slate-300">
-                        {{ selectedShippingOption()?.labelKey | translate }}
+                        {{
+                          selectedShippingOption()?.labelKey ?? '' | translate
+                        }}
                       </p>
                     </div>
                     <div>
@@ -369,6 +379,10 @@ export class CheckoutComponent {
   readonly shippingOptions = SHIPPING_OPTIONS;
 
   readonly #router = inject(Router);
+
+  toNumber(value: string | number): number {
+    return Number(value);
+  }
 
   readonly selectedAddress = computed<AddressModel | null>(
     () =>

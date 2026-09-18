@@ -6,6 +6,7 @@ import {
   input,
   output,
   signal,
+  ChangeDetectionStrategy,
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Subject } from 'rxjs';
@@ -33,6 +34,7 @@ import { LanguageService } from '@shared/services/language';
     SelectComponent,
     TranslatePipe,
   ],
+  changeDetection: ChangeDetectionStrategy.Eager,
   template: `
     <div
       class="rounded-card border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 p-4"

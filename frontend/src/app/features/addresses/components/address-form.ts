@@ -1,4 +1,11 @@
-import { Component, effect, inject, input, output } from '@angular/core';
+import {
+  Component,
+  effect,
+  inject,
+  input,
+  output,
+  ChangeDetectionStrategy,
+} from '@angular/core';
 import { ReactiveFormsModule } from '@angular/forms';
 import type { AddressModel, AddressPayloadModel } from '@domain/models/address';
 import { ButtonComponent } from '@shared/components/button';
@@ -23,6 +30,7 @@ import { AddressFormService } from '../forms/address';
     ToggleComponent,
     TranslatePipe,
   ],
+  changeDetection: ChangeDetectionStrategy.Eager,
   template: `
     <app-form
       [formGroup]="addressForm.form"

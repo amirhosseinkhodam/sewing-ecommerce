@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, ChangeDetectionStrategy } from '@angular/core';
 import { HugeiconsIconComponent } from '@hugeicons/angular';
 import { Sun01Icon, Moon02Icon } from '@hugeicons/core-free-icons';
 import { ThemeService } from '../services/theme';
@@ -7,6 +7,7 @@ import { ThemeService } from '../services/theme';
   selector: 'app-theme-toggle',
   standalone: true,
   imports: [HugeiconsIconComponent],
+  changeDetection: ChangeDetectionStrategy.Eager,
   template: `
     <button
       class="flex items-center bg-transparent border-0 p-0 cursor-pointer focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-500"

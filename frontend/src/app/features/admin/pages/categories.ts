@@ -1,4 +1,10 @@
-import { Component, inject, OnInit, signal } from '@angular/core';
+import {
+  Component,
+  inject,
+  OnInit,
+  signal,
+  ChangeDetectionStrategy,
+} from '@angular/core';
 import { ReactiveFormsModule } from '@angular/forms';
 import { HugeiconsIconComponent } from '@hugeicons/angular';
 import {
@@ -35,6 +41,7 @@ import { AdminCategoryStore } from '../store/category';
     TranslatePipe,
   ],
   providers: [AdminCategoryStore],
+  changeDetection: ChangeDetectionStrategy.Eager,
   template: `
     <div class="flex flex-col gap-6">
       <div class="flex items-center justify-between">

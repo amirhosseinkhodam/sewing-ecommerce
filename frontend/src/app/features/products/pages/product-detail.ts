@@ -5,6 +5,7 @@ import {
   inject,
   OnInit,
   signal,
+  ChangeDetectionStrategy,
 } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
@@ -35,6 +36,7 @@ import { ProductDetailStore } from '../store/product-detail';
     TranslatePipe,
   ],
   providers: [ProductDetailStore],
+  changeDetection: ChangeDetectionStrategy.Eager,
   template: `
     <div class="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
       <app-button variant="ghost" cssClass="mb-6" (buttonClick)="onBack()">

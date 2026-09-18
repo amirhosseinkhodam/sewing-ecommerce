@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, ChangeDetectionStrategy } from '@angular/core';
 import { Router } from '@angular/router';
 import { HugeiconsIconComponent } from '@hugeicons/angular';
 import {
@@ -28,6 +28,7 @@ import { CartStore } from '../store/cart';
     LocalizedNumberPipe,
     TranslatePipe,
   ],
+  changeDetection: ChangeDetectionStrategy.Eager,
   template: `
     <div class="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
       <h1 class="text-2xl font-bold text-slate-900 dark:text-slate-100 mb-6">
@@ -141,7 +142,7 @@ import { CartStore } from '../store/cart';
                 <div class="text-end shrink-0">
                   <p class="font-bold text-slate-900 dark:text-slate-100">
                     {{
-                      item.quantity * Number(item.unitPrice) | localizedNumber
+                      item.quantity * toNumber(item.unitPrice) | localizedNumber
                     }}
                   </p>
                   <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">
@@ -197,6 +198,10 @@ export class CartComponent {
   readonly #modal = inject(ModalService);
   readonly #notification = inject(NotificationService);
   readonly #language = inject(LanguageService);
+
+  toNumber(value: string | number): number {
+    return Number(value);
+  }
 
   onStartShopping() {
     this.#router.navigate(['/products']);

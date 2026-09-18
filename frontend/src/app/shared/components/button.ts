@@ -1,10 +1,16 @@
-import { Component, input, output } from '@angular/core';
+import {
+  Component,
+  input,
+  output,
+  ChangeDetectionStrategy,
+} from '@angular/core';
 import { LoadingSpinnerComponent } from './loading-spinner';
 
 @Component({
   selector: 'app-button',
   standalone: true,
   imports: [LoadingSpinnerComponent],
+  changeDetection: ChangeDetectionStrategy.Eager,
   template: `
     <button
       [type]="type()"
@@ -58,7 +64,7 @@ export class ButtonComponent {
     }
   }
 
-  onEnter(event: KeyboardEvent) {
+  onEnter(event: Event) {
     event.preventDefault();
     if (!this.disabled() && !this.loading()) {
       this.click.emit();

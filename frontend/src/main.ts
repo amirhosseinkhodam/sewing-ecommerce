@@ -1,5 +1,5 @@
 import { provideZoneChangeDetection } from '@angular/core';
-import { provideHttpClient } from '@angular/common/http';
+import { provideHttpClient, withXhr } from '@angular/common/http';
 import { bootstrapApplication } from '@angular/platform-browser';
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
 import { provideRouter } from '@angular/router';
@@ -11,7 +11,7 @@ bootstrapApplication(AppComponent, {
   providers: [
     provideZoneChangeDetection(),
     provideAnimationsAsync(),
-    provideHttpClient(),
+    provideHttpClient(withXhr()),
     provideRouter(routes),
     ThemeService,
   ],

@@ -6,6 +6,7 @@ import {
   inject,
   signal,
   viewChild,
+  ChangeDetectionStrategy,
 } from '@angular/core';
 import { NgClass } from '@angular/common';
 import { RouterLink } from '@angular/router';
@@ -32,6 +33,7 @@ import { CartStore } from '../../features/cart/store/cart';
     ThemeToggleComponent,
     LanguageToggleComponent,
   ],
+  changeDetection: ChangeDetectionStrategy.Eager,
   template: `
     <nav
       class="sticky top-0 z-50 bg-white/80 dark:bg-slate-900/80 backdrop-blur-lg border-b border-slate-200 dark:border-slate-800"

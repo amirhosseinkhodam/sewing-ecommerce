@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, ChangeDetectionStrategy } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { ReactiveFormsModule } from '@angular/forms';
 import { TranslatePipe } from '@shared/pipes/translate';
@@ -23,6 +23,7 @@ import { AuthStore } from '../store/auth';
     FormFieldComponent,
     TranslatePipe,
   ],
+  changeDetection: ChangeDetectionStrategy.Eager,
   template: `
     <div class="min-h-screen-80 flex items-center justify-center px-4 py-8">
       <app-card variant="bordered" [cssClass]="'max-w-md w-full'">

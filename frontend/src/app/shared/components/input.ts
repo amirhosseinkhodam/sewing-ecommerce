@@ -5,6 +5,7 @@ import {
   forwardRef,
   ViewChild,
   ElementRef,
+  ChangeDetectionStrategy,
 } from '@angular/core';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 
@@ -36,6 +37,7 @@ import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
       (keydown)="keydown.emit($event)"
     />
   `,
+  changeDetection: ChangeDetectionStrategy.Eager,
   providers: [
     {
       provide: NG_VALUE_ACCESSOR,
@@ -46,7 +48,7 @@ import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 })
 export class InputComponent implements ControlValueAccessor {
   readonly type = input<
-    'text' | 'email' | 'password' | 'number' | 'textarea' | 'search'
+    'text' | 'email' | 'password' | 'number' | 'textarea' | 'search' | 'tel'
   >('text');
   readonly placeholder = input<string>();
   readonly disabled = input<boolean>(false);

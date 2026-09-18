@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, ChangeDetectionStrategy } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { FooterComponent } from './shared/components/footer';
 import { NavbarComponent } from './shared/components/navbar';
@@ -13,6 +13,7 @@ import { NotificationComponent } from './shared/components/notification';
     FooterComponent,
     NotificationComponent,
   ],
+  changeDetection: ChangeDetectionStrategy.Eager,
   template: `
     <div class="min-h-screen flex flex-col bg-slate-50 dark:bg-slate-900">
       <app-navbar />

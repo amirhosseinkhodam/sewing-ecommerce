@@ -7,6 +7,7 @@ import {
   input,
   OnInit,
   signal,
+  ChangeDetectionStrategy,
 } from '@angular/core';
 import { AbstractControl, ValidationErrors } from '@angular/forms';
 import { merge } from 'rxjs';
@@ -43,6 +44,7 @@ interface ErrorMessage {
   selector: 'app-form-field',
   standalone: true,
   imports: [TranslatePipe],
+  changeDetection: ChangeDetectionStrategy.Eager,
   template: `
     @if (errors().length > 0) {
       <div class="mt-1 text-sm text-red-600 dark:text-red-400">

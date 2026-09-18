@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, ChangeDetectionStrategy } from '@angular/core';
 import { ButtonComponent } from '@shared/components/button';
 import { CardComponent } from '@shared/components/card';
 import { LanguageToggleComponent } from '@shared/components/language-toggle';
@@ -15,6 +15,7 @@ import { TranslatePipe } from '@shared/pipes/translate';
     LanguageToggleComponent,
     TranslatePipe,
   ],
+  changeDetection: ChangeDetectionStrategy.Eager,
   template: `
     <div class="min-h-screen flex items-center justify-center p-6">
       <app-card variant="bordered" [cssClass]="'max-w-md w-full'">

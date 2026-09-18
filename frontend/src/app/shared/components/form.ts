@@ -4,6 +4,7 @@ import {
   inject,
   input,
   output,
+  ChangeDetectionStrategy,
 } from '@angular/core';
 import { FormGroup, ReactiveFormsModule } from '@angular/forms';
 
@@ -11,6 +12,7 @@ import { FormGroup, ReactiveFormsModule } from '@angular/forms';
   selector: 'app-form',
   standalone: true,
   imports: [ReactiveFormsModule],
+  changeDetection: ChangeDetectionStrategy.Eager,
   template: `
     <form
       [formGroup]="formGroup()!"

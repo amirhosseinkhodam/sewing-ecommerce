@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, ChangeDetectionStrategy } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { HugeiconsIconComponent } from '@hugeicons/angular';
 import { MapPinIcon, TelephoneIcon } from '@hugeicons/core-free-icons';
@@ -8,6 +8,7 @@ import { TranslatePipe } from '../pipes/translate';
   selector: 'app-footer',
   standalone: true,
   imports: [RouterLink, HugeiconsIconComponent, TranslatePipe],
+  changeDetection: ChangeDetectionStrategy.Eager,
   template: `
     <footer class="bg-slate-900 dark:bg-slate-950 text-slate-300">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
