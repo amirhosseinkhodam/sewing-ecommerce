@@ -20,7 +20,7 @@
           }
         },
         "serve": {
-          "builder": "@angular/build:dev-server",
+          "builder": "@angular-devkit/build-angular:dev-server",
           "options": {
             "buildTarget": "sewing-ecommerce:build",
             "proxyConfig": "frontend/proxy.conf.json"
