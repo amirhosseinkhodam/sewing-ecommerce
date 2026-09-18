@@ -7,7 +7,6 @@ import { AuthStore } from '../store/auth';
 
 @Component({
   selector: 'app-profile',
-  standalone: true,
   imports: [RouterLink, CardComponent, ButtonComponent, TranslatePipe],
   changeDetection: ChangeDetectionStrategy.Eager,
   template: `

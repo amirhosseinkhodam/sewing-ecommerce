@@ -25,7 +25,6 @@ import { ProductDetailStore } from '../store/product-detail';
 
 @Component({
   selector: 'app-product-detail',
-  standalone: true,
   imports: [
     ButtonComponent,
     CardComponent,

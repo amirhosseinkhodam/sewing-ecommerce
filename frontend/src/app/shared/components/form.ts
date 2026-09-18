@@ -10,7 +10,6 @@ import { FormGroup, ReactiveFormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-form',
-  standalone: true,
   imports: [ReactiveFormsModule],
   changeDetection: ChangeDetectionStrategy.Eager,
   template: `

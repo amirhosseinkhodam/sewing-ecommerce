@@ -1,10 +1,11 @@
+import { computed, inject } from '@angular/core';
 import { HttpErrorResponse } from '@angular/common/http';
-import { inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { tapResponse } from '@ngrx/operators';
 import {
   patchState,
   signalStore,
+  withComputed,
   withHooks,
   withMethods,
   withState,
@@ -18,10 +19,10 @@ import { LoginRequestModel, RegisterPayloadModel } from '../models/auth';
 import { AuthService } from '../services/auth';
 
 interface AuthState {
-  accessToken: string | null;
-  refreshToken: string | null;
-  user: UserModel | null;
-  loading: boolean;
+  readonly accessToken: string | null;
+  readonly refreshToken: string | null;
+  readonly user: UserModel | null;
+  readonly loading: boolean;
 }
 
 const initialState: AuthState = {
@@ -34,6 +35,10 @@ const initialState: AuthState = {
 export const AuthStore = signalStore(
   { providedIn: 'root' },
   withState(initialState),
+  withComputed((store) => ({
+    isAuthenticated: computed(() => Boolean(store.accessToken())),
+    isAdmin: computed(() => store.user()?.role === USER_ROLES.ADMIN),
+  })),
   withMethods(
     (
       store,
@@ -114,12 +119,20 @@ export const AuthStore = signalStore(
           ),
         ),
       ),
-      setToken: (accessToken: string, refreshToken: string) => {
+      setTokens(accessToken: string, refreshToken: string) {
         localStorage.setItem('accessToken', accessToken);
         localStorage.setItem('refreshToken', refreshToken);
         patchState(store, { accessToken, refreshToken });
       },
-      logout: () => {
+      setToken(accessToken: string, refreshToken: string) {
+        localStorage.setItem('accessToken', accessToken);
+        localStorage.setItem('refreshToken', refreshToken);
+        patchState(store, { accessToken, refreshToken });
+      },
+      setUser(user: UserModel | null) {
+        patchState(store, { user });
+      },
+      logout() {
         localStorage.removeItem('accessToken');
         localStorage.removeItem('refreshToken');
         patchState(store, {

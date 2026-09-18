@@ -42,7 +42,7 @@ Two changes from the current `AuthStore`:
 
 Behavior preserved: skip `/api/auth/refresh` (prevents loops) → attach `Authorization: Bearer <token>` → on **401** with a refresh token present, refresh once, store the new pair, retry the original request → if refresh fails, clear the session and redirect to `/`.
 
-**Bug fixed in passing.** The current interceptor calls `inject(AuthService)` *inside* the `catchError` callback ([auth.interceptor.ts:26](../frontend/src/app/core/interceptors/auth.interceptor.ts#L26)). By then the injection context is gone — `injection-context.md` limits `inject()` to construction-time contexts — so the 401 refresh path throws instead of refreshing whenever it is reached outside a live context. Both dependencies are injected up front in the new version.
+**Bug fixed in passing.** The current interceptor calls `inject(AuthService)` *inside* the `catchError` callback ([auth.ts:26](../frontend/src/app/core/interceptors/auth.ts#L26)). By then the injection context is gone — `injection-context.md` limits `inject()` to construction-time contexts — so the 401 refresh path throws instead of refreshing whenever it is reached outside a live context. Both dependencies are injected up front in the new version.
 
 Concurrent 401s share a single in-flight refresh so a page issuing several requests at once does not fire several refreshes.
 

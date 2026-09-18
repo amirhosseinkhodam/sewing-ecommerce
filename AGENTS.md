@@ -148,7 +148,7 @@ Auth is JWT: short-lived access token + 7-day refresh token. On a 401 the fronte
 
 ### Testing
 
-Testing infrastructure has been removed from the Angular 19 app (no `tests/`, no jest config, no test scripts). The Angular 22 workspace in `frontend-next/` uses Vitest. Verification = `npm run lint` + `npm run build` + manual testing.
+Testing infrastructure has been removed from the Angular 19 app (no `tests/`, no jest config, no test scripts). Verification = `npm run lint` + `npm run build` + manual testing.
 
 ---
 

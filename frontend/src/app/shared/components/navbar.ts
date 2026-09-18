@@ -8,7 +8,6 @@ import {
   viewChild,
   ChangeDetectionStrategy,
 } from '@angular/core';
-import { NgClass } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { HugeiconsIconComponent } from '@hugeicons/angular';
 import {
@@ -24,9 +23,7 @@ import { CartStore } from '../../features/cart/store/cart';
 
 @Component({
   selector: 'app-navbar',
-  standalone: true,
   imports: [
-    NgClass,
     RouterLink,
     HugeiconsIconComponent,
     TranslatePipe,
@@ -210,7 +207,7 @@ import { CartStore } from '../../features/cart/store/cart';
 
         <div
           class="md:hidden absolute top-16 inset-x-0 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-700 shadow-lg z-40 origin-top transition-all duration-300 ease-in-out"
-          [ngClass]="
+          [class]="
             mobileMenuOpen()
               ? 'opacity-100 scale-y-100 pointer-events-auto'
               : 'opacity-0 scale-y-0 pointer-events-none'

@@ -16,7 +16,6 @@ import { SelectOption } from '../models/select';
 
 @Component({
   selector: 'app-select',
-  standalone: true,
   imports: [FormsModule, NgSelectModule],
   template: `
     @if (label()) {

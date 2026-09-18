@@ -6,7 +6,6 @@ import { TranslatePipe } from '@shared/pipes/translate';
 
 @Component({
   selector: 'app-admin-layout',
-  standalone: true,
   imports: [
     RouterLink,
     RouterLinkActive,

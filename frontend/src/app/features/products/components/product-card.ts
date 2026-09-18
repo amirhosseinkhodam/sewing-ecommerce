@@ -13,7 +13,6 @@ import { TranslatePipe } from '@shared/pipes/translate';
 
 @Component({
   selector: 'app-product-card',
-  standalone: true,
   imports: [
     CardComponent,
     HugeiconsIconComponent,

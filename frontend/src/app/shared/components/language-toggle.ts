@@ -7,7 +7,6 @@ import { ThemeService } from '../services/theme';
 
 @Component({
   selector: 'app-language-toggle',
-  standalone: true,
   imports: [HugeiconsIconComponent],
   changeDetection: ChangeDetectionStrategy.Eager,
   template: `

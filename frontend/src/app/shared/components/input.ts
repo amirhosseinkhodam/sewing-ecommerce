@@ -11,7 +11,6 @@ import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 
 @Component({
   selector: 'app-input',
-  standalone: true,
   imports: [],
   template: `
     @if (label()) {

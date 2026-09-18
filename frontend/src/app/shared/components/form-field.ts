@@ -42,7 +42,6 @@ interface ErrorMessage {
 
 @Component({
   selector: 'app-form-field',
-  standalone: true,
   imports: [TranslatePipe],
   changeDetection: ChangeDetectionStrategy.Eager,
   template: `

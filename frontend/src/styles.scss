@@ -1,37 +1,71 @@
-@import '@angular/material/prebuilt-themes/indigo-pink.css';
+@layer theme, base, components, utilities;
+@import "tailwindcss/theme.css" layer(theme);
+@import "tailwindcss/preflight.css" layer(base);
+@import "tailwindcss/utilities.css";
 
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "@spartan-ng/brain/hlm-tailwind-preset.css";
 
-html {
+:root {
   color-scheme: light;
-  font-family: 'Amiri', Tahoma, Arial, sans-serif;
+  --font-sans: 'Amiri', Tahoma, Arial, sans-serif;
+  --radius: 0.625rem;
 }
 
-html.dark {
+.dark {
   color-scheme: dark;
-  font-family: 'Amiri', Tahoma, Arial, sans-serif;
 }
 
-/* Angular Material dark mode overrides */
-html.dark {
-  --mat-bottom-sheet-container-background-color: white;
-  --mat-bottom-sheet-container-text-color: rgb(15 23 42);
-  --mat-dialog-container-background-color: white;
-  --mat-dialog-container-text-color: rgb(15 23 42);
-}
-
-/* Angular Material font — override only components we use */
 html {
-  --mat-bottom-sheet-container-text-font: 'Amiri', Tahoma, Arial, sans-serif;
-  --mat-dialog-container-text-font: 'Amiri', Tahoma, Arial, sans-serif;
+  font-family: 'Amiri', Tahoma, Arial, sans-serif;
 }
 
 html[dir='rtl'] input,
 html[dir='rtl'] textarea,
 html[dir='rtl'] select {
-  @apply text-right;
+  text-align: right;
+}
+
+/* Spartan UI theme tokens */
+:root {
+  --background: oklch(1 0 0);
+  --foreground: oklch(0.145 0 0);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.145 0 0);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.145 0 0);
+  --primary: oklch(0.205 0 0);
+  --primary-foreground: oklch(0.985 0 0);
+  --secondary: oklch(0.97 0 0);
+  --secondary-foreground: oklch(0.205 0 0);
+  --muted: oklch(0.97 0 0);
+  --muted-foreground: oklch(0.556 0 0);
+  --accent: oklch(0.97 0 0);
+  --accent-foreground: oklch(0.205 0 0);
+  --destructive: oklch(0.577 0.245 27.325);
+  --border: oklch(0.922 0 0);
+  --input: oklch(0.922 0 0);
+  --ring: oklch(0.708 0 0);
+}
+
+.dark {
+  --background: oklch(0.145 0 0);
+  --foreground: oklch(0.985 0 0);
+  --card: oklch(0.205 0 0);
+  --card-foreground: oklch(0.985 0 0);
+  --popover: oklch(0.205 0 0);
+  --popover-foreground: oklch(0.985 0 0);
+  --primary: oklch(0.922 0 0);
+  --primary-foreground: oklch(0.205 0 0);
+  --secondary: oklch(0.269 0 0);
+  --secondary-foreground: oklch(0.985 0 0);
+  --muted: oklch(0.269 0 0);
+  --muted-foreground: oklch(0.708 0 0);
+  --accent: oklch(0.269 0 0);
+  --accent-foreground: oklch(0.985 0 0);
+  --destructive: oklch(0.704 0.191 22.216);
+  --border: oklch(1 0 0 / 10%);
+  --input: oklch(1 0 0 / 15%);
+  --ring: oklch(0.556 0 0);
 }
 
 app-select {
@@ -69,7 +103,7 @@ app-select .ng-select .ng-clear-wrapper {
 }
 
 app-select .ng-dropdown-panel .ng-dropdown-panel-items {
-  @apply rounded-control border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 shadow-lg;
+  @apply rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 shadow-lg;
 }
 
 app-select .ng-dropdown-panel .ng-option {
@@ -85,36 +119,5 @@ app-select .ng-dropdown-panel .ng-option.ng-option-selected {
 }
 
 app-select .ng-dropdown-panel .ng-input input {
-  @apply rounded-t-control border-b border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 px-3 py-2 text-slate-900 dark:text-slate-100 focus:outline-none;
-}
-
-/* Status filter — mat-chip-listbox responsive */
-app-status-filter {
-  @apply block w-full;
-}
-
-app-status-filter mat-chip-option {
-  @apply cursor-pointer;
-}
-
-@media (max-width: 639px) {
-  app-status-filter .mat-mdc-chip-listbox,
-  app-status-filter .mdc-evolution-chip-set__chips {
-    @apply flex flex-nowrap gap-2 w-full m-0 #{!important};
-  }
-
-  app-status-filter mat-chip-option {
-    @apply w-full flex items-center justify-center m-0 #{!important};
-  }
-}
-
-@media (min-width: 640px) {
-  app-status-filter .mat-mdc-chip-listbox,
-  app-status-filter .mdc-evolution-chip-set__chips {
-    @apply inline-flex grid-cols-none w-auto #{!important};
-  }
-
-  app-status-filter mat-chip-option {
-    @apply w-auto #{!important};
-  }
+  @apply rounded-t-lg border-b border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 px-3 py-2 text-slate-900 dark:text-slate-100 focus:outline-none;
 }

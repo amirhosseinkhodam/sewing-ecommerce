@@ -4,7 +4,7 @@ import type {
   UploadMultipleResponseModel,
   UploadResponseModel,
 } from '@shared/models/upload';
-import { ApiService } from './api.service';
+import { ApiService } from './api';
 
 @Injectable({ providedIn: 'root' })
 export class UploadService {

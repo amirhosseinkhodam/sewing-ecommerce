@@ -6,7 +6,6 @@ import { NotificationComponent } from './shared/components/notification';
 
 @Component({
   selector: 'app-root',
-  standalone: true,
   imports: [
     RouterOutlet,
     NavbarComponent,

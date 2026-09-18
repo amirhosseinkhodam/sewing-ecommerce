@@ -2,7 +2,6 @@ import { Component, input, ChangeDetectionStrategy } from '@angular/core';
 
 @Component({
   selector: 'app-card',
-  standalone: true,
   imports: [],
   changeDetection: ChangeDetectionStrategy.Eager,
   template: `

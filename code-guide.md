@@ -301,9 +301,9 @@ frontend/src/app/
 ├── app.ts                # root shell component (navbar + router-outlet + footer + toast)
 ├── main.route.ts         # all routes (lazy-loaded)
 ├── core/                 # app-wide plumbing
-│   ├── guards/auth.guard.ts
-│   ├── interceptors/auth.interceptor.ts
-│   └── services/api.service.ts
+│   ├── guards/auth.ts
+│   ├── interceptors/auth.ts
+│   └── services/api.ts
 ├── features/             # one folder per feature (auth, products, admin, ...)
 │   ├── auth/             # login/register/profile (reference feature)
 │   ├── products/         # public catalog + detail
@@ -348,11 +348,11 @@ Every route renders inside `<router-outlet>`. The navbar and footer never re-ren
 ```
 
 - Every page is **lazy-loaded** with `loadComponent` — the browser only fetches the JS chunk when you navigate there (like lazy NestJS module loading, but on the client).
-- `canActivate: [authGuard]` protects routes. **`auth.guard.ts`** is the backend's `RolesGuard` equivalent but client-side: reads the `AuthStore`, returns `true` to allow, or a `Router` URL to redirect.
+- `canActivate: [authGuard]` protects routes. **`core/guards/auth.ts`** is the backend's `RolesGuard` equivalent but client-side: reads the `AuthStore`, returns `true` to allow, or a `Router` URL to redirect.
 
 ## B4. `core/`: API service, interceptor, guards
 
-### `services/api.service.ts` — your HTTP client wrapper
+### `services/api.ts` — your HTTP client wrapper
 
 The frontend never calls `HttpClient` directly. Everything goes through `ApiService`, which prefixes `/api`:
 
@@ -363,7 +363,7 @@ post<T>(path, body) { return this.#http.post<T>(`/api${path}`, body); }
 
 `T` is the expected response type — the backend's DTOs have frontend mirror interfaces in `features/*/models/*.ts`.
 
-### `interceptors/auth.interceptor.ts` — the JWT middleware
+### `interceptors/auth.ts` — the JWT middleware
 
 This is the frontend equivalent of `JwtAuthGuard` + your refresh logic combined into an HTTP middleware:
 
@@ -374,7 +374,7 @@ This is the frontend equivalent of `JwtAuthGuard` + your refresh logic combined 
 
 **Why this matters to you as a backend dev**: the access token is short-lived (15 min) and the refresh token is long-lived (7 days). The frontend *expects* your refresh endpoint at `POST /api/auth/refresh` returning `{ accessToken, refreshToken, user }`, and it expects 401 (not 403) to trigger refresh.
 
-### `guards/auth.guard.ts` — route protection
+### `guards/auth.ts` — route protection
 
 - `authGuard`: logged in? → allow; else redirect `/login`.
 - `adminGuard`: logged in **and** `role === 'ADMIN'`? → allow; else `/`.

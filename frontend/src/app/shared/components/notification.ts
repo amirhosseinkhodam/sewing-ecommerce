@@ -3,7 +3,6 @@ import { NotificationService } from '../services/notification';
 
 @Component({
   selector: 'app-notification',
-  standalone: true,
   changeDetection: ChangeDetectionStrategy.Eager,
   template: `
     @if (notification(); as notif) {

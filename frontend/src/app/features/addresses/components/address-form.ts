@@ -19,7 +19,6 @@ import { AddressFormService } from '../forms/address';
 
 @Component({
   selector: 'app-address-form',
-  standalone: true,
   imports: [
     ReactiveFormsModule,
     ButtonComponent,

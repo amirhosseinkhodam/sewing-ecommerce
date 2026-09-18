@@ -24,7 +24,6 @@ import { AdminProductStore } from '../store/product';
 
 @Component({
   selector: 'app-admin-products',
-  standalone: true,
   imports: [
     HugeiconsIconComponent,
     ButtonComponent,
@@ -100,7 +99,7 @@ import { AdminProductStore } from '../store/product';
                     <td class="px-4 py-3">
                       <div class="flex items-center gap-3">
                         <div
-                          class="h-10 w-10 shrink-0 overflow-hidden rounded-control bg-slate-100 dark:bg-slate-800"
+                          class="h-10 w-10 shrink-0 overflow-hidden rounded-lg bg-slate-100 dark:bg-slate-800"
                         >
                           @if (product.images[0]; as image) {
                             <img
@@ -256,7 +255,7 @@ export class AdminProductsComponent implements OnInit {
         confirmLabel: 'delete',
         cancelLabel: 'cancel',
       })
-      .subscribe((confirmed) => {
+      .then((confirmed) => {
         if (confirmed) this.store.removeProduct(product.id);
       });
   }

@@ -10,7 +10,6 @@ import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 
 @Component({
   selector: 'app-toggle',
-  standalone: true,
   template: `
     <label [class]="computedClasses()">
       @if (label()) {

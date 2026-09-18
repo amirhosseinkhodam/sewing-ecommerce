@@ -15,7 +15,6 @@ import { AddressesStore } from '../store/addresses';
 
 @Component({
   selector: 'app-addresses',
-  standalone: true,
   imports: [
     ButtonComponent,
     CardComponent,
@@ -187,7 +186,7 @@ export class AddressesComponent {
         confirmLabel: 'delete',
         cancelLabel: 'cancel',
       })
-      .subscribe((confirmed) => {
+      .then((confirmed) => {
         if (confirmed) this.store.remove(address.id);
       });
   }

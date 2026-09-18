@@ -8,7 +8,6 @@ import { LoadingSpinnerComponent } from './loading-spinner';
 
 @Component({
   selector: 'app-button',
-  standalone: true,
   imports: [LoadingSpinnerComponent],
   changeDetection: ChangeDetectionStrategy.Eager,
   template: `

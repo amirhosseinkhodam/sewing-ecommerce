@@ -11,7 +11,6 @@ import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 
 @Component({
   selector: 'app-textarea',
-  standalone: true,
   imports: [],
   template: `
     @if (label()) {
@@ -99,7 +98,7 @@ export class TextareaComponent implements ControlValueAccessor {
     const focusClasses = this.focusRing()
       ? 'focus:ring-2 focus:ring-slate-500 focus:ring-offset-2'
       : 'focus:outline-none';
-    const base = `w-full rounded-control border px-3 py-2 transition-colors ${focusClasses} placeholder:text-slate-400 dark:placeholder:text-slate-500 resize-vertical`;
+    const base = `w-full rounded-lg border px-3 py-2 transition-colors ${focusClasses} placeholder:text-slate-400 dark:placeholder:text-slate-500 resize-vertical`;
 
     const variants = {
       default:

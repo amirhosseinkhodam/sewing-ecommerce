@@ -11,7 +11,6 @@ import type { ProductVariantModel } from '../models/product';
 
 @Component({
   selector: 'app-size-selector',
-  standalone: true,
   imports: [TranslatePipe],
   changeDetection: ChangeDetectionStrategy.Eager,
   template: `
@@ -48,7 +47,7 @@ export class SizeSelectorComponent {
 
   readonly sizeClasses = (id: string) => {
     const base =
-      'min-w-12 rounded-control border px-3 py-2 text-sm font-medium transition-colors';
+      'min-w-12 rounded-lg border px-3 py-2 text-sm font-medium transition-colors';
     const isSelected = this.selected() === id;
     if (isSelected) {
       return `${base} border-slate-900 dark:border-slate-400 bg-slate-900 dark:bg-slate-500 text-white`;

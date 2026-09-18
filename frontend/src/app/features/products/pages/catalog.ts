@@ -15,7 +15,6 @@ import { CatalogStore } from '../store/catalog';
 
 @Component({
   selector: 'app-catalog',
-  standalone: true,
   imports: [
     ButtonComponent,
     LoadingSpinnerComponent,

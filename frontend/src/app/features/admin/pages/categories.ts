@@ -27,7 +27,6 @@ import { AdminCategoryStore } from '../store/category';
 
 @Component({
   selector: 'app-admin-categories',
-  standalone: true,
   imports: [
     ReactiveFormsModule,
     HugeiconsIconComponent,
@@ -285,7 +284,7 @@ export class AdminCategoriesComponent implements OnInit {
         confirmLabel: 'delete',
         cancelLabel: 'cancel',
       })
-      .subscribe((confirmed) => {
+      .then((confirmed) => {
         if (confirmed) this.store.removeCategory(category.id);
       });
   }

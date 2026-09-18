@@ -1,11 +1,11 @@
-import { Injectable, signal, effect } from '@angular/core';
+import { Service, signal, effect } from '@angular/core';
 import en from '@i18n/en.json';
 import fa from '@i18n/fa.json';
 import { Language, LanguageOptionModel } from '../models/language';
 
 const translations: Record<Language, Record<string, unknown>> = { en, fa };
 
-@Injectable({ providedIn: 'root' })
+@Service()
 export class LanguageService {
   readonly #STORAGE_KEY = 'app-language';
 
@@ -14,7 +14,7 @@ export class LanguageService {
     { code: 'fa', name: 'Persian', nativeName: 'فارسی', rtl: true },
   ];
 
-  currentLanguage = signal<Language>(this.#loadLanguage());
+  readonly currentLanguage = signal<Language>(this.#loadLanguage());
 
   constructor() {
     effect(() => {

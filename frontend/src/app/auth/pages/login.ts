@@ -12,7 +12,6 @@ import { AuthStore } from '../store/auth';
 
 @Component({
   selector: 'app-login',
-  standalone: true,
   imports: [
     RouterLink,
     ReactiveFormsModule,

@@ -26,7 +26,6 @@ import { LanguageService } from '@shared/services/language';
 
 @Component({
   selector: 'app-product-filter',
-  standalone: true,
   imports: [
     FormsModule,
     ButtonComponent,

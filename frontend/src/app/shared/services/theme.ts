@@ -1,9 +1,9 @@
-import { Injectable, signal, effect } from '@angular/core';
+import { Service, signal, effect } from '@angular/core';
 
-@Injectable({ providedIn: 'root' })
+@Service()
 export class ThemeService {
   readonly #STORAGE_KEY = 'app-theme';
-  isDark = signal(this.#loadTheme());
+  readonly isDark = signal(this.#loadTheme());
 
   constructor() {
     effect(() => {

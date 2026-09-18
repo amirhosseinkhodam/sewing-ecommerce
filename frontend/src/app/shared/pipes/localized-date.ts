@@ -3,7 +3,7 @@ import { format } from 'date-fns';
 import { formatDate } from 'date-fns-jalali';
 import { LanguageService } from '../services/language';
 
-@Pipe({ name: 'localizedDate', standalone: true, pure: false })
+@Pipe({ name: 'localizedDate' })
 export class LocalizedDatePipe implements PipeTransform {
   readonly #languageService = inject(LanguageService);
 

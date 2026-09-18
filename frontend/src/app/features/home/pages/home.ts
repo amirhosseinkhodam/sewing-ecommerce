@@ -7,7 +7,6 @@ import { TranslatePipe } from '@shared/pipes/translate';
 
 @Component({
   selector: 'app-home',
-  standalone: true,
   imports: [
     CardComponent,
     ButtonComponent,

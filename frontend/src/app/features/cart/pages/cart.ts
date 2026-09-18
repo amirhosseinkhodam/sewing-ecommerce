@@ -19,7 +19,6 @@ import { CartStore } from '../store/cart';
 
 @Component({
   selector: 'app-cart',
-  standalone: true,
   imports: [
     ButtonComponent,
     CardComponent,
@@ -225,7 +224,7 @@ export class CartComponent {
         confirmLabel: 'delete',
         cancelLabel: 'cancel',
       })
-      .subscribe((confirmed) => {
+      .then((confirmed) => {
         if (!confirmed) return;
         this.store.removeItem(item.id);
         this.#notification.show(

@@ -25,7 +25,7 @@ import { LoadingSpinnerComponent } from '@shared/components/loading-spinner';
 import { SelectComponent } from '@shared/components/select';
 import { TextareaComponent } from '@shared/components/textarea';
 import { ToggleComponent } from '@shared/components/toggle';
-import { UploadService } from '@core/services/upload.service';
+import { UploadService } from '@core/services/upload';
 import { TranslatePipe } from '@shared/pipes/translate';
 import { NotificationService } from '@shared/services/notification';
 import { LanguageService } from '@shared/services/language';
@@ -35,7 +35,6 @@ import { ProductFormStore } from '../store/product-form';
 
 @Component({
   selector: 'app-product-form',
-  standalone: true,
   imports: [
     ReactiveFormsModule,
     HugeiconsIconComponent,
@@ -166,7 +165,7 @@ import { ProductFormStore } from '../store/product-form';
                 let i = $index
               ) {
                 <div
-                  class="relative aspect-square overflow-hidden rounded-control border border-slate-200 dark:border-slate-700"
+                  class="relative aspect-square overflow-hidden rounded-lg border border-slate-200 dark:border-slate-700"
                 >
                   <img [src]="image.value" class="h-full w-full object-cover" />
                   <button
@@ -186,7 +185,7 @@ import { ProductFormStore } from '../store/product-form';
               }
               <button
                 type="button"
-                class="flex aspect-square flex-col items-center justify-center gap-2 rounded-control border-2 border-dashed border-slate-300 dark:border-slate-600 text-slate-400 dark:text-slate-500 transition-colors hover:text-slate-600 dark:hover:text-slate-300"
+                class="flex aspect-square flex-col items-center justify-center gap-2 rounded-lg border-2 border-dashed border-slate-300 dark:border-slate-600 text-slate-400 dark:text-slate-500 transition-colors hover:text-slate-600 dark:hover:text-slate-300"
                 [disabled]="uploading()"
                 (click)="fileInput.click()"
               >

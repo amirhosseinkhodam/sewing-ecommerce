@@ -6,7 +6,6 @@ import { TranslatePipe } from '../pipes/translate';
 
 @Component({
   selector: 'app-footer',
-  standalone: true,
   imports: [RouterLink, HugeiconsIconComponent, TranslatePipe],
   changeDetection: ChangeDetectionStrategy.Eager,
   template: `

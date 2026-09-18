@@ -186,12 +186,12 @@ frontend/src/app/
 │
 ├── core/
 │   ├── guards/
-│   │   ├── auth.guard.ts
-│   │   └── admin.guard.ts
+│   │   ├── auth.ts
+│   │   └── admin.ts
 │   ├── interceptors/
-│   │   └── auth.interceptor.ts
+│   │   └── auth.ts
 │   └── services/
-│       └── api.service.ts (exists)
+│       └── api.ts (exists)
 │
 ├── auth/
 │   ├── pages/login.ts, register.ts, profile.ts

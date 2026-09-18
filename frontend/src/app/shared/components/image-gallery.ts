@@ -9,7 +9,6 @@ import { Image01Icon } from '@hugeicons/core-free-icons';
 
 @Component({
   selector: 'app-image-gallery',
-  standalone: true,
   imports: [HugeiconsIconComponent],
   changeDetection: ChangeDetectionStrategy.Eager,
   template: `

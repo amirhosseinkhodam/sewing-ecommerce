@@ -1,7 +1,7 @@
 import { Pipe, PipeTransform, inject } from '@angular/core';
 import { LanguageService } from '../services/language';
 
-@Pipe({ name: 'localizedNumber', standalone: true, pure: false })
+@Pipe({ name: 'localizedNumber' })
 export class LocalizedNumberPipe implements PipeTransform {
   readonly #languageService = inject(LanguageService);
 

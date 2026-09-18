@@ -2,7 +2,6 @@ import { Component, input, ChangeDetectionStrategy } from '@angular/core';
 
 @Component({
   selector: 'app-loading-spinner',
-  standalone: true,
   changeDetection: ChangeDetectionStrategy.Eager,
   template: `
     <span [class]="containerClasses()">

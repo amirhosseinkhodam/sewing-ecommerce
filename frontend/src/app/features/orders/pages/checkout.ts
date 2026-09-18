@@ -7,7 +7,6 @@ import {
   ChangeDetectionStrategy,
 } from '@angular/core';
 import { Router } from '@angular/router';
-import { NgClass } from '@angular/common';
 import type { AddressModel, AddressPayloadModel } from '@domain/models/address';
 import { PAYMENT_METHODS } from '@domain/const/payment-methods';
 import type { ShippingMethod } from '@domain/const/shipping-methods';
@@ -23,9 +22,7 @@ import { CheckoutStore } from '../store/checkout';
 
 @Component({
   selector: 'app-checkout',
-  standalone: true,
   imports: [
-    NgClass,
     ButtonComponent,
     CardComponent,
     LoadingSpinnerComponent,
@@ -68,7 +65,7 @@ import { CheckoutStore } from '../store/checkout';
               </span>
               <span
                 class="hidden sm:inline font-medium"
-                [ngClass]="
+                [class]="
                   i === currentStep()
                     ? 'text-slate-900 dark:text-slate-100'
                     : 'text-slate-500 dark:text-slate-400'

@@ -5,7 +5,6 @@ import { ThemeService } from '../services/theme';
 
 @Component({
   selector: 'app-theme-toggle',
-  standalone: true,
   imports: [HugeiconsIconComponent],
   changeDetection: ChangeDetectionStrategy.Eager,
   template: `
