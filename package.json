@@ -42,7 +42,7 @@
     "@nestjs/platform-express": "^11.0.1",
     "@nestjs/serve-static": "^5.0.5",
     "@nestjs/swagger": "^11.4.6",
-    "@ng-select/ng-select": "^16.0.0",
+    "@ng-select/ng-select": "^24.1.2",
     "@ngrx/operators": "^21.1.1",
     "@ngrx/signals": "^21.1.1",
     "@prisma/adapter-pg": "^7.9.1",
