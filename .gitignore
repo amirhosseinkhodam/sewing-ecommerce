@@ -2,6 +2,9 @@
 /dist
 /node_modules
 /build
+# The Angular 22 workspace (frontend-next/) has its own dist + node_modules.
+dist/
+node_modules/
 
 # TypeScript build cache
 .angular/

@@ -1,0 +1,113 @@
+# 001 — Foundation: Workspace, Styling, Providers, i18n
+
+**Status**: Accepted · **Depends on**: [000](000-architecture.md)
+
+## 1. Intent
+
+Stand up an Angular 22 workspace that later feature specs can build on without revisiting configuration: CLI-generated scaffold, Tailwind v4, Material theming with RTL + dark mode, the provider set, and the i18n mechanism.
+
+## 2. Workspace scaffold
+
+Created with the CLI per `angular-new-app` (no version pin — v22 is latest stable, and the skill says not to specify a version unless asked):
+
+```bash
+npx @angular/cli@latest new frontend-next --style=css --ssr=false \
+  --prefix=app --ai-config=none --interactive=false
+```
+
+Flag reasoning:
+
+- `--style=css` — Tailwind v4 is CSS-first; SCSS bought only the `#{!important}` interpolation used by the ng-select overrides being deleted. The `tailwind-css.md` reference gives `@import 'tailwindcss'` for CSS as the standard path.
+- `--ssr=false` — the app is a dev-proxy SPA today with no SSR configuration (`PROJECT_KNOWLEDGE.md` §11 records deployment as unconfigured). Adding SSR would be new scope, not modernization.
+- `--ai-config=none` — this repo already has `AGENTS.md`; a second generated agent config would compete with it.
+- Tests **not** skipped — spec 006 reinstates them.
+
+Not renamed to `frontend/` until parity (000 §8), so the working app stays available for behavioral comparison.
+
+### Inherited v22 defaults — kept deliberately
+
+Zoneless change detection, `@angular/build:application` builder, `@angular/build:unit-test` (Vitest), TypeScript 6.0, `provideBrowserGlobalErrorListeners()`, production budgets. All verified present in a scratch `ng new` run.
+
+## 3. Dependencies
+
+```bash
+ng add @angular/material        # theming + typography + animations wiring
+ng add tailwindcss              # v4 + @tailwindcss/postcss + .postcssrc.json
+npm i @angular/aria @ngrx/signals @tanstack/angular-query-experimental \
+      date-fns date-fns-jalali
+```
+
+`ng add` over `npm install` for Angular libraries, per `cli.md`: "ALWAYS use `ng add`… installs the package AND runs initialization schematics."
+
+## 4. Styling
+
+`src/styles.css` — Tailwind v4 CSS-first, no `tailwind.config.js` (the reference is explicit that creating one "will break the application build"):
+
+```css
+@import 'tailwindcss';
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme {
+  --font-sans: 'Amiri', Tahoma, Arial, sans-serif;
+  --radius-card: 1rem;
+  --radius-control: 0.5rem;
+  --radius-container: 0.75rem;
+}
+```
+
+Design tokens carry over from `tailwind.config.js` as `@theme` variables. The `dark` variant is declared explicitly because the app toggles a `.dark` class on `<html>` rather than using `prefers-color-scheme`, preserving the existing user-controlled theme.
+
+**RTL**: `tailwindcss-rtl` is dropped (abandoned 2022, v3-only). Tailwind v4's logical properties replace it — `ps-*`/`pe-*`/`ms-*`/`me-*`/`text-start`/`text-end` follow `dir` natively, so a single class set serves both directions. This is strictly better than the plugin for a Persian-first app.
+
+**Material theming**: Material 3 with a light/dark color scheme driven by the same `.dark` class, so Material components and Tailwind utilities stay visually consistent. No `::ng-deep`; the ~90 lines of ng-select overrides are deleted with the library.
+
+## 5. Providers
+
+`src/app/app.config.ts`:
+
+```ts
+export const appConfig: ApplicationConfig = {
+  providers: [
+    provideBrowserGlobalErrorListeners(),
+    provideRouter(routes, withViewTransitions(), withComponentInputBinding()),
+    provideHttpClient(withInterceptors([authInterceptor])),
+    provideAnimationsAsync(),
+    provideTanStackQuery(new QueryClient({ /* see 002 */ })),
+  ],
+};
+```
+
+- `provideHttpClient(withInterceptors(...))` — `http-client.md`: functional interceptors preferred; the provider is needed here specifically to register one.
+- `withComponentInputBinding()` — lets routed pages take route params as signal `input()`s instead of injecting `ActivatedRoute`.
+- `withViewTransitions()` — `route-animations.md`, native View Transitions API.
+- Zoneless is the default; no change-detection provider is added.
+
+## 6. i18n
+
+Existing mechanism reused in shape (en/fa JSON dictionaries + a `translate` pipe) because it is a product requirement with full key parity, but with the performance defect fixed.
+
+**Current defect**: `TranslatePipe` is `pure: false`, so `transform` re-runs for every interpolation on every change detection cycle, plus it holds an `effect` and a manual `markForCheck`.
+
+**Target**: a **pure** pipe that reads the language `signal` inside `transform`. Signal reads in a template expression register the template as a reactive consumer, so switching language re-renders exactly the affected bindings, with no impure-pipe cost and no manual change detection. `pipes.md` prefers pure pipes; best practices warn against `effect` for state propagation.
+
+`LanguageService` → `@Service()`, exposing `readonly language = signal<Language>()`, and setting `<html lang>`/`<html dir>`. Writing to `document` is genuine DOM-sync side-effect work, which `effects.md` lists as a valid `effect` use — it stays, unlike the state-propagating effects being removed.
+
+`ThemeService` → `@Service()`, same pattern, `.dark` class on `<html>`, persisted to `app-theme`.
+
+## 7. Root shell
+
+`app.ts` — a shell with one responsibility, matching the current structure (toolbar / outlet / footer / toast). Toolbar, footer and toast each live in their own component; the shell composes and holds no logic.
+
+## 8. Acceptance criteria
+
+- [ ] `ng build` succeeds; `ng test` runs; `ng version` reports Angular 22.1.x
+- [ ] No `tailwind.config.js`; `styles.css` uses `@import 'tailwindcss'`, never `@tailwind` directives
+- [ ] `.postcssrc.json` registers `@tailwindcss/postcss`
+- [ ] No `tailwindcss-rtl`; RTL achieved with logical properties, verified in fa and en
+- [ ] Dark mode toggles via `.dark` on `<html>`, persists to `app-theme`, and restyles Material and Tailwind surfaces consistently
+- [ ] `<html lang>` and `<html dir>` track the selected language; choice persists to `app-language`
+- [ ] `TranslatePipe` is pure; changing language updates all visible text
+- [ ] Missing key falls back to English, then to the key itself (current behavior preserved)
+- [ ] en/fa dictionaries have identical key sets
+- [ ] `LanguageService` and `ThemeService` use `@Service()` and expose readonly signals
+- [ ] Amiri font and the card/control/container radii are available as theme tokens
