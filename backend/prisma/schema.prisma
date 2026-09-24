@@ -167,19 +167,36 @@ model Order {
   paymentMethod     PaymentMethod   @default(CARD_TO_CARD)
   paymentStatus     PaymentStatus   @default(PENDING)
   zarinpalAuthority String?
+  paymentReceipt    String?
   trackingCode      String?
   notes             String?
   createdAt         DateTime        @default(now())
   updatedAt         DateTime        @updatedAt
 
+  // Shipping address is snapshotted the same way OrderItem snapshots product
+  // data: deleting an address must never rewrite delivered order history.
+  shippingLabel       String
+  shippingProvince    String
+  shippingCity        String
+  shippingFullAddress String
+  shippingPostalCode  String?
+  shippingPhone       String
+
   user  User        @relation(fields: [userId], references: [id])
   items OrderItem[]
+
+  @@index([userId, createdAt])
+  @@index([status])
 }
 
 model OrderItem {
   id           String @id @default(uuid())
   orderId      String
   productId    String
+  // Kept so cancellation can restore stock to the exact variant. Nullable
+  // because a variant may be deleted after the order was placed; the rest of
+  // the row stays a self-contained snapshot.
+  variantId    String?
   productName  String
   productImage String?
   size         String
@@ -188,6 +205,8 @@ model OrderItem {
   totalPrice   Decimal
 
   order Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  @@index([variantId])
 }
 
 model ContactMessage {

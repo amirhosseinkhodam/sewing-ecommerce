@@ -1,7 +1,12 @@
 import { Component, ChangeDetectionStrategy } from '@angular/core';
 import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { HugeiconsIconComponent } from '@hugeicons/angular';
-import { BoxIcon, Tag01Icon, Settings01Icon } from '@hugeicons/core-free-icons';
+import {
+  BoxIcon,
+  Tag01Icon,
+  Settings01Icon,
+  ShoppingBag01Icon,
+} from '@hugeicons/core-free-icons';
 import { TranslatePipe } from '@shared/pipes/translate';
 
 @Component({
@@ -46,6 +51,19 @@ import { TranslatePipe } from '@shared/pipes/translate';
               {{ 'manageCategories' | translate }}
             </a>
             <a
+              routerLink="/admin/orders"
+              routerLinkActive="!bg-slate-100 dark:!bg-slate-700 !text-slate-900 dark:!text-slate-100"
+              class="flex shrink-0 items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-slate-600 dark:text-slate-300 transition-colors hover:bg-slate-100 dark:hover:bg-slate-800"
+            >
+              <hugeicons-icon
+                [icon]="icons.ShoppingBag01Icon"
+                [size]="18"
+                color="currentColor"
+                [strokeWidth]="1.5"
+              />
+              {{ 'manageOrders' | translate }}
+            </a>
+            <a
               routerLink="/settings"
               class="flex shrink-0 items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-slate-400 dark:text-slate-500 pointer-events-none"
             >
@@ -68,5 +86,5 @@ import { TranslatePipe } from '@shared/pipes/translate';
   `,
 })
 export class AdminLayoutComponent {
-  readonly icons = { BoxIcon, Tag01Icon, Settings01Icon };
+  readonly icons = { BoxIcon, Tag01Icon, Settings01Icon, ShoppingBag01Icon };
 }

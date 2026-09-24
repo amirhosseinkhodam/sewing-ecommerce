@@ -82,14 +82,16 @@ export const CheckoutStore = signalStore(
           switchMap((payload) =>
             orderService.create(payload).pipe(
               tapResponse({
-                next: () => {
+                next: (order) => {
                   patchState(store, { placing: false });
                   cartStore.clearLocal();
                   notification.show(
                     'success',
                     language.translate('orderPlaced'),
                   );
-                  router.navigateByUrl('/');
+                  // The detail page carries the card-to-card instructions and
+                  // the receipt upload (PLAN.md §7).
+                  router.navigate(['/orders', order.id]);
                 },
                 error: (err: HttpErrorResponse) => {
                   patchState(store, { placing: false });

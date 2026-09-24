@@ -54,6 +54,22 @@ export const routes: Routes = [
       import('./auth/pages/register').then((m) => m.RegisterComponent),
   },
   {
+    path: 'orders',
+    canActivate: [authGuard],
+    loadComponent: () =>
+      import('./features/orders/pages/order-history').then(
+        (m) => m.OrderHistoryComponent,
+      ),
+  },
+  {
+    path: 'orders/:id',
+    canActivate: [authGuard],
+    loadComponent: () =>
+      import('./features/orders/pages/order-detail').then(
+        (m) => m.OrderDetailComponent,
+      ),
+  },
+  {
     path: 'profile',
     canActivate: [authGuard],
     loadComponent: () =>
@@ -94,6 +110,20 @@ export const routes: Routes = [
         loadComponent: () =>
           import('./features/admin/pages/categories').then(
             (m) => m.AdminCategoriesComponent,
+          ),
+      },
+      {
+        path: 'orders',
+        loadComponent: () =>
+          import('./features/admin/pages/orders').then(
+            (m) => m.AdminOrdersComponent,
+          ),
+      },
+      {
+        path: 'orders/:id',
+        loadComponent: () =>
+          import('./features/admin/pages/order-detail').then(
+            (m) => m.AdminOrderDetailComponent,
           ),
       },
     ],

@@ -112,9 +112,12 @@ Order
 ├── status: PENDING | CONFIRMED | PROCESSING | SHIPPED | DELIVERED | CANCELLED
 ├── shippingMethod: POST | COURIER
 ├── shippingAddressId (FK -> Address)
+├── shippingLabel / shippingProvince / shippingCity   (address snapshot)
+├── shippingFullAddress / shippingPostalCode / shippingPhone
 ├── paymentMethod: ZARINPAL | CARD_TO_CARD
 ├── paymentStatus: PENDING | PAID | FAILED | REFUNDED
 ├── zarinpalAuthority
+├── paymentReceipt (card-to-card receipt image path)
 ├── trackingCode
 ├── notes
 ├── createdAt / updatedAt
@@ -270,9 +273,11 @@ frontend/src/app/
 - `DELETE /api/cart/items/:id`
 
 **Orders (auth)**
-- `GET /api/orders`
+- `GET /api/orders` — paginated, filterable by status/paymentStatus
 - `GET /api/orders/:id`
 - `POST /api/orders` — from cart
+- `PATCH /api/orders/:id/receipt` — card-to-card receipt path
+- `PATCH /api/orders/:id/cancel` — customer cancel while PENDING/CONFIRMED
 
 **Addresses (auth)**
 - `GET /api/addresses`
@@ -297,9 +302,10 @@ frontend/src/app/
 - `GET /PATCH/DELETE /api/admin/products/:id`
 - `GET /POST /api/admin/categories`
 - `PATCH/DELETE /api/admin/categories/:id`
-- `GET /api/admin/orders`
+- `GET /api/admin/orders` — paginated; filters: status, paymentStatus, search (order id / customer name / phone)
 - `GET /api/admin/orders/:id`
-- `PATCH /api/admin/orders/:id/status`
+- `PATCH /api/admin/orders/:id/status` — enforces the lifecycle state machine
+- `PATCH /api/admin/orders/:id/payment` — confirm/reject card-to-card payment
 - `GET /POST /api/admin/portfolio`
 - `PATCH/DELETE /api/admin/portfolio/:id`
 - `GET /api/admin/customers`
@@ -450,11 +456,14 @@ Only admin can change status. (Phase 8: SMS sent to customer on each transition.
 - [x] Cart count badge in navbar
 - [x] (pulled forward from Phase 4) Backend: `POST /api/orders` — order creation from cart in one transaction (snapshot items, decrement stock, clear cart) so checkout is functional end-to-end
 
-### Phase 4 — Orders (3 days)
+### Phase 4 — Orders (3 days) — **DONE**
 - [x] Backend: Order creation from cart (done in Phase 3 — see note above)
-- [ ] Frontend: OrderHistoryPage + OrderDetailPage
-- [ ] Admin: OrderListPage + status management + tracking
-- [ ] Card-to-card payment receipt upload flow
+- [x] Backend: `GET /api/orders`, `GET /api/orders/:id`, `PATCH /api/orders/:id/receipt`, `PATCH /api/orders/:id/cancel`
+- [x] Backend: `GET /api/admin/orders`, `GET /api/admin/orders/:id`, `PATCH /api/admin/orders/:id/status`, `PATCH /api/admin/orders/:id/payment`
+- [x] Backend: status transition state machine + stock restore on cancellation
+- [x] Frontend: OrderHistoryPage + OrderDetailPage
+- [x] Admin: OrderListPage (filters/search/pagination) + OrderDetailPage with status management + tracking
+- [x] Card-to-card payment receipt upload flow (customer uploads, admin confirms/rejects)
 
 ### Phase 5 — Portfolio + Contact (2 days)
 - [ ] Backend: Portfolio CRUD
