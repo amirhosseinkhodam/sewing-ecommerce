@@ -8,7 +8,9 @@ import { AuthModule } from './auth/auth.module';
 import { CartModule } from './cart/cart.module';
 import { CategoriesModule } from './categories/categories.module';
 import { PrismaModule } from './common/prisma/prisma.module';
+import { ContactModule } from './contact/contact.module';
 import { OrdersModule } from './orders/orders.module';
+import { PortfolioModule } from './portfolio/portfolio.module';
 import { ProductsModule } from './products/products.module';
 import { UploadModule } from './upload/upload.module';
 
@@ -27,6 +29,8 @@ import { UploadModule } from './upload/upload.module';
     CartModule,
     AddressesModule,
     OrdersModule,
+    PortfolioModule,
+    ContactModule,
   ],
   controllers: [AppController],
 })

@@ -22,6 +22,32 @@ export const routes: Routes = [
       ),
   },
   {
+    path: 'portfolio',
+    loadComponent: () =>
+      import('./features/portfolio/pages/portfolio').then(
+        (m) => m.PortfolioComponent,
+      ),
+  },
+  {
+    path: 'portfolio/:slug',
+    loadComponent: () =>
+      import('./features/portfolio/pages/portfolio-detail').then(
+        (m) => m.PortfolioDetailComponent,
+      ),
+  },
+  {
+    path: 'about',
+    loadComponent: () =>
+      import('./features/contact/pages/about').then((m) => m.AboutComponent),
+  },
+  {
+    path: 'contact',
+    loadComponent: () =>
+      import('./features/contact/pages/contact').then(
+        (m) => m.ContactComponent,
+      ),
+  },
+  {
     path: 'cart',
     canActivate: [authGuard],
     loadComponent: () =>
@@ -124,6 +150,34 @@ export const routes: Routes = [
         loadComponent: () =>
           import('./features/admin/pages/order-detail').then(
             (m) => m.AdminOrderDetailComponent,
+          ),
+      },
+      {
+        path: 'portfolio',
+        loadComponent: () =>
+          import('./features/admin/pages/portfolio').then(
+            (m) => m.AdminPortfolioComponent,
+          ),
+      },
+      {
+        path: 'portfolio/new',
+        loadComponent: () =>
+          import('./features/admin/pages/portfolio-form').then(
+            (m) => m.AdminPortfolioFormComponent,
+          ),
+      },
+      {
+        path: 'portfolio/:id/edit',
+        loadComponent: () =>
+          import('./features/admin/pages/portfolio-form').then(
+            (m) => m.AdminPortfolioFormComponent,
+          ),
+      },
+      {
+        path: 'messages',
+        loadComponent: () =>
+          import('./features/admin/pages/messages').then(
+            (m) => m.AdminMessagesComponent,
           ),
       },
     ],

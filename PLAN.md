@@ -291,11 +291,11 @@ frontend/src/app/
 - `POST /api/payment/verify`
 
 **Portfolio (public)**
-- `GET /api/portfolio`
-- `GET /api/portfolio/:slug`
+- `GET /api/portfolio` — paginated, active only; filters: `category` (slug), `search`
+- `GET /api/portfolio/:slug` — active only, 404 otherwise
 
 **Contact (public)**
-- `POST /api/contact`
+- `POST /api/contact` — unauthenticated; returns `{ submitted: true }` only
 
 **Admin**
 - `GET /POST /api/admin/products`
@@ -306,10 +306,10 @@ frontend/src/app/
 - `GET /api/admin/orders/:id`
 - `PATCH /api/admin/orders/:id/status` — enforces the lifecycle state machine
 - `PATCH /api/admin/orders/:id/payment` — confirm/reject card-to-card payment
-- `GET /POST /api/admin/portfolio`
-- `PATCH/DELETE /api/admin/portfolio/:id`
+- `GET /POST /api/admin/portfolio` — list includes inactive items
+- `GET /PATCH/DELETE /api/admin/portfolio/:id`
 - `GET /api/admin/customers`
-- `GET /api/admin/messages`
+- `GET /api/admin/messages` — paginated; filter: `isRead`; response carries `unreadCount`
 - `PATCH /api/admin/messages/:id/read`
 - `DELETE /api/admin/messages/:id`
 - `GET /api/admin/dashboard/stats`
@@ -465,20 +465,23 @@ Only admin can change status. (Phase 8: SMS sent to customer on each transition.
 - [x] Admin: OrderListPage (filters/search/pagination) + OrderDetailPage with status management + tracking
 - [x] Card-to-card payment receipt upload flow (customer uploads, admin confirms/rejects)
 
-### Phase 5 — Portfolio + Contact (2 days)
-- [ ] Backend: Portfolio CRUD
-- [ ] Admin: PortfolioListPage + PortfolioFormPage
-- [ ] Public: PortfolioPage + PortfolioDetailPage
-- [ ] Public: AboutPage
-- [ ] Public: ContactPage
-- [ ] Admin: MessagesPage
+### Phase 5 — Portfolio + Contact (2 days) — **DONE**
+- [x] Backend: Portfolio CRUD (public paginated list/detail + admin CRUD, category filter, Persian slug transliteration)
+- [x] Backend: Contact module — public `POST /api/contact` + admin message management
+- [x] Admin: PortfolioListPage + PortfolioFormPage (multi-image upload)
+- [x] Public: PortfolioPage (gallery, category filter, pagination) + PortfolioDetailPage
+- [x] Public: AboutPage (static i18n content — owner's decision; admin-editable in Phase 6)
+- [x] Public: ContactPage (form + shop contact details)
+- [x] Admin: MessagesPage (read/unread filter, mark read, delete)
+- [x] Fixed: `CategoriesService.remove` now guards portfolio items too (was a latent 500)
 
 ### Phase 6 — Admin Dashboard (2 days)
 - [ ] Backend: Dashboard stats endpoint
 - [ ] Frontend: DashboardPage (stats cards, charts, recent orders)
 - [ ] Frontend: CustomerListPage
-- [ ] Frontend: SettingsPage (shop name, business hours, bank card info, shipping rates)
-- [ ] Admin layout (sidebar + header)
+- [ ] Frontend: SettingsPage (shop name, business hours, bank card info, shipping rates) — also the home for the Phase 4/5 placeholder consts: `orders/const/bank-card.ts`, `contact/const/shop-contact.ts`, and the About page copy
+- [x] Admin layout (sidebar + header) — done in Phase 2, extended in Phases 4–5
+- [x] ~~Admin: MessagesPage~~ — delivered in Phase 5
 
 ### Phase 7 — Polish + Launch (3 days)
 - [ ] SEO meta tags for all pages (Title, Description, OG tags)

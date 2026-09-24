@@ -65,12 +65,20 @@ export class CategoriesService {
 
   async remove(id: string) {
     await this.findOne(id);
-    const productCount = await this.#prisma.product.count({
-      where: { categoryId: id },
-    });
+    // Both relations must be checked: an unguarded delete would surface the
+    // raw Prisma foreign-key error as a 500 instead of this 409.
+    const [productCount, portfolioCount] = await Promise.all([
+      this.#prisma.product.count({ where: { categoryId: id } }),
+      this.#prisma.portfolio.count({ where: { categoryId: id } }),
+    ]);
     if (productCount > 0) {
       throw new ConflictException(
         'Cannot delete a category that still has products',
+      );
+    }
+    if (portfolioCount > 0) {
+      throw new ConflictException(
+        'Cannot delete a category that still has portfolio items',
       );
     }
     await this.#prisma.category.delete({ where: { id } });

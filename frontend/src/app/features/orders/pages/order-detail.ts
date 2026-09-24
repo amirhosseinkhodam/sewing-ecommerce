@@ -326,11 +326,11 @@ export class OrderDetailComponent implements OnInit {
   }
 
   onReceiptSelected(event: Event) {
-    const input = event.target as HTMLInputElement;
-    const file = input.files?.[0];
+    const fileInput = event.target as HTMLInputElement;
+    const file = fileInput.files?.[0];
     if (!file) return;
     // Clear immediately so re-picking the same file still fires a change.
-    input.value = '';
+    fileInput.value = '';
 
     this.uploading.set(true);
     this.#upload.upload(file).subscribe({

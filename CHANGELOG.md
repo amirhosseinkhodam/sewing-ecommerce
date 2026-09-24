@@ -1,5 +1,44 @@
 # Logs
 
+## [0.3.0] - 2026-09-24
+
+### Added
+- **Phase 5 — Portfolio + Contact** (backend + public pages + admin)
+- Backend: `backend/src/portfolio` — `GET /api/portfolio` (paginated, active only, `category`/`search` filters), `GET /api/portfolio/:slug`, and admin CRUD at `/api/admin/portfolio`; Persian titles transliterate to readable slugs via the existing `slugify`
+- Backend: `backend/src/contact` — public unauthenticated `POST /api/contact`, plus `/api/admin/messages` (paginated, `isRead` filter, `unreadCount`), `PATCH :id/read`, `DELETE :id`
+- Frontend: `/portfolio` gallery (category filter, pagination) and `/portfolio/:slug` detail reusing `ImageGalleryComponent`
+- Frontend: `/contact` (form with validation + shop contact details) and `/about` (static i18n copy)
+- Admin: `/admin/portfolio` list, `/admin/portfolio/new` + `/:id/edit` form with multi-image upload, `/admin/messages` with read/unread filtering
+- Shared: `shared/models/portfolio.ts`, `shared/models/contact.ts`
+- i18n: 33 Phase-5 keys added to `en.json` + `fa.json` (238 keys each, parity verified)
+
+### Fixed
+- `CategoriesService.remove` only counted products, so deleting a category referenced by a portfolio item surfaced a raw Prisma foreign-key error as a 500. It now checks both relations and returns a 409 `ConflictException`, which the existing frontend already maps to `cannotDeleteCategory`.
+- Renamed a local `input` variable that shadowed Angular's imported `input` in `orders/pages/order-detail.ts` and `admin/pages/portfolio-form.ts` (ESLint `no-shadow`).
+
+### Updated
+- `main.route.ts` — added `/portfolio`, `/portfolio/:slug`, `/about`, `/contact` and the admin `portfolio*`/`messages` children. The navbar and footer already linked the three public routes, which previously fell through the `**` catch-all to the home page.
+- `admin-layout.ts` — "Manage portfolio" and "Messages" sidebar entries
+
+## [0.2.0] - 2026-09-23
+
+### Added
+- **Phase 4 — Orders** (backend + customer frontend + admin)
+- Backend: `GET /api/orders` (paginated, status filters), `GET /api/orders/:id`, `PATCH /api/orders/:id/receipt`, `PATCH /api/orders/:id/cancel` in `backend/src/orders`
+- Backend: `AdminOrdersController` (`/api/admin/orders`) — list with status/paymentStatus/search filters, detail, `PATCH :id/status`, `PATCH :id/payment`
+- Backend: `STATUS_TRANSITIONS` state machine enforcing the PLAN.md §7 order lifecycle; illegal transitions return 400 and `DELIVERED`/`CANCELLED` are terminal
+- Backend: cancellation restores variant stock in the same transaction as the status change
+- Schema: `Order.paymentReceipt`, `Order.shipping*` address snapshot, `OrderItem.variantId`; migrations `20260923173302_orders_phase4` and `20260923185904_order_item_variant_id` backfill existing rows
+- Frontend: `/orders` OrderHistoryPage and `/orders/:id` OrderDetailPage with card-to-card bank details and receipt upload
+- Frontend: `/admin/orders` list (filters, search, pagination) and `/admin/orders/:id` detail with status management, tracking code, and receipt review (confirm/reject payment)
+- Shared: `OrderStatusBadgeComponent`, `AdminOrderModel`/`PaginatedOrdersModel` in `shared/models/order.ts`, `BANK_CARD` const
+- i18n: 45 Phase-4 keys added to `en.json` + `fa.json` (205 keys each, parity verified)
+
+### Updated
+- `main.route.ts` — added `/orders`, `/orders/:id`, `/admin/orders`, `/admin/orders/:id`
+- `admin-layout.ts` — "Manage orders" sidebar entry
+- Checkout now redirects to `/orders/:id` after placing an order (previously `/`), where the payment instructions live
+
 ## [0.1.0] - 2026-08-13
 
 ### Added
