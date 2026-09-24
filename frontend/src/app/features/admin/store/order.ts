@@ -1,196 +1,86 @@
-import { HttpErrorResponse } from '@angular/common/http';
-import { inject } from '@angular/core';
-import { tapResponse } from '@ngrx/operators';
-import { patchState, signalStore, withMethods, withState } from '@ngrx/signals';
-import { rxMethod } from '@ngrx/signals/rxjs-interop';
-import { pipe, switchMap, tap } from 'rxjs';
-import type { AdminOrderModel } from '@domain/models/order';
+import { computed, inject, Injectable, signal } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
 import type { OrderStatus } from '@domain/const/order-statuses';
 import type { PaymentStatus } from '@domain/const/payment-statuses';
-import { LanguageService } from '@shared/services/language';
-import { NotificationService } from '@shared/services/notification';
-import { AdminOrderService } from '../services/admin-order';
+import {
+  injectUpdateOrderStatusMutation,
+  injectUpdatePaymentStatusMutation,
+  type UpdateOrderStatusModel,
+  type UpdatePaymentStatusModel,
+} from '../mutation/admin-orders';
+import {
+  injectAdminOrderQuery,
+  injectAdminOrdersQuery,
+} from '../query/admin-orders';
 
-interface AdminOrderState {
-  orders: AdminOrderModel[];
-  order: AdminOrderModel | null;
-  total: number;
-  page: number;
-  pageSize: number;
-  totalPages: number;
-  status: OrderStatus | null;
-  paymentStatus: PaymentStatus | null;
-  search: string;
-  loading: boolean;
-  saving: boolean;
+@Injectable()
+export class AdminOrderStore {
+  readonly page = signal(1);
+  readonly pageSize = signal(10);
+  readonly status = signal<OrderStatus | null>(null);
+  readonly paymentStatus = signal<PaymentStatus | null>(null);
+  readonly search = signal('');
+  readonly #id = signal(inject(ActivatedRoute).snapshot.paramMap.get('id'));
+
+  readonly #ordersQuery = injectAdminOrdersQuery(
+    () => ({
+      page: this.page(),
+      pageSize: this.pageSize(),
+      status: this.status() ?? undefined,
+      paymentStatus: this.paymentStatus() ?? undefined,
+      search: this.search() || undefined,
+    }),
+    () => !this.#id(),
+  );
+  readonly #orderQuery = injectAdminOrderQuery(() => this.#id());
+
+  readonly orders = computed(() => this.#ordersQuery.data()?.items ?? []);
+  readonly order = computed(() => this.#orderQuery.data() ?? null);
+  readonly total = computed(() => this.#ordersQuery.data()?.total ?? 0);
+  readonly totalPages = computed(
+    () => this.#ordersQuery.data()?.totalPages ?? 0,
+  );
+  readonly loading = computed(() =>
+    this.#id() ? this.#orderQuery.isPending() : this.#ordersQuery.isPending(),
+  );
+  readonly error = computed(() =>
+    this.#id() ? this.#orderQuery.error() : this.#ordersQuery.error(),
+  );
+
+  readonly #statusMutation = injectUpdateOrderStatusMutation();
+  readonly #paymentMutation = injectUpdatePaymentStatusMutation();
+  readonly saving = computed(
+    () => this.#statusMutation.isPending() || this.#paymentMutation.isPending(),
+  );
+
+  loadOrder(id: string): void {
+    this.#id.set(id);
+  }
+
+  setPage(page: number): void {
+    this.page.set(page);
+  }
+
+  setStatus(status: OrderStatus | null): void {
+    this.status.set(status);
+    this.page.set(1);
+  }
+
+  setPaymentStatus(paymentStatus: PaymentStatus | null): void {
+    this.paymentStatus.set(paymentStatus);
+    this.page.set(1);
+  }
+
+  setSearch(search: string): void {
+    this.search.set(search);
+    this.page.set(1);
+  }
+
+  updateStatus(value: UpdateOrderStatusModel): void {
+    this.#statusMutation.mutate(value);
+  }
+
+  updatePaymentStatus(value: UpdatePaymentStatusModel): void {
+    this.#paymentMutation.mutate(value);
+  }
 }
-
-const initialState: AdminOrderState = {
-  orders: [],
-  order: null,
-  total: 0,
-  page: 1,
-  pageSize: 10,
-  totalPages: 0,
-  status: null,
-  paymentStatus: null,
-  search: '',
-  loading: false,
-  saving: false,
-};
-
-export const AdminOrderStore = signalStore(
-  withState(initialState),
-  withMethods(
-    (
-      store,
-      orderService = inject(AdminOrderService),
-      notification = inject(NotificationService),
-      languageService = inject(LanguageService),
-    ) => ({
-      loadOrders: rxMethod<void>(
-        pipe(
-          tap(() => patchState(store, { loading: true })),
-          switchMap(() =>
-            orderService
-              .list({
-                page: store.page(),
-                pageSize: store.pageSize(),
-                status: store.status() ?? undefined,
-                paymentStatus: store.paymentStatus() ?? undefined,
-                search: store.search() || undefined,
-              })
-              .pipe(
-                tapResponse({
-                  next: (result) =>
-                    patchState(store, {
-                      orders: result.items,
-                      total: result.total,
-                      page: result.page,
-                      pageSize: result.pageSize,
-                      totalPages: result.totalPages,
-                      loading: false,
-                    }),
-                  error: (err: HttpErrorResponse) => {
-                    patchState(store, { loading: false });
-                    notification.show(
-                      'error',
-                      err.error?.message ??
-                        languageService.translate('couldNotLoadData'),
-                    );
-                  },
-                }),
-              ),
-          ),
-        ),
-      ),
-      loadOrder: rxMethod<string>(
-        pipe(
-          tap(() => patchState(store, { loading: true })),
-          switchMap((id) =>
-            orderService.get(id).pipe(
-              tapResponse({
-                next: (order) => patchState(store, { order, loading: false }),
-                error: (err: HttpErrorResponse) => {
-                  patchState(store, { loading: false, order: null });
-                  notification.show(
-                    'error',
-                    err.error?.message ??
-                      languageService.translate('couldNotLoadData'),
-                  );
-                },
-              }),
-            ),
-          ),
-        ),
-      ),
-    }),
-  ),
-  // Second block so these methods can call loadOrders()/loadOrder() above.
-  withMethods(
-    (
-      store,
-      orderService = inject(AdminOrderService),
-      notification = inject(NotificationService),
-      languageService = inject(LanguageService),
-    ) => ({
-      setPage(page: number) {
-        patchState(store, { page });
-        store.loadOrders();
-      },
-      setStatus(status: OrderStatus | null) {
-        patchState(store, { status, page: 1 });
-        store.loadOrders();
-      },
-      setPaymentStatus(paymentStatus: PaymentStatus | null) {
-        patchState(store, { paymentStatus, page: 1 });
-        store.loadOrders();
-      },
-      setSearch(search: string) {
-        patchState(store, { search, page: 1 });
-        store.loadOrders();
-      },
-      updateStatus: rxMethod<{
-        id: string;
-        status: OrderStatus;
-        trackingCode?: string;
-      }>(
-        pipe(
-          tap(() => patchState(store, { saving: true })),
-          switchMap(({ id, status, trackingCode }) =>
-            orderService.updateStatus(id, status, trackingCode).pipe(
-              tapResponse({
-                next: (order) => {
-                  patchState(store, { order, saving: false });
-                  notification.show(
-                    'success',
-                    languageService.translate('orderStatusUpdated'),
-                  );
-                  store.loadOrders();
-                },
-                error: (err: HttpErrorResponse) => {
-                  patchState(store, { saving: false });
-                  notification.show(
-                    'error',
-                    err.error?.message ??
-                      languageService.translate('couldNotSave'),
-                  );
-                },
-              }),
-            ),
-          ),
-        ),
-      ),
-      updatePaymentStatus: rxMethod<{
-        id: string;
-        paymentStatus: PaymentStatus;
-      }>(
-        pipe(
-          tap(() => patchState(store, { saving: true })),
-          switchMap(({ id, paymentStatus }) =>
-            orderService.updatePaymentStatus(id, paymentStatus).pipe(
-              tapResponse({
-                next: (order) => {
-                  patchState(store, { order, saving: false });
-                  notification.show(
-                    'success',
-                    languageService.translate('paymentStatusUpdated'),
-                  );
-                  store.loadOrders();
-                },
-                error: (err: HttpErrorResponse) => {
-                  patchState(store, { saving: false });
-                  notification.show(
-                    'error',
-                    err.error?.message ??
-                      languageService.translate('couldNotSave'),
-                  );
-                },
-              }),
-            ),
-          ),
-        ),
-      ),
-    }),
-  ),
-);

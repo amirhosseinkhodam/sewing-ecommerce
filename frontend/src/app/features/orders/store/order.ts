@@ -1,173 +1,67 @@
-import { HttpErrorResponse } from '@angular/common/http';
-import { inject } from '@angular/core';
-import { tapResponse } from '@ngrx/operators';
-import { patchState, signalStore, withMethods, withState } from '@ngrx/signals';
-import { rxMethod } from '@ngrx/signals/rxjs-interop';
-import { pipe, switchMap, tap } from 'rxjs';
-import type { OrderModel } from '@domain/models/order';
+import { computed, inject, Injectable, signal } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
 import type { OrderStatus } from '@domain/const/order-statuses';
-import { LanguageService } from '@shared/services/language';
-import { NotificationService } from '@shared/services/notification';
-import { OrderService } from '../services/order';
+import {
+  injectCancelOrderMutation,
+  injectUploadReceiptMutation,
+  type UploadReceiptModel,
+} from '../mutation/orders';
+import { injectOrderQuery, injectOrdersQuery } from '../query/orders';
 
-interface OrderState {
-  orders: OrderModel[];
-  order: OrderModel | null;
-  total: number;
-  page: number;
-  pageSize: number;
-  totalPages: number;
-  status: OrderStatus | null;
-  loading: boolean;
-  saving: boolean;
+@Injectable()
+export class OrderStore {
+  readonly page = signal(1);
+  readonly pageSize = signal(10);
+  readonly status = signal<OrderStatus | null>(null);
+  readonly #id = signal(inject(ActivatedRoute).snapshot.paramMap.get('id'));
+
+  readonly #ordersQuery = injectOrdersQuery(
+    () => ({
+      page: this.page(),
+      pageSize: this.pageSize(),
+      status: this.status() ?? undefined,
+    }),
+    () => !this.#id(),
+  );
+  readonly #orderQuery = injectOrderQuery(() => this.#id());
+
+  readonly orders = computed(() => this.#ordersQuery.data()?.items ?? []);
+  readonly order = computed(() => this.#orderQuery.data() ?? null);
+  readonly total = computed(() => this.#ordersQuery.data()?.total ?? 0);
+  readonly totalPages = computed(
+    () => this.#ordersQuery.data()?.totalPages ?? 0,
+  );
+  readonly loading = computed(() =>
+    this.#id() ? this.#orderQuery.isPending() : this.#ordersQuery.isPending(),
+  );
+  readonly error = computed(() =>
+    this.#id() ? this.#orderQuery.error() : this.#ordersQuery.error(),
+  );
+
+  readonly #receiptMutation = injectUploadReceiptMutation();
+  readonly #cancelMutation = injectCancelOrderMutation();
+  readonly saving = computed(
+    () => this.#receiptMutation.isPending() || this.#cancelMutation.isPending(),
+  );
+
+  loadOrder(id: string): void {
+    this.#id.set(id);
+  }
+
+  setPage(page: number): void {
+    this.page.set(page);
+  }
+
+  setStatus(status: OrderStatus | null): void {
+    this.status.set(status);
+    this.page.set(1);
+  }
+
+  uploadReceipt(value: UploadReceiptModel): void {
+    this.#receiptMutation.mutate(value);
+  }
+
+  cancelOrder(id: string): void {
+    this.#cancelMutation.mutate(id);
+  }
 }
-
-const initialState: OrderState = {
-  orders: [],
-  order: null,
-  total: 0,
-  page: 1,
-  pageSize: 10,
-  totalPages: 0,
-  status: null,
-  loading: false,
-  saving: false,
-};
-
-export const OrderStore = signalStore(
-  withState(initialState),
-  withMethods(
-    (
-      store,
-      orderService = inject(OrderService),
-      notification = inject(NotificationService),
-      languageService = inject(LanguageService),
-    ) => ({
-      loadOrders: rxMethod<void>(
-        pipe(
-          tap(() => patchState(store, { loading: true })),
-          switchMap(() =>
-            orderService
-              .list({
-                page: store.page(),
-                pageSize: store.pageSize(),
-                status: store.status() ?? undefined,
-              })
-              .pipe(
-                tapResponse({
-                  next: (result) =>
-                    patchState(store, {
-                      orders: result.items,
-                      total: result.total,
-                      page: result.page,
-                      pageSize: result.pageSize,
-                      totalPages: result.totalPages,
-                      loading: false,
-                    }),
-                  error: (err: HttpErrorResponse) => {
-                    patchState(store, { loading: false });
-                    notification.show(
-                      'error',
-                      err.error?.message ??
-                        languageService.translate('couldNotLoadData'),
-                    );
-                  },
-                }),
-              ),
-          ),
-        ),
-      ),
-      loadOrder: rxMethod<string>(
-        pipe(
-          tap(() => patchState(store, { loading: true })),
-          switchMap((id) =>
-            orderService.get(id).pipe(
-              tapResponse({
-                next: (order) => patchState(store, { order, loading: false }),
-                error: (err: HttpErrorResponse) => {
-                  patchState(store, { loading: false, order: null });
-                  notification.show(
-                    'error',
-                    err.error?.message ??
-                      languageService.translate('couldNotLoadData'),
-                  );
-                },
-              }),
-            ),
-          ),
-        ),
-      ),
-    }),
-  ),
-  // Second block so these methods can call loadOrders() from the first.
-  withMethods(
-    (
-      store,
-      orderService = inject(OrderService),
-      notification = inject(NotificationService),
-      languageService = inject(LanguageService),
-    ) => ({
-      setPage(page: number) {
-        patchState(store, { page });
-        store.loadOrders();
-      },
-      setStatus(status: OrderStatus | null) {
-        patchState(store, { status, page: 1 });
-        store.loadOrders();
-      },
-      uploadReceipt: rxMethod<{ id: string; paymentReceipt: string }>(
-        pipe(
-          tap(() => patchState(store, { saving: true })),
-          switchMap(({ id, paymentReceipt }) =>
-            orderService.uploadReceipt(id, paymentReceipt).pipe(
-              tapResponse({
-                next: (order) => {
-                  patchState(store, { order, saving: false });
-                  notification.show(
-                    'success',
-                    languageService.translate('receiptUploaded'),
-                  );
-                },
-                error: (err: HttpErrorResponse) => {
-                  patchState(store, { saving: false });
-                  notification.show(
-                    'error',
-                    err.error?.message ??
-                      languageService.translate('couldNotSave'),
-                  );
-                },
-              }),
-            ),
-          ),
-        ),
-      ),
-      cancelOrder: rxMethod<string>(
-        pipe(
-          tap(() => patchState(store, { saving: true })),
-          switchMap((id) =>
-            orderService.cancel(id).pipe(
-              tapResponse({
-                next: (order) => {
-                  patchState(store, { order, saving: false });
-                  notification.show(
-                    'success',
-                    languageService.translate('orderCancelled'),
-                  );
-                  store.loadOrders();
-                },
-                error: (err: HttpErrorResponse) => {
-                  patchState(store, { saving: false });
-                  notification.show(
-                    'error',
-                    err.error?.message ??
-                      languageService.translate('couldNotSave'),
-                  );
-                },
-              }),
-            ),
-          ),
-        ),
-      ),
-    }),
-  ),
-);

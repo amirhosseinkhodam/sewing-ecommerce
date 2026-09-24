@@ -6,11 +6,11 @@ import {
   output,
   ChangeDetectionStrategy,
 } from '@angular/core';
-import { ReactiveFormsModule } from '@angular/forms';
+import { FormField, submit } from '@angular/forms/signals';
 import type { AddressModel, AddressPayloadModel } from '@domain/models/address';
 import { ButtonComponent } from '@shared/components/button';
-import { FormComponent } from '@shared/components/form';
-import { FormFieldComponent } from '@shared/components/form-field';
+import { SignalFormComponent } from '@shared/components/signal-form';
+import { SignalFormFieldComponent } from '@shared/components/signal-form-field';
 import { InputComponent } from '@shared/components/input';
 import { TextareaComponent } from '@shared/components/textarea';
 import { ToggleComponent } from '@shared/components/toggle';
@@ -20,10 +20,10 @@ import { AddressFormService } from '../forms/address';
 @Component({
   selector: 'app-address-form',
   imports: [
-    ReactiveFormsModule,
+    FormField,
     ButtonComponent,
-    FormComponent,
-    FormFieldComponent,
+    SignalFormComponent,
+    SignalFormFieldComponent,
     InputComponent,
     TextareaComponent,
     ToggleComponent,
@@ -31,69 +31,65 @@ import { AddressFormService } from '../forms/address';
   ],
   changeDetection: ChangeDetectionStrategy.Eager,
   template: `
-    <app-form
-      [formGroup]="addressForm.form"
-      (formSubmit)="onSubmit()"
-      cssClass="flex flex-col gap-4"
-    >
+    <app-signal-form (formSubmit)="onSubmit()" cssClass="flex flex-col gap-4">
       <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <div>
           <app-input
-            formControlName="label"
+            [formField]="addressForm.form.label"
             [label]="'addressLabel' | translate"
             [placeholder]="'addressLabel' | translate"
           />
-          <app-form-field [control]="addressForm.form.get('label')!" />
+          <app-signal-form-field [field]="addressForm.form.label" />
         </div>
         <div>
           <app-input
-            formControlName="phone"
+            [formField]="addressForm.form.phone"
             type="tel"
             [label]="'phone' | translate"
             [placeholder]="'phone' | translate"
           />
-          <app-form-field [control]="addressForm.form.get('phone')!" />
+          <app-signal-form-field [field]="addressForm.form.phone" />
         </div>
         <div>
           <app-input
-            formControlName="province"
+            [formField]="addressForm.form.province"
             [label]="'province' | translate"
             [placeholder]="'province' | translate"
           />
-          <app-form-field [control]="addressForm.form.get('province')!" />
+          <app-signal-form-field [field]="addressForm.form.province" />
         </div>
         <div>
           <app-input
-            formControlName="city"
+            [formField]="addressForm.form.city"
             [label]="'city' | translate"
             [placeholder]="'city' | translate"
           />
-          <app-form-field [control]="addressForm.form.get('city')!" />
+          <app-signal-form-field [field]="addressForm.form.city" />
         </div>
       </div>
 
       <div>
         <app-textarea
-          formControlName="fullAddress"
+          [formField]="addressForm.form.fullAddress"
           [rows]="3"
           [label]="'fullAddress' | translate"
           [placeholder]="'fullAddress' | translate"
         />
-        <app-form-field [control]="addressForm.form.get('fullAddress')!" />
+        <app-signal-form-field [field]="addressForm.form.fullAddress" />
       </div>
 
       <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <div>
           <app-input
-            formControlName="postalCode"
+            [formField]="addressForm.form.postalCode"
             [label]="'postalCode' | translate"
             [placeholder]="'postalCode' | translate"
           />
-          <app-form-field [control]="addressForm.form.get('postalCode')!" />
+          <app-signal-form-field [field]="addressForm.form.postalCode" />
         </div>
         <div class="flex items-end pb-3">
           <app-toggle
-            formControlName="isDefault"
+            [formField]="addressForm.form.isDefault"
             [label]="'setAsDefault' | translate"
           />
         </div>
@@ -107,7 +103,7 @@ import { AddressFormService } from '../forms/address';
           {{ 'save' | translate }}
         </app-button>
       </div>
-    </app-form>
+    </app-signal-form>
   `,
 })
 export class AddressFormComponent {
@@ -126,8 +122,10 @@ export class AddressFormComponent {
   }
 
   onSubmit() {
-    this.saveAddress.emit(this.addressForm.form.getRawValue());
-    this.addressForm.resetForm();
+    void submit(this.addressForm.form, async () => {
+      this.saveAddress.emit(this.addressForm.model());
+      this.addressForm.resetForm();
+    });
   }
 
   onCancel() {

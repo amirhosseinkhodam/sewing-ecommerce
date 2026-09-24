@@ -1,11 +1,10 @@
 import {
   Component,
   inject,
-  OnInit,
   signal,
   ChangeDetectionStrategy,
 } from '@angular/core';
-import { ReactiveFormsModule } from '@angular/forms';
+import { FormField, submit } from '@angular/forms/signals';
 import { HugeiconsIconComponent } from '@hugeicons/angular';
 import {
   PlusSignIcon,
@@ -14,8 +13,8 @@ import {
 } from '@hugeicons/core-free-icons';
 import { ButtonComponent } from '@shared/components/button';
 import { CardComponent } from '@shared/components/card';
-import { FormComponent } from '@shared/components/form';
-import { FormFieldComponent } from '@shared/components/form-field';
+import { SignalFormComponent } from '@shared/components/signal-form';
+import { SignalFormFieldComponent } from '@shared/components/signal-form-field';
 import { InputComponent } from '@shared/components/input';
 import { TextareaComponent } from '@shared/components/textarea';
 import { ToggleComponent } from '@shared/components/toggle';
@@ -28,12 +27,12 @@ import { AdminCategoryStore } from '../store/category';
 @Component({
   selector: 'app-admin-categories',
   imports: [
-    ReactiveFormsModule,
+    FormField,
     HugeiconsIconComponent,
     ButtonComponent,
     CardComponent,
-    FormComponent,
-    FormFieldComponent,
+    SignalFormComponent,
+    SignalFormFieldComponent,
     InputComponent,
     TextareaComponent,
     ToggleComponent,
@@ -69,23 +68,22 @@ import { AdminCategoryStore } from '../store/category';
                 : ('addCategory' | translate)
             }}
           </h2>
-          <app-form
-            [formGroup]="categoryForm.form"
+          <app-signal-form
             (formSubmit)="onSubmit()"
             cssClass="flex flex-col gap-4"
           >
             <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <div>
                 <app-input
-                  formControlName="name"
+                  [formField]="categoryForm.form.name"
                   [label]="'categoryName' | translate"
                   [placeholder]="'categoryName' | translate"
                 />
-                <app-form-field [control]="categoryForm.form.get('name')!" />
+                <app-signal-form-field [field]="categoryForm.form.name" />
               </div>
               <div>
                 <app-input
-                  formControlName="slug"
+                  [formField]="categoryForm.form.slug"
                   [label]="'slug' | translate"
                   [placeholder]="'slug' | translate"
                 />
@@ -94,7 +92,7 @@ import { AdminCategoryStore } from '../store/category';
 
             <div>
               <app-textarea
-                formControlName="description"
+                [formField]="categoryForm.form.description"
                 [label]="'description' | translate"
                 [placeholder]="'description' | translate"
                 [rows]="3"
@@ -105,13 +103,13 @@ import { AdminCategoryStore } from '../store/category';
               <div>
                 <app-input
                   type="number"
-                  formControlName="sortOrder"
+                  [formField]="categoryForm.form.sortOrder"
                   [label]="'sortOrder' | translate"
                 />
               </div>
               <div class="flex items-end pb-2">
                 <app-toggle
-                  formControlName="isActive"
+                  [formField]="categoryForm.form.isActive"
                   [label]="'isActive' | translate"
                 />
               </div>
@@ -129,7 +127,7 @@ import { AdminCategoryStore } from '../store/category';
                 {{ 'cancel' | translate }}
               </app-button>
             </div>
-          </app-form>
+          </app-signal-form>
         </app-card>
       }
 
@@ -236,7 +234,7 @@ import { AdminCategoryStore } from '../store/category';
     </div>
   `,
 })
-export class AdminCategoriesComponent implements OnInit {
+export class AdminCategoriesComponent {
   readonly store = inject(AdminCategoryStore);
   readonly categoryForm = inject(CategoryFormService);
 
@@ -246,10 +244,6 @@ export class AdminCategoriesComponent implements OnInit {
   readonly editingId = signal<string | null>(null);
 
   readonly #modal = inject(ModalService);
-
-  ngOnInit() {
-    this.store.loadCategories();
-  }
 
   onAdd() {
     this.editingId.set(null);
@@ -269,11 +263,14 @@ export class AdminCategoriesComponent implements OnInit {
   }
 
   onSubmit() {
-    this.store.saveCategory({
-      id: this.editingId() ?? undefined,
-      payload: this.categoryForm.form.getRawValue(),
+    void submit(this.categoryForm.form, async () => {
+      const { sortOrder, ...payload } = this.categoryForm.model();
+      this.store.saveCategory({
+        id: this.editingId() ?? undefined,
+        payload: { ...payload, sortOrder: Number(sortOrder) },
+      });
+      this.formOpen.set(false);
     });
-    this.formOpen.set(false);
   }
 
   onDelete(category: CategoryModel) {

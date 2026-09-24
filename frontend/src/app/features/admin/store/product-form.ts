@@ -1,115 +1,35 @@
-import { HttpErrorResponse } from '@angular/common/http';
-import { inject } from '@angular/core';
+import { computed, inject, Injectable, signal } from '@angular/core';
 import { Router } from '@angular/router';
-import { tapResponse } from '@ngrx/operators';
-import { patchState, signalStore, withMethods, withState } from '@ngrx/signals';
-import { rxMethod } from '@ngrx/signals/rxjs-interop';
-import { pipe, switchMap, tap } from 'rxjs';
-import { NotificationService } from '@shared/services/notification';
-import { LanguageService } from '@shared/services/language';
-import type {
-  CategoryModel,
-  ProductDetailModel,
-  SaveProductModel,
-} from '../../products/models/product';
-import { CategoryService } from '../../products/services/category';
-import { AdminProductService } from '../services/admin-product';
+import type { SaveProductModel } from '../../products/models/product';
+import { injectCategoriesQuery } from '../../products/query/products';
+import { injectSaveProductMutation } from '../mutation/admin-catalog';
+import { injectAdminProductQuery } from '../query/admin-catalog';
 
-interface ProductFormState {
-  categories: CategoryModel[];
-  product: ProductDetailModel | null;
-  loading: boolean;
-  saving: boolean;
+@Injectable()
+export class ProductFormStore {
+  readonly #router = inject(Router);
+  readonly #id = signal<string | null>(null);
+
+  // The shared public key, so the list is cached across every form that needs it.
+  readonly #categoriesQuery = injectCategoriesQuery();
+  readonly categories = computed(() => this.#categoriesQuery.data() ?? []);
+
+  readonly #productQuery = injectAdminProductQuery(() => this.#id());
+  readonly product = computed(() => this.#productQuery.data() ?? null);
+  readonly loading = computed(
+    () => !!this.#id() && this.#productQuery.isPending(),
+  );
+
+  readonly #saveMutation = injectSaveProductMutation({
+    onSuccess: () => void this.#router.navigate(['/admin/products']),
+  });
+  readonly saving = computed(() => this.#saveMutation.isPending());
+
+  loadProduct(id: string): void {
+    this.#id.set(id);
+  }
+
+  save(value: SaveProductModel): void {
+    this.#saveMutation.mutate(value);
+  }
 }
-
-const initialState: ProductFormState = {
-  categories: [],
-  product: null,
-  loading: false,
-  saving: false,
-};
-
-export const ProductFormStore = signalStore(
-  withState(initialState),
-  withMethods(
-    (
-      store,
-      adminProductService = inject(AdminProductService),
-      categoryService = inject(CategoryService),
-      router = inject(Router),
-      notification = inject(NotificationService),
-      languageService = inject(LanguageService),
-    ) => ({
-      loadCategories: rxMethod<void>(
-        pipe(
-          switchMap(() =>
-            categoryService.list().pipe(
-              tapResponse({
-                next: (categories) => patchState(store, { categories }),
-                error: (err: HttpErrorResponse) => {
-                  notification.show(
-                    'error',
-                    err.error?.message ??
-                      languageService.translate('couldNotLoadData'),
-                  );
-                },
-              }),
-            ),
-          ),
-        ),
-      ),
-      loadProduct: rxMethod<string>(
-        pipe(
-          tap(() => patchState(store, { loading: true })),
-          switchMap((id) =>
-            adminProductService.get(id).pipe(
-              tapResponse({
-                next: (product) =>
-                  patchState(store, { product, loading: false }),
-                error: (err: HttpErrorResponse) => {
-                  patchState(store, { loading: false });
-                  notification.show(
-                    'error',
-                    err.error?.message ??
-                      languageService.translate('couldNotLoadData'),
-                  );
-                  router.navigate(['/admin/products']);
-                },
-              }),
-            ),
-          ),
-        ),
-      ),
-      save: rxMethod<SaveProductModel>(
-        pipe(
-          tap(() => patchState(store, { saving: true })),
-          switchMap(({ id, payload }) =>
-            (id
-              ? adminProductService.update(id, payload)
-              : adminProductService.create(payload)
-            ).pipe(
-              tapResponse({
-                next: () => {
-                  patchState(store, { saving: false });
-                  notification.show(
-                    'success',
-                    languageService.translate('productSaved'),
-                  );
-                  router.navigate(['/admin/products']);
-                },
-                error: (err: HttpErrorResponse) => {
-                  patchState(store, { saving: false });
-                  notification.show(
-                    'error',
-                    err.error?.message ??
-                      languageService.translate('couldNotSave'),
-                  );
-                },
-              }),
-            ),
-          ),
-        ),
-      ),
-    }),
-  ),
-);

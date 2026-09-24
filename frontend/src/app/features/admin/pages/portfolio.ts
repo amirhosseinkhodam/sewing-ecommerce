@@ -1,9 +1,4 @@
-import {
-  ChangeDetectionStrategy,
-  Component,
-  inject,
-  OnInit,
-} from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { HugeiconsIconComponent } from '@hugeicons/angular';
 import {
@@ -216,7 +211,7 @@ import { AdminPortfolioStore } from '../store/portfolio';
     </div>
   `,
 })
-export class AdminPortfolioComponent implements OnInit {
+export class AdminPortfolioComponent {
   readonly store = inject(AdminPortfolioStore);
 
   readonly icons = {
@@ -229,10 +224,6 @@ export class AdminPortfolioComponent implements OnInit {
   readonly #router = inject(Router);
   readonly #modal = inject(ModalService);
   #searchInput = '';
-
-  ngOnInit() {
-    this.store.loadItems();
-  }
 
   onNew() {
     this.#router.navigate(['/admin/portfolio/new']);

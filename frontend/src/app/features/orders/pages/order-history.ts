@@ -1,9 +1,4 @@
-import {
-  ChangeDetectionStrategy,
-  Component,
-  inject,
-  OnInit,
-} from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { HugeiconsIconComponent } from '@hugeicons/angular';
 import { Image01Icon } from '@hugeicons/core-free-icons';
@@ -43,6 +38,12 @@ import { OrderStore } from '../store/order';
             size="lg"
             cssClass="text-slate-400 dark:text-slate-500"
           />
+        </div>
+      } @else if (store.error()) {
+        <div
+          class="rounded-card border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 p-10 text-center"
+        >
+          {{ 'couldNotLoadData' | translate }}
         </div>
       } @else if (store.orders().length === 0) {
         <div
@@ -158,16 +159,12 @@ import { OrderStore } from '../store/order';
     </div>
   `,
 })
-export class OrderHistoryComponent implements OnInit {
+export class OrderHistoryComponent {
   readonly store = inject(OrderStore);
 
   readonly icons = { Image01Icon };
 
   readonly #router = inject(Router);
-
-  ngOnInit() {
-    this.store.loadOrders();
-  }
 
   toNumber(value: string): number {
     return Number(value);

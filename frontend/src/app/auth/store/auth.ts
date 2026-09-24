@@ -2,6 +2,7 @@ import { computed, inject } from '@angular/core';
 import { HttpErrorResponse } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { tapResponse } from '@ngrx/operators';
+import { QueryClient } from '@tanstack/angular-query-experimental';
 import {
   patchState,
   signalStore,
@@ -45,6 +46,7 @@ export const AuthStore = signalStore(
       authService = inject(AuthService),
       router = inject(Router),
       notification = inject(NotificationService),
+      queryClient = inject(QueryClient),
     ) => ({
       isLoggedIn: () => store.accessToken() !== null,
       isAdmin: () => store.user()?.role === USER_ROLES.ADMIN,
@@ -55,6 +57,7 @@ export const AuthStore = signalStore(
             authService.login(payload).pipe(
               tapResponse({
                 next: ({ accessToken, refreshToken, user }) => {
+                  queryClient.clear();
                   localStorage.setItem('accessToken', accessToken);
                   localStorage.setItem('refreshToken', refreshToken);
                   patchState(store, {
@@ -84,6 +87,7 @@ export const AuthStore = signalStore(
             authService.register(payload).pipe(
               tapResponse({
                 next: ({ accessToken, refreshToken, user }) => {
+                  queryClient.clear();
                   localStorage.setItem('accessToken', accessToken);
                   localStorage.setItem('refreshToken', refreshToken);
                   patchState(store, {
@@ -133,6 +137,7 @@ export const AuthStore = signalStore(
         patchState(store, { user });
       },
       logout() {
+        queryClient.clear();
         localStorage.removeItem('accessToken');
         localStorage.removeItem('refreshToken');
         patchState(store, {

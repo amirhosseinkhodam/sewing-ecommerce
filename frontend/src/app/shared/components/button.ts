@@ -4,14 +4,16 @@ import {
   output,
   ChangeDetectionStrategy,
 } from '@angular/core';
+import { BrnButton } from '@spartan-ng/brain/button';
 import { LoadingSpinnerComponent } from './loading-spinner';
 
 @Component({
   selector: 'app-button',
-  imports: [LoadingSpinnerComponent],
+  imports: [BrnButton, LoadingSpinnerComponent],
   changeDetection: ChangeDetectionStrategy.Eager,
   template: `
     <button
+      brnButton
       [type]="type()"
       [disabled]="disabled() || loading()"
       [attr.aria-label]="ariaLabel()"

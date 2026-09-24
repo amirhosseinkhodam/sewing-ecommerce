@@ -242,7 +242,6 @@ export class AdminPortfolioFormComponent implements OnInit {
 
   ngOnInit() {
     this.portfolioForm.resetForm();
-    this.store.loadCategories();
     const id = this.id();
     if (id) this.store.loadItem(id);
   }

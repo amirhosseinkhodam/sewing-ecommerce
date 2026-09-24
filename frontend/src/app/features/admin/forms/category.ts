@@ -1,28 +1,31 @@
-import { inject, Injectable } from '@angular/core';
-import { FormBuilder, Validators } from '@angular/forms';
+import { Injectable, signal } from '@angular/core';
+import { form, required } from '@angular/forms/signals';
 import type { CategoryModel } from '../../products/models/product';
 
 @Injectable({ providedIn: 'root' })
 export class CategoryFormService {
-  readonly #fb = inject(FormBuilder);
-
-  readonly #form = this.#fb.nonNullable.group({
-    name: ['', Validators.required],
-    slug: [''],
-    description: [''],
-    sortOrder: [0],
-    isActive: [true],
+  readonly model = signal({
+    name: '',
+    slug: '',
+    description: '',
+    sortOrder: '0',
+    isActive: true,
+  });
+  readonly form = form(this.model, (path) => {
+    required(path.name, { message: 'validation.required' });
   });
 
   patchFromCategory(category: CategoryModel) {
-    this.#form.patchValue(category);
+    this.model.set({
+      name: category.name,
+      slug: category.slug,
+      description: category.description ?? '',
+      sortOrder: String(category.sortOrder),
+      isActive: category.isActive,
+    });
   }
 
   resetForm() {
-    this.#form.reset();
-  }
-
-  get form() {
-    return this.#form;
+    this.form().reset();
   }
 }

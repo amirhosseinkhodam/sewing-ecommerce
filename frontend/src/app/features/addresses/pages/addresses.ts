@@ -149,10 +149,6 @@ export class AddressesComponent {
 
   readonly #modal = inject(ModalService);
 
-  constructor() {
-    this.store.load();
-  }
-
   onAdd() {
     this.editingAddress.set(null);
     this.formOpen.set(true);

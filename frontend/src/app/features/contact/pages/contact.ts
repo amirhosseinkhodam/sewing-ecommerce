@@ -1,10 +1,5 @@
-import {
-  ChangeDetectionStrategy,
-  Component,
-  inject,
-  signal,
-} from '@angular/core';
-import { ReactiveFormsModule } from '@angular/forms';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import { FormField, submit } from '@angular/forms/signals';
 import { HugeiconsIconComponent } from '@hugeicons/angular';
 import {
   Location01Icon,
@@ -14,25 +9,23 @@ import {
 } from '@hugeicons/core-free-icons';
 import { ButtonComponent } from '@shared/components/button';
 import { CardComponent } from '@shared/components/card';
-import { FormComponent } from '@shared/components/form';
-import { FormFieldComponent } from '@shared/components/form-field';
+import { SignalFormComponent } from '@shared/components/signal-form';
+import { SignalFormFieldComponent } from '@shared/components/signal-form-field';
 import { InputComponent } from '@shared/components/input';
 import { TextareaComponent } from '@shared/components/textarea';
 import { TranslatePipe } from '@shared/pipes/translate';
-import { LanguageService } from '@shared/services/language';
-import { NotificationService } from '@shared/services/notification';
 import { SHOP_CONTACT } from '../const/shop-contact';
 import { ContactFormService } from '../forms/contact';
-import { ContactService } from '../services/contact';
+import { injectSubmitContactMutation } from '../mutation/contact';
 
 @Component({
   selector: 'app-contact',
   imports: [
-    ReactiveFormsModule,
+    FormField,
     ButtonComponent,
     CardComponent,
-    FormComponent,
-    FormFieldComponent,
+    SignalFormComponent,
+    SignalFormFieldComponent,
     HugeiconsIconComponent,
     InputComponent,
     TextareaComponent,
@@ -50,61 +43,63 @@ import { ContactService } from '../services/contact';
 
       <div class="grid grid-cols-1 gap-6 lg:grid-cols-3">
         <app-card variant="bordered" cssClass="lg:col-span-2">
-          <app-form
-            [formGroup]="contactForm.form"
+          <app-signal-form
             (formSubmit)="onSubmit()"
             cssClass="flex flex-col gap-4"
           >
             <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <div>
                 <app-input
-                  formControlName="name"
+                  [formField]="contactForm.form.name"
                   [label]="'name' | translate"
                   [placeholder]="'name' | translate"
                 />
-                <app-form-field [control]="contactForm.form.get('name')!" />
+                <app-signal-form-field [field]="contactForm.form.name" />
               </div>
               <div>
                 <app-input
-                  formControlName="email"
+                  [formField]="contactForm.form.email"
                   type="email"
                   [label]="'email' | translate"
                   [placeholder]="'email' | translate"
                 />
-                <app-form-field [control]="contactForm.form.get('email')!" />
+                <app-signal-form-field [field]="contactForm.form.email" />
               </div>
             </div>
 
             <div>
               <app-input
-                formControlName="phone"
+                [formField]="contactForm.form.phone"
                 type="tel"
                 [label]="'phoneNumber' | translate"
                 [placeholder]="'optional' | translate"
               />
-              <app-form-field [control]="contactForm.form.get('phone')!" />
+              <app-signal-form-field [field]="contactForm.form.phone" />
             </div>
 
             <div>
               <app-textarea
-                formControlName="message"
+                [formField]="contactForm.form.message"
                 [label]="'message' | translate"
                 [placeholder]="'message' | translate"
                 [rows]="6"
               />
-              <app-form-field [control]="contactForm.form.get('message')!" />
+              <app-signal-form-field
+                [field]="contactForm.form.message"
+                [requiredLength]="10"
+              />
             </div>
 
             <div>
               <app-button
                 type="submit"
                 variant="primary"
-                [loading]="submitting()"
+                [loading]="submitMessage.isPending()"
               >
                 {{ 'sendMessage' | translate }}
               </app-button>
             </div>
-          </app-form>
+          </app-signal-form>
         </app-card>
 
         <app-card variant="bordered" cssClass="h-fit">
@@ -206,35 +201,17 @@ export class ContactComponent {
   };
   readonly shop = SHOP_CONTACT;
 
-  readonly submitting = signal(false);
+  readonly submitMessage = injectSubmitContactMutation({
+    onSuccess: () => this.contactForm.resetForm(),
+  });
 
-  readonly #contact = inject(ContactService);
-  readonly #notification = inject(NotificationService);
-  readonly #language = inject(LanguageService);
-
-  onSubmit() {
-    if (this.contactForm.form.invalid) {
-      this.contactForm.form.markAllAsTouched();
-      return;
-    }
-
-    this.submitting.set(true);
-    this.#contact.submit(this.contactForm.payload).subscribe({
-      next: () => {
-        this.submitting.set(false);
-        this.contactForm.resetForm();
-        this.#notification.show(
-          'success',
-          this.#language.translate('messageSent'),
-        );
-      },
-      error: () => {
-        this.submitting.set(false);
-        this.#notification.show(
-          'error',
-          this.#language.translate('couldNotSave'),
-        );
-      },
+  onSubmit(): void {
+    void submit(this.contactForm.form, async () => {
+      // The mutation reports both outcomes; swallow the rejection so it does
+      // not surface as an unhandled promise.
+      await this.submitMessage
+        .mutateAsync(this.contactForm.payload)
+        .catch(() => undefined);
     });
   }
 }

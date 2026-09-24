@@ -29,7 +29,7 @@ import { TranslatePipe } from '@shared/pipes/translate';
               {{ 'appName' | translate }}
             </h1>
             <p class="mt-2 text-sm text-slate-500 dark:text-slate-400">
-              Angular 19 + Tailwind + i18n + Dark Mode
+              Angular 22 + Tailwind + i18n + Dark Mode
             </p>
           </div>
 

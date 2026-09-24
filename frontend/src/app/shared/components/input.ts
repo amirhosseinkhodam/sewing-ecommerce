@@ -1,6 +1,7 @@
 import {
   Component,
   input,
+  model,
   output,
   forwardRef,
   ViewChild,
@@ -8,6 +9,7 @@ import {
   ChangeDetectionStrategy,
 } from '@angular/core';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
+import type { FormValueControl } from '@angular/forms/signals';
 
 @Component({
   selector: 'app-input',
@@ -30,6 +32,7 @@ import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
       [max]="max()"
       [step]="step()"
       [autocomplete]="autocomplete()"
+      [value]="value()"
       (input)="onInput($event)"
       (blur)="onBlur()"
       (focus)="onFocus()"
@@ -45,7 +48,11 @@ import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
     },
   ],
 })
-export class InputComponent implements ControlValueAccessor {
+export class InputComponent
+  implements ControlValueAccessor, FormValueControl<string>
+{
+  readonly value = model('');
+  readonly touch = output<void>();
   readonly type = input<
     'text' | 'email' | 'password' | 'number' | 'textarea' | 'search' | 'tel'
   >('text');
@@ -55,15 +62,15 @@ export class InputComponent implements ControlValueAccessor {
   readonly focusRing = input<boolean>(false);
   readonly autocomplete = input<string>();
   readonly variant = input<'default' | 'error' | 'disabled'>('default');
-  readonly min = input<string | number>();
-  readonly max = input<string | number>();
+  readonly min = input<string>();
+  readonly max = input<string>();
   readonly step = input<string | number>();
   readonly error = input<boolean>(false);
   readonly label = input<string>();
 
   readonly input = output<string>({ alias: 'inputChange' });
   readonly blur = output<void>({ alias: 'inputBlur' });
-  readonly focus = output<void>({ alias: 'inputFocus' });
+  readonly focusChange = output<void>({ alias: 'inputFocus' });
   readonly keydown = output<KeyboardEvent>({ alias: 'inputKeydown' });
 
   @ViewChild('inputElement', { static: true })
@@ -73,20 +80,23 @@ export class InputComponent implements ControlValueAccessor {
 
   onInput(event: Event) {
     const value = (event.target as HTMLInputElement).value;
+    this.value.set(value);
     this.#onChange(value);
     this.input.emit(value);
   }
 
   onBlur() {
     this.#onTouched();
+    this.touch.emit();
     this.blur.emit();
   }
 
   onFocus() {
-    this.focus.emit();
+    this.focusChange.emit();
   }
 
   writeValue(value: string): void {
+    this.value.set(value ?? '');
     if (this.inputElement) {
       this.inputElement.nativeElement.value = value ?? '';
     }

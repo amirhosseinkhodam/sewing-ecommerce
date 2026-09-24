@@ -2,11 +2,12 @@ import {
   Component,
   forwardRef,
   input,
+  model,
   output,
-  signal,
   ChangeDetectionStrategy,
 } from '@angular/core';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
+import type { FormCheckboxControl } from '@angular/forms/signals';
 
 @Component({
   selector: 'app-toggle',
@@ -20,7 +21,7 @@ import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
       <button
         type="button"
         role="switch"
-        [attr.aria-checked]="innerValue()"
+        [attr.aria-checked]="checked()"
         [disabled]="disabled()"
         [class]="switchClasses()"
         (click)="onToggle()"
@@ -38,7 +39,11 @@ import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
     },
   ],
 })
-export class ToggleComponent implements ControlValueAccessor {
+export class ToggleComponent
+  implements ControlValueAccessor, FormCheckboxControl
+{
+  readonly checked = model(false);
+  readonly touch = output<void>();
   readonly label = input<string>();
   readonly disabled = input<boolean>(false);
   readonly cssClass = input<string>();
@@ -47,18 +52,18 @@ export class ToggleComponent implements ControlValueAccessor {
 
   #onChange: (value: boolean) => void = () => {};
   #onTouched: () => void = () => {};
-  readonly innerValue = signal(false);
 
   onToggle(): void {
     if (this.disabled()) return;
-    this.innerValue.update((value) => !value);
-    this.#onChange(this.innerValue());
+    this.checked.update((value) => !value);
+    this.#onChange(this.checked());
     this.#onTouched();
-    this.change.emit(this.innerValue());
+    this.touch.emit();
+    this.change.emit(this.checked());
   }
 
   writeValue(value: boolean): void {
-    this.innerValue.set(value ?? false);
+    this.checked.set(value ?? false);
   }
 
   registerOnChange(fn: (value: boolean) => void): void {
@@ -82,14 +87,14 @@ export class ToggleComponent implements ControlValueAccessor {
   };
 
   readonly switchClasses = () => {
-    const on = this.innerValue()
+    const on = this.checked()
       ? 'bg-slate-900 dark:bg-slate-500'
       : 'bg-slate-300 dark:bg-slate-600';
     return `relative inline-flex h-6 w-11 shrink-0 items-center rounded-full transition-colors disabled:cursor-not-allowed ${on}`;
   };
 
   readonly thumbClasses = () => {
-    const on = this.innerValue()
+    const on = this.checked()
       ? 'translate-x-5 rtl:-translate-x-5'
       : 'translate-x-0';
     return `inline-block h-5 w-5 transform rounded-full bg-white shadow transition-transform ${on}`;

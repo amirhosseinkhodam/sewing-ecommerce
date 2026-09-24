@@ -1,30 +1,40 @@
-import { inject, Injectable } from '@angular/core';
-import { FormBuilder, Validators } from '@angular/forms';
-import { iranianPhoneValidator } from '@shared/validators/validators';
+import { Injectable, signal } from '@angular/core';
+import {
+  email,
+  form,
+  minLength,
+  required,
+  validate,
+} from '@angular/forms/signals';
 import type { ContactPayloadModel } from '@domain/models/contact';
 
 @Injectable({ providedIn: 'root' })
 export class ContactFormService {
-  readonly #fb = inject(FormBuilder);
-
-  readonly #form = this.#fb.nonNullable.group({
-    name: ['', Validators.required],
-    email: ['', [Validators.required, Validators.email]],
-    // Optional, but must look like an Iranian number when provided.
-    phone: ['', iranianPhoneValidator()],
-    message: ['', [Validators.required, Validators.minLength(10)]],
+  readonly model = signal({
+    name: '',
+    email: '',
+    phone: '',
+    message: '',
+  });
+  readonly form = form(this.model, (path) => {
+    required(path.name, { message: 'validation.required' });
+    required(path.email, { message: 'validation.required' });
+    email(path.email, { message: 'validation.email' });
+    validate(path.phone, ({ value }) =>
+      value() && !/^09\d{9}$/.test(value())
+        ? { kind: 'invalidPhone', message: 'validation.invalidPhone' }
+        : undefined,
+    );
+    required(path.message, { message: 'validation.required' });
+    minLength(path.message, 10, { message: 'validation.minlength' });
   });
 
   resetForm() {
-    this.#form.reset();
-  }
-
-  get form() {
-    return this.#form;
+    this.form().reset();
   }
 
   get payload(): ContactPayloadModel {
-    const value = this.#form.getRawValue();
+    const value = this.model();
     return {
       name: value.name.trim(),
       email: value.email.trim(),

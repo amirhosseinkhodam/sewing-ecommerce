@@ -1,9 +1,4 @@
-import {
-  Component,
-  inject,
-  OnInit,
-  ChangeDetectionStrategy,
-} from '@angular/core';
+import { Component, inject, ChangeDetectionStrategy } from '@angular/core';
 import { Router } from '@angular/router';
 import { ButtonComponent } from '@shared/components/button';
 import { LoadingSpinnerComponent } from '@shared/components/loading-spinner';
@@ -107,15 +102,10 @@ import { CatalogStore } from '../store/catalog';
     </div>
   `,
 })
-export class CatalogComponent implements OnInit {
+export class CatalogComponent {
   readonly store = inject(CatalogStore);
 
   readonly #router = inject(Router);
-
-  ngOnInit() {
-    this.store.loadCategories();
-    this.store.loadProducts();
-  }
 
   onProductClick(product: ProductModel) {
     this.#router.navigate(['/products', product.slug]);

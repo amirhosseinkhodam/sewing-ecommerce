@@ -1,9 +1,4 @@
-import {
-  ChangeDetectionStrategy,
-  Component,
-  inject,
-  OnInit,
-} from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { HugeiconsIconComponent } from '@hugeicons/angular';
 import { Image01Icon } from '@hugeicons/core-free-icons';
@@ -57,6 +52,12 @@ import { PortfolioStore } from '../store/portfolio';
             size="lg"
             cssClass="text-slate-400 dark:text-slate-500"
           />
+        </div>
+      } @else if (store.error()) {
+        <div
+          class="flex flex-col items-center gap-4 rounded-card border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 p-10 text-center"
+        >
+          <p>{{ 'couldNotLoadData' | translate }}</p>
         </div>
       } @else if (store.items().length === 0) {
         <div
@@ -150,7 +151,7 @@ import { PortfolioStore } from '../store/portfolio';
     </div>
   `,
 })
-export class PortfolioComponent implements OnInit {
+export class PortfolioComponent {
   readonly store = inject(PortfolioStore);
 
   readonly icons = { Image01Icon };
@@ -164,11 +165,6 @@ export class PortfolioComponent implements OnInit {
       .categories()
       .map((category) => ({ value: category.slug, label: category.name })),
   ];
-
-  ngOnInit() {
-    this.store.loadCategories();
-    this.store.loadItems();
-  }
 
   cover(item: PortfolioModel): string | null {
     return item.images[0] ?? null;

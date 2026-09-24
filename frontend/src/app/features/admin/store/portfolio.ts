@@ -1,119 +1,37 @@
-import { HttpErrorResponse } from '@angular/common/http';
-import { inject } from '@angular/core';
-import { tapResponse } from '@ngrx/operators';
-import { patchState, signalStore, withMethods, withState } from '@ngrx/signals';
-import { rxMethod } from '@ngrx/signals/rxjs-interop';
-import { pipe, switchMap, tap } from 'rxjs';
-import type { PortfolioModel } from '@domain/models/portfolio';
-import { LanguageService } from '@shared/services/language';
-import { NotificationService } from '@shared/services/notification';
-import { AdminPortfolioService } from '../services/admin-portfolio';
+import { computed, Injectable, signal } from '@angular/core';
+import { injectRemovePortfolioMutation } from '../mutation/admin-portfolio';
+import { injectAdminPortfolioQuery } from '../query/admin-portfolio';
 
-interface AdminPortfolioState {
-  items: PortfolioModel[];
-  total: number;
-  page: number;
-  pageSize: number;
-  totalPages: number;
-  search: string;
-  loading: boolean;
+@Injectable()
+export class AdminPortfolioStore {
+  readonly page = signal(1);
+  readonly pageSize = signal(10);
+  readonly search = signal('');
+
+  readonly #itemsQuery = injectAdminPortfolioQuery(() => ({
+    page: this.page(),
+    pageSize: this.pageSize(),
+    search: this.search() || undefined,
+  }));
+  readonly items = computed(() => this.#itemsQuery.data()?.items ?? []);
+  readonly total = computed(() => this.#itemsQuery.data()?.total ?? 0);
+  readonly totalPages = computed(
+    () => this.#itemsQuery.data()?.totalPages ?? 0,
+  );
+  readonly loading = computed(() => this.#itemsQuery.isPending());
+
+  readonly #removeMutation = injectRemovePortfolioMutation();
+
+  setPage(page: number): void {
+    this.page.set(page);
+  }
+
+  setSearch(search: string): void {
+    this.search.set(search);
+    this.page.set(1);
+  }
+
+  removeItem(id: string): void {
+    this.#removeMutation.mutate(id);
+  }
 }
-
-const initialState: AdminPortfolioState = {
-  items: [],
-  total: 0,
-  page: 1,
-  pageSize: 10,
-  totalPages: 0,
-  search: '',
-  loading: false,
-};
-
-export const AdminPortfolioStore = signalStore(
-  withState(initialState),
-  withMethods(
-    (
-      store,
-      portfolioService = inject(AdminPortfolioService),
-      notification = inject(NotificationService),
-      languageService = inject(LanguageService),
-    ) => ({
-      loadItems: rxMethod<void>(
-        pipe(
-          tap(() => patchState(store, { loading: true })),
-          switchMap(() =>
-            portfolioService
-              .list({
-                page: store.page(),
-                pageSize: store.pageSize(),
-                search: store.search() || undefined,
-              })
-              .pipe(
-                tapResponse({
-                  next: (result) =>
-                    patchState(store, {
-                      items: result.items,
-                      total: result.total,
-                      page: result.page,
-                      pageSize: result.pageSize,
-                      totalPages: result.totalPages,
-                      loading: false,
-                    }),
-                  error: (err: HttpErrorResponse) => {
-                    patchState(store, { loading: false });
-                    notification.show(
-                      'error',
-                      err.error?.message ??
-                        languageService.translate('couldNotLoadData'),
-                    );
-                  },
-                }),
-              ),
-          ),
-        ),
-      ),
-    }),
-  ),
-  // Second block so these can call loadItems() from the first.
-  withMethods(
-    (
-      store,
-      portfolioService = inject(AdminPortfolioService),
-      notification = inject(NotificationService),
-      languageService = inject(LanguageService),
-    ) => ({
-      setPage(page: number) {
-        patchState(store, { page });
-        store.loadItems();
-      },
-      setSearch(search: string) {
-        patchState(store, { search, page: 1 });
-        store.loadItems();
-      },
-      removeItem: rxMethod<string>(
-        pipe(
-          switchMap((id) =>
-            portfolioService.remove(id).pipe(
-              tapResponse({
-                next: () => {
-                  notification.show(
-                    'success',
-                    languageService.translate('portfolioDeleted'),
-                  );
-                  store.loadItems();
-                },
-                error: (err: HttpErrorResponse) => {
-                  notification.show(
-                    'error',
-                    err.error?.message ??
-                      languageService.translate('couldNotDelete'),
-                  );
-                },
-              }),
-            ),
-          ),
-        ),
-      ),
-    }),
-  ),
-);

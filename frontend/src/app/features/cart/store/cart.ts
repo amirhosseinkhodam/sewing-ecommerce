@@ -1,121 +1,65 @@
-import { HttpErrorResponse } from '@angular/common/http';
-import { computed, inject } from '@angular/core';
-import { tapResponse } from '@ngrx/operators';
-import {
-  patchState,
-  signalStore,
-  withComputed,
-  withMethods,
-  withState,
-} from '@ngrx/signals';
-import { rxMethod } from '@ngrx/signals/rxjs-interop';
-import { pipe, switchMap, tap } from 'rxjs';
+import { computed, inject, Injectable } from '@angular/core';
+import { QueryClient } from '@tanstack/angular-query-experimental';
+import { AuthStore } from '@auth/store/auth';
 import type { AddCartItemPayloadModel, CartModel } from '@domain/models/cart';
-import { NotificationService } from '@shared/services/notification';
-import { LanguageService } from '@shared/services/language';
-import { CartService } from '../services/cart';
+import { QUERY_KEYS } from '@shared/const/query-keys';
+import {
+  injectAddCartItemMutation,
+  injectRemoveCartItemMutation,
+  injectUpdateCartItemMutation,
+  type UpdateCartItemModel,
+} from '../mutation/cart';
+import { injectCartQuery } from '../query/cart';
 
-interface CartState {
-  cart: CartModel | null;
-  loading: boolean;
+@Injectable({ providedIn: 'root' })
+export class CartStore {
+  readonly #auth = inject(AuthStore);
+  readonly #queryClient = inject(QueryClient);
+
+  readonly #cartQuery = injectCartQuery(() => this.#auth.isLoggedIn());
+  readonly cart = computed(() => this.#cartQuery.data() ?? null);
+  readonly items = computed(() => this.cart()?.items ?? []);
+  readonly totalItems = computed(() =>
+    this.items().reduce((sum, item) => sum + item.quantity, 0),
+  );
+  readonly totalPrice = computed(() =>
+    this.items().reduce(
+      (sum, item) => sum + Number(item.unitPrice) * item.quantity,
+      0,
+    ),
+  );
+  readonly loading = computed(
+    () => this.#auth.isLoggedIn() && this.#cartQuery.isPending(),
+  );
+
+  readonly #addMutation = injectAddCartItemMutation();
+  readonly #updateMutation = injectUpdateCartItemMutation();
+  readonly #removeMutation = injectRemoveCartItemMutation();
+
+  load(): void {
+    if (
+      this.#auth.isLoggedIn() &&
+      !this.#cartQuery.data() &&
+      !this.#cartQuery.isFetching()
+    ) {
+      void this.#cartQuery.refetch();
+    }
+  }
+
+  addItem(payload: AddCartItemPayloadModel): void {
+    this.#addMutation.mutate(payload);
+  }
+
+  updateQuantity(value: UpdateCartItemModel): void {
+    this.#updateMutation.mutate(value);
+  }
+
+  removeItem(itemId: string): void {
+    this.#removeMutation.mutate(itemId);
+  }
+
+  /** Clears the cached cart after checkout, without a server round trip. */
+  clearLocal(): void {
+    this.#queryClient.setQueryData<CartModel | null>([QUERY_KEYS.cart], null);
+  }
 }
-
-const initialState: CartState = {
-  cart: null,
-  loading: false,
-};
-
-export const CartStore = signalStore(
-  { providedIn: 'root' },
-  withState(initialState),
-  withComputed((store) => ({
-    items: computed(() => store.cart()?.items ?? []),
-    totalItems: computed(() =>
-      (store.cart()?.items ?? []).reduce((sum, item) => sum + item.quantity, 0),
-    ),
-    totalPrice: computed(() =>
-      (store.cart()?.items ?? []).reduce(
-        (sum, item) => sum + Number(item.unitPrice) * item.quantity,
-        0,
-      ),
-    ),
-  })),
-  withMethods(
-    (
-      store,
-      cartService = inject(CartService),
-      notification = inject(NotificationService),
-      language = inject(LanguageService),
-    ) => ({
-      load: rxMethod<void>(
-        pipe(
-          tap(() => patchState(store, { loading: true })),
-          switchMap(() =>
-            cartService.get().pipe(
-              tapResponse({
-                next: (cart) => patchState(store, { cart, loading: false }),
-                error: () => patchState(store, { loading: false }),
-              }),
-            ),
-          ),
-        ),
-      ),
-      addItem: rxMethod<AddCartItemPayloadModel>(
-        pipe(
-          switchMap((payload) =>
-            cartService.addItem(payload).pipe(
-              tapResponse({
-                next: (cart) => patchState(store, { cart }),
-                error: (err: HttpErrorResponse) =>
-                  notification.show(
-                    'error',
-                    err.error?.message ??
-                      language.translate('couldNotAddToCart'),
-                  ),
-              }),
-            ),
-          ),
-        ),
-      ),
-      updateQuantity: rxMethod<{ itemId: string; quantity: number }>(
-        pipe(
-          tap(() => patchState(store, { loading: true })),
-          switchMap(({ itemId, quantity }) =>
-            cartService.updateItem(itemId, { quantity }).pipe(
-              tapResponse({
-                next: (cart) => patchState(store, { cart, loading: false }),
-                error: (err: HttpErrorResponse) => {
-                  patchState(store, { loading: false });
-                  notification.show(
-                    'error',
-                    err.error?.message ?? language.translate('couldNotSave'),
-                  );
-                },
-              }),
-            ),
-          ),
-        ),
-      ),
-      removeItem: rxMethod<string>(
-        pipe(
-          tap(() => patchState(store, { loading: true })),
-          switchMap((itemId) =>
-            cartService.removeItem(itemId).pipe(
-              tapResponse({
-                next: (cart) => patchState(store, { cart, loading: false }),
-                error: () => {
-                  patchState(store, { loading: false });
-                  notification.show(
-                    'error',
-                    language.translate('couldNotDelete'),
-                  );
-                },
-              }),
-            ),
-          ),
-        ),
-      ),
-      clearLocal: () => patchState(store, initialState),
-    }),
-  ),
-);

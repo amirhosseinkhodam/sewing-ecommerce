@@ -1,12 +1,12 @@
 import { Component, inject, ChangeDetectionStrategy } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
-import { ReactiveFormsModule } from '@angular/forms';
+import { FormField, submit } from '@angular/forms/signals';
 import { TranslatePipe } from '@shared/pipes/translate';
 import { CardComponent } from '@shared/components/card';
 import { ButtonComponent } from '@shared/components/button';
 import { InputComponent } from '@shared/components/input';
-import { FormComponent } from '@shared/components/form';
-import { FormFieldComponent } from '@shared/components/form-field';
+import { SignalFormComponent } from '@shared/components/signal-form';
+import { SignalFormFieldComponent } from '@shared/components/signal-form-field';
 import { LoginFormService } from '../forms/login';
 import { AuthStore } from '../store/auth';
 
@@ -14,12 +14,12 @@ import { AuthStore } from '../store/auth';
   selector: 'app-login',
   imports: [
     RouterLink,
-    ReactiveFormsModule,
+    FormField,
     CardComponent,
     ButtonComponent,
     InputComponent,
-    FormComponent,
-    FormFieldComponent,
+    SignalFormComponent,
+    SignalFormFieldComponent,
     TranslatePipe,
   ],
   changeDetection: ChangeDetectionStrategy.Eager,
@@ -33,31 +33,30 @@ import { AuthStore } from '../store/auth';
             </h1>
           </div>
 
-          <app-form
-            [formGroup]="loginForm.form"
+          <app-signal-form
             (formSubmit)="onSubmit()"
             cssClass="flex flex-col gap-4"
           >
             <div>
               <app-input
-                formControlName="email"
+                [formField]="loginForm.form.email"
                 type="email"
                 [label]="'email' | translate"
                 [placeholder]="'email' | translate"
                 autocomplete="email"
               />
-              <app-form-field [control]="loginForm.form.get('email')!" />
+              <app-signal-form-field [field]="loginForm.form.email" />
             </div>
 
             <div>
               <app-input
-                formControlName="password"
+                [formField]="loginForm.form.password"
                 type="password"
                 [label]="'password' | translate"
                 [placeholder]="'password' | translate"
                 autocomplete="current-password"
               />
-              <app-form-field [control]="loginForm.form.get('password')!" />
+              <app-signal-form-field [field]="loginForm.form.password" />
             </div>
 
             <app-button
@@ -68,7 +67,7 @@ import { AuthStore } from '../store/auth';
             >
               {{ 'login' | translate }}
             </app-button>
-          </app-form>
+          </app-signal-form>
 
           <div class="text-center text-sm text-slate-500 dark:text-slate-400">
             {{ 'dontHaveAccount' | translate }}
@@ -91,10 +90,12 @@ export class LoginComponent {
   readonly #route = inject(ActivatedRoute);
 
   onSubmit(): void {
-    this.store.login({
-      payload: this.loginForm.form.getRawValue(),
-      returnUrl:
-        this.#route.snapshot.queryParamMap.get('returnUrl') ?? undefined,
+    void submit(this.loginForm.form, async () => {
+      this.store.login({
+        payload: this.loginForm.model(),
+        returnUrl:
+          this.#route.snapshot.queryParamMap.get('returnUrl') ?? undefined,
+      });
     });
   }
 }

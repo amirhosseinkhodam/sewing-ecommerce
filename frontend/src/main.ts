@@ -5,6 +5,10 @@ import {
 } from '@angular/core';
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { bootstrapApplication } from '@angular/platform-browser';
+import {
+  provideTanStackQuery,
+  QueryClient,
+} from '@tanstack/angular-query-experimental';
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
 import {
   provideRouter,
@@ -22,6 +26,14 @@ bootstrapApplication(AppComponent, {
     provideBrowserGlobalErrorListeners(),
     provideRouter(routes, withComponentInputBinding(), withViewTransitions()),
     provideHttpClient(withInterceptors([authInterceptor])),
+    provideTanStackQuery(
+      new QueryClient({
+        defaultOptions: {
+          queries: { retry: 1, staleTime: 30_000, refetchOnWindowFocus: false },
+          mutations: { retry: false },
+        },
+      }),
+    ),
     provideAnimationsAsync(),
     provideAppInitializer(() => {
       inject(LanguageService);

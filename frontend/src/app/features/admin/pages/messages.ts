@@ -1,9 +1,4 @@
-import {
-  ChangeDetectionStrategy,
-  Component,
-  inject,
-  OnInit,
-} from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { HugeiconsIconComponent } from '@hugeicons/angular';
 import { Delete01Icon, MailOpen01Icon } from '@hugeicons/core-free-icons';
 import type { ContactMessageModel } from '@domain/models/contact';
@@ -181,7 +176,7 @@ const READ_FILTERS = {
     </div>
   `,
 })
-export class AdminMessagesComponent implements OnInit {
+export class AdminMessagesComponent {
   readonly store = inject(AdminMessageStore);
 
   readonly icons = { MailOpen01Icon, Delete01Icon };
@@ -194,10 +189,6 @@ export class AdminMessagesComponent implements OnInit {
     { value: READ_FILTERS.unread, label: this.#language.translate('unread') },
     { value: READ_FILTERS.read, label: this.#language.translate('read') },
   ];
-
-  ngOnInit() {
-    this.store.loadMessages();
-  }
 
   currentFilter(): string {
     const isRead = this.store.isRead();

@@ -1,9 +1,4 @@
-import {
-  ChangeDetectionStrategy,
-  Component,
-  inject,
-  OnInit,
-} from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { ORDER_STATUSES, type OrderStatus } from '@domain/const/order-statuses';
 import {
@@ -197,7 +192,7 @@ import { AdminOrderStore } from '../store/order';
     </div>
   `,
 })
-export class AdminOrdersComponent implements OnInit {
+export class AdminOrdersComponent {
   readonly store = inject(AdminOrderStore);
 
   readonly #router = inject(Router);
@@ -216,10 +211,6 @@ export class AdminOrdersComponent implements OnInit {
       value: status,
       label: this.#language.translate(PAYMENT_STATUS_KEYS[status]),
     }));
-
-  ngOnInit() {
-    this.store.loadOrders();
-  }
 
   toNumber(value: string): number {
     return Number(value);

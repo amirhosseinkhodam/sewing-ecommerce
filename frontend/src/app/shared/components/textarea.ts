@@ -1,6 +1,7 @@
 import {
   Component,
   input,
+  model,
   output,
   forwardRef,
   ViewChild,
@@ -8,6 +9,7 @@ import {
   ChangeDetectionStrategy,
 } from '@angular/core';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
+import type { FormValueControl } from '@angular/forms/signals';
 
 @Component({
   selector: 'app-textarea',
@@ -26,6 +28,7 @@ import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
       [placeholder]="placeholder()"
       [disabled]="disabled()"
       [class]="computedClasses()"
+      [value]="value()"
       (input)="onInput($event)"
       (blur)="onBlur()"
       (focus)="onFocus()"
@@ -40,7 +43,11 @@ import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
     },
   ],
 })
-export class TextareaComponent implements ControlValueAccessor {
+export class TextareaComponent
+  implements ControlValueAccessor, FormValueControl<string>
+{
+  readonly value = model('');
+  readonly touch = output<void>();
   readonly rows = input<number>(4);
   readonly placeholder = input<string>();
   readonly disabled = input<boolean>(false);
@@ -52,7 +59,7 @@ export class TextareaComponent implements ControlValueAccessor {
 
   readonly input = output<string>({ alias: 'inputChange' });
   readonly blur = output<void>({ alias: 'inputBlur' });
-  readonly focus = output<void>({ alias: 'inputFocus' });
+  readonly focusChange = output<void>({ alias: 'inputFocus' });
 
   @ViewChild('textareaElement', { static: true })
   textareaElement!: ElementRef<HTMLTextAreaElement>;
@@ -61,20 +68,23 @@ export class TextareaComponent implements ControlValueAccessor {
 
   onInput(event: Event) {
     const value = (event.target as HTMLTextAreaElement).value;
+    this.value.set(value);
     this.#onChange(value);
     this.input.emit(value);
   }
 
   onBlur() {
     this.#onTouched();
+    this.touch.emit();
     this.blur.emit();
   }
 
   onFocus() {
-    this.focus.emit();
+    this.focusChange.emit();
   }
 
   writeValue(value: string): void {
+    this.value.set(value ?? '');
     if (this.textareaElement) {
       this.textareaElement.nativeElement.value = value ?? '';
     }

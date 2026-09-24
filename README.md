@@ -6,7 +6,7 @@ Persian-first, mobile-responsive sewing shop ecommerce website with guest browsi
 
 | Layer | Technology |
 |---|---|
-| Frontend | Angular 19 standalone + Tailwind CSS v4 + Spartan UI + NgRx SignalStore |
+| Frontend | Angular 22 standalone + Tailwind CSS v4 + Spartan UI; TanStack Query and NgRx SignalStore during migration |
 | Backend | NestJS + Prisma + PostgreSQL (in `backend/`) |
 | Auth | JWT (access + refresh) |
 | Styling | Tailwind CSS v4 + tailwindcss-rtl (RTL ready) |
@@ -42,13 +42,15 @@ npm run start:backend  # API on localhost:3000, Swagger at /docs
 
 ```
 frontend/src/app/
-├── main.ts / app.ts / main.route.ts
+├── app.ts / main.route.ts  # bootstrap is frontend/src/main.ts
 ├── core/                 # Guards, interceptors, API service
 ├── auth/                 # Auth feature (store, services, forms, pages)
 ├── features/             # Feature modules (home, products, ...)
-│   ├── <feature>/pages/  # Routed page components
-│   ├── <feature>/store/  # SignalStore state
-│   ├── <feature>/forms/  # Reactive form services
+│   ├── <feature>/pages/    # Routed page components
+│   ├── <feature>/query/    # injectQuery factories (server reads)
+│   ├── <feature>/mutation/ # injectMutation factories (server writes)
+│   ├── <feature>/store/    # Client state + computed projections
+│   ├── <feature>/forms/  # Signal Forms or existing Reactive Forms
 │   ├── <feature>/models/ # Feature models/interfaces
 │   └── <feature>/services/
 ├── i18n/                 # en.json + fa.json (Persian RTL)
@@ -63,5 +65,7 @@ shared/                   # Cross-half shared types (root, backend-importable)
 - **Phase 1 — Auth Frontend + Layout**: done (login, register, profile, guards, interceptor, navbar/footer, AuthStore)
 - **Phase 2 — Products + Categories**: done (public catalog + product detail with gallery/sizes, admin category/product management with image upload)
 - **Phase 3 — Cart + Checkout**: done (cart/address/order backend modules; CartPage, AddressManagementPage, multi-step CheckoutPage; navbar cart badge; add-to-cart with login-return flow)
+- **Phases 4–5**: done (orders, portfolio, contact)
+- **Frontend migration before Phase 6**: underway; see `PLAN.md` for the remaining checklist.
 
 Full roadmap, database schema, API endpoints, and implementation phases: see `PLAN.md`. How the system works (architecture, flows, auth, DB, decisions & why): see `PROJECT_KNOWLEDGE.md` — the canonical living knowledge guide, kept up to date automatically.

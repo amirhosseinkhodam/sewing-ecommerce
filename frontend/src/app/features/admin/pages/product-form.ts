@@ -341,7 +341,6 @@ export class AdminProductFormComponent implements OnInit {
 
   ngOnInit() {
     this.productForm.resetForm();
-    this.store.loadCategories();
     const id = this.#route.snapshot.paramMap.get('id');
     if (id) {
       this.#productId.set(id);

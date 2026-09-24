@@ -1,12 +1,12 @@
 import { Component, inject, ChangeDetectionStrategy } from '@angular/core';
 import { RouterLink } from '@angular/router';
-import { ReactiveFormsModule } from '@angular/forms';
+import { FormField, submit } from '@angular/forms/signals';
 import { TranslatePipe } from '@shared/pipes/translate';
 import { CardComponent } from '@shared/components/card';
 import { ButtonComponent } from '@shared/components/button';
 import { InputComponent } from '@shared/components/input';
-import { FormComponent } from '@shared/components/form';
-import { FormFieldComponent } from '@shared/components/form-field';
+import { SignalFormComponent } from '@shared/components/signal-form';
+import { SignalFormFieldComponent } from '@shared/components/signal-form-field';
 import { RegisterFormService } from '../forms/register';
 import { AuthStore } from '../store/auth';
 
@@ -14,12 +14,12 @@ import { AuthStore } from '../store/auth';
   selector: 'app-register',
   imports: [
     RouterLink,
-    ReactiveFormsModule,
+    FormField,
     CardComponent,
     ButtonComponent,
     InputComponent,
-    FormComponent,
-    FormFieldComponent,
+    SignalFormComponent,
+    SignalFormFieldComponent,
     TranslatePipe,
   ],
   changeDetection: ChangeDetectionStrategy.Eager,
@@ -33,90 +33,80 @@ import { AuthStore } from '../store/auth';
             </h1>
           </div>
 
-          @if (
-            registerForm.form.errors?.['passwordsMismatch'] &&
-            registerForm.form.get('confirmPassword')?.touched
-          ) {
-            <div
-              class="p-3 text-sm text-red-700 dark:text-red-400 bg-red-50 dark:bg-red-900/30 rounded-lg"
-            >
-              {{ 'validation.passwordsMismatch' | translate }}
-            </div>
-          }
-
-          <app-form
-            [formGroup]="registerForm.form"
+          <app-signal-form
             (formSubmit)="onSubmit()"
             cssClass="flex flex-col gap-4"
           >
             <div class="grid grid-cols-2 gap-4">
               <div>
                 <app-input
-                  formControlName="firstName"
+                  [formField]="registerForm.form.firstName"
                   type="text"
                   [label]="'firstName' | translate"
                   [placeholder]="'firstName' | translate"
                 />
-                <app-form-field
-                  [control]="registerForm.form.get('firstName')!"
+                <app-signal-form-field
+                  [field]="registerForm.form.firstName"
+                  [requiredLength]="2"
                 />
               </div>
               <div>
                 <app-input
-                  formControlName="lastName"
+                  [formField]="registerForm.form.lastName"
                   type="text"
                   [label]="'lastName' | translate"
                   [placeholder]="'lastName' | translate"
                 />
-                <app-form-field
-                  [control]="registerForm.form.get('lastName')!"
+                <app-signal-form-field
+                  [field]="registerForm.form.lastName"
+                  [requiredLength]="2"
                 />
               </div>
             </div>
 
             <div>
               <app-input
-                formControlName="email"
+                [formField]="registerForm.form.email"
                 type="email"
                 [label]="'email' | translate"
                 [placeholder]="'email' | translate"
                 autocomplete="email"
               />
-              <app-form-field [control]="registerForm.form.get('email')!" />
+              <app-signal-form-field [field]="registerForm.form.email" />
             </div>
 
             <div>
               <app-input
-                formControlName="phone"
+                [formField]="registerForm.form.phone"
                 type="text"
                 [label]="'phone' | translate"
                 [placeholder]="'phone' | translate"
                 autocomplete="tel"
               />
-              <app-form-field [control]="registerForm.form.get('phone')!" />
+              <app-signal-form-field [field]="registerForm.form.phone" />
             </div>
 
             <div>
               <app-input
-                formControlName="password"
+                [formField]="registerForm.form.password"
                 type="password"
                 [label]="'password' | translate"
                 [placeholder]="'password' | translate"
                 autocomplete="new-password"
               />
-              <app-form-field [control]="registerForm.form.get('password')!" />
+              <app-signal-form-field [field]="registerForm.form.password" />
             </div>
 
             <div>
               <app-input
-                formControlName="confirmPassword"
+                [formField]="registerForm.form.confirmPassword"
                 type="password"
                 [label]="'confirmPassword' | translate"
                 [placeholder]="'confirmPassword' | translate"
                 autocomplete="new-password"
               />
-              <app-form-field
-                [control]="registerForm.form.get('confirmPassword')!"
+              <app-signal-form-field
+                [field]="registerForm.form.confirmPassword"
               />
             </div>
 
@@ -128,7 +118,7 @@ import { AuthStore } from '../store/auth';
             >
               {{ 'register' | translate }}
             </app-button>
-          </app-form>
+          </app-signal-form>
 
           <div class="text-center text-sm text-slate-500 dark:text-slate-400">
             {{ 'alreadyHaveAccount' | translate }}
@@ -149,8 +139,10 @@ export class RegisterComponent {
   readonly store = inject(AuthStore);
 
   onSubmit(): void {
-    const { confirmPassword, ...payload } =
-      this.registerForm.form.getRawValue();
-    this.store.register(payload);
+    void submit(this.registerForm.form, async () => {
+      const { confirmPassword: _confirmPassword, ...payload } =
+        this.registerForm.model();
+      this.store.register(payload);
+    });
   }
 }

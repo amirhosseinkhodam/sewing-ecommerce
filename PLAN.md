@@ -9,7 +9,7 @@ A Persian-first, mobile-responsive sewing shop ecommerce website with guest brow
 ## 1. System Architecture
 
 ```
-Frontend (Angular 19 + Tailwind CSS + SignalStore)
+Frontend (Angular 22 + Tailwind CSS + Spartan UI + TanStack Query)
        │  HTTP (JSON + JWT)
 Backend (NestJS + Prisma + PostgreSQL)
        │  SQL
@@ -24,7 +24,7 @@ Database (PostgreSQL)
 
 | Layer | Technology | Reason |
 |-------|-----------|--------|
-| Frontend | Angular 19 standalone + Tailwind + NgRx SignalStore | Already set up, modern, zoneless |
+| Frontend | Angular 22 standalone + Tailwind + Spartan UI; TanStack Query for server state and NgRx SignalStore for client state | Migrate the existing app before Phase 6 |
 | Backend | NestJS + TypeScript | Same language as frontend, structured, scalable |
 | ORM | Prisma | Type-safe, auto-generated types, migrations |
 | Database | PostgreSQL | Reliable, JSON support, full-text search |
@@ -474,6 +474,19 @@ Only admin can change status. (Phase 8: SMS sent to customer on each transition.
 - [x] Public: ContactPage (form + shop contact details)
 - [x] Admin: MessagesPage (read/unread filter, mark read, delete)
 - [x] Fixed: `CategoriesService.remove` now guards portfolio items too (was a latent 500)
+
+### Frontend migration — before Phase 6
+- [x] Configure TanStack Query at bootstrap; migrate public catalog, product detail, and portfolio reads; invalidate affected caches on admin changes
+- [x] Migrate login, registration, and contact forms to Signal Forms; use a contact mutation and Spartan button primitive
+- [x] Migrate address list/write workflows and shared address form to Query and Signal Forms
+- [x] Migrate cart reads and writes to TanStack Query; preserve navbar count and checkout clear
+- [x] Migrate customer order history/detail and checkout queries/mutations
+- [x] Migrate admin categories and product lists/writes to TanStack Query; migrate category form to Signal Forms
+- [x] Migrate remaining admin product/portfolio forms, portfolio, orders, and messages to queries and mutations
+- [ ] Migrate customer profile reads/writes to queries and mutations (`AuthStore` still owns the session + profile via SignalStore, by design)
+- [ ] Migrate remaining profile/password and admin product/portfolio forms to Angular Signal Forms; retain validation and accessibility
+- [ ] Adopt Spartan primitives for shared controls when appropriate while preserving `app-*` APIs and visual/RTL behavior
+- [ ] Check lint, development build, and critical login/cart/checkout/admin flows before Phase 6
 
 ### Phase 6 — Admin Dashboard (2 days)
 - [ ] Backend: Dashboard stats endpoint
