@@ -8,7 +8,7 @@ import {
   OnInit,
   signal,
 } from '@angular/core';
-import { ReactiveFormsModule } from '@angular/forms';
+import { FormField, submit } from '@angular/forms/signals';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Router } from '@angular/router';
 import { HugeiconsIconComponent } from '@hugeicons/angular';
@@ -16,8 +16,8 @@ import { Delete01Icon, Upload04Icon } from '@hugeicons/core-free-icons';
 import { UploadService } from '@core/services/upload';
 import { ButtonComponent } from '@shared/components/button';
 import { CardComponent } from '@shared/components/card';
-import { FormComponent } from '@shared/components/form';
-import { FormFieldComponent } from '@shared/components/form-field';
+import { SignalFormComponent } from '@shared/components/signal-form';
+import { SignalFormFieldComponent } from '@shared/components/signal-form-field';
 import { InputComponent } from '@shared/components/input';
 import { LoadingSpinnerComponent } from '@shared/components/loading-spinner';
 import { SelectComponent } from '@shared/components/select';
@@ -33,11 +33,11 @@ import { PortfolioFormStore } from '../store/portfolio-form';
 @Component({
   selector: 'app-admin-portfolio-form',
   imports: [
-    ReactiveFormsModule,
+    FormField,
     ButtonComponent,
     CardComponent,
-    FormComponent,
-    FormFieldComponent,
+    SignalFormComponent,
+    SignalFormFieldComponent,
     HugeiconsIconComponent,
     InputComponent,
     LoadingSpinnerComponent,
@@ -66,8 +66,7 @@ import { PortfolioFormStore } from '../store/portfolio-form';
           />
         </div>
       } @else {
-        <app-form
-          [formGroup]="portfolioForm.form"
+        <app-signal-form
           (formSubmit)="onSubmit()"
           cssClass="flex flex-col gap-6"
         >
@@ -76,17 +75,15 @@ import { PortfolioFormStore } from '../store/portfolio-form';
               <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
                 <div>
                   <app-input
-                    formControlName="title"
+                    [formField]="portfolioForm.form.title"
                     [label]="'title' | translate"
                     [placeholder]="'title' | translate"
                   />
-                  <app-form-field
-                    [control]="portfolioForm.form.get('title')!"
-                  />
+                  <app-signal-form-field [field]="portfolioForm.form.title" />
                 </div>
                 <div>
                   <app-input
-                    formControlName="slug"
+                    [formField]="portfolioForm.form.slug"
                     [label]="'slug' | translate"
                     [placeholder]="'slug' | translate"
                   />
@@ -95,7 +92,7 @@ import { PortfolioFormStore } from '../store/portfolio-form';
 
               <div>
                 <app-textarea
-                  formControlName="description"
+                  [formField]="portfolioForm.form.description"
                   [label]="'description' | translate"
                   [placeholder]="'description' | translate"
                   [rows]="4"
@@ -105,7 +102,7 @@ import { PortfolioFormStore } from '../store/portfolio-form';
               <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
                 <div>
                   <app-select
-                    formControlName="categoryId"
+                    [formField]="portfolioForm.form.categoryId"
                     [options]="categoryOptions()"
                     [label]="'category' | translate"
                     [placeholder]="'category' | translate"
@@ -113,7 +110,7 @@ import { PortfolioFormStore } from '../store/portfolio-form';
                 </div>
                 <div class="flex items-end pb-2">
                   <app-toggle
-                    formControlName="isActive"
+                    [formField]="portfolioForm.form.isActive"
                     [label]="'isActive' | translate"
                   />
                 </div>
@@ -199,7 +196,7 @@ import { PortfolioFormStore } from '../store/portfolio-form';
               {{ 'cancel' | translate }}
             </app-button>
           </div>
-        </app-form>
+        </app-signal-form>
       }
     </div>
   `,
@@ -278,13 +275,11 @@ export class AdminPortfolioFormComponent implements OnInit {
   }
 
   onSubmit() {
-    if (this.portfolioForm.form.invalid) {
-      this.portfolioForm.form.markAllAsTouched();
-      return;
-    }
-    this.store.save({
-      id: this.id(),
-      payload: this.portfolioForm.payload,
+    void submit(this.portfolioForm.form, async () => {
+      this.store.save({
+        id: this.id(),
+        payload: this.portfolioForm.payload,
+      });
     });
   }
 

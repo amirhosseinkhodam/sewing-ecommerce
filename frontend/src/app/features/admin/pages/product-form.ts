@@ -8,7 +8,7 @@ import {
   ChangeDetectionStrategy,
 } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { ReactiveFormsModule } from '@angular/forms';
+import { FormField, submit } from '@angular/forms/signals';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { HugeiconsIconComponent } from '@hugeicons/angular';
 import {
@@ -18,8 +18,8 @@ import {
 } from '@hugeicons/core-free-icons';
 import { ButtonComponent } from '@shared/components/button';
 import { CardComponent } from '@shared/components/card';
-import { FormComponent } from '@shared/components/form';
-import { FormFieldComponent } from '@shared/components/form-field';
+import { SignalFormComponent } from '@shared/components/signal-form';
+import { SignalFormFieldComponent } from '@shared/components/signal-form-field';
 import { InputComponent } from '@shared/components/input';
 import { LoadingSpinnerComponent } from '@shared/components/loading-spinner';
 import { SelectComponent } from '@shared/components/select';
@@ -36,12 +36,12 @@ import { ProductFormStore } from '../store/product-form';
 @Component({
   selector: 'app-product-form',
   imports: [
-    ReactiveFormsModule,
+    FormField,
     HugeiconsIconComponent,
     ButtonComponent,
     CardComponent,
-    FormComponent,
-    FormFieldComponent,
+    SignalFormComponent,
+    SignalFormFieldComponent,
     InputComponent,
     LoadingSpinnerComponent,
     SelectComponent,
@@ -72,8 +72,7 @@ import { ProductFormStore } from '../store/product-form';
           />
         </div>
       } @else {
-        <app-form
-          [formGroup]="productForm.form"
+        <app-signal-form
           (formSubmit)="onSubmit()"
           cssClass="flex flex-col gap-6"
         >
@@ -82,15 +81,15 @@ import { ProductFormStore } from '../store/product-form';
               <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
                 <div>
                   <app-input
-                    formControlName="name"
+                    [formField]="productForm.form.name"
                     [label]="'productName' | translate"
                     [placeholder]="'productName' | translate"
                   />
-                  <app-form-field [control]="productForm.form.get('name')!" />
+                  <app-signal-form-field [field]="productForm.form.name" />
                 </div>
                 <div>
                   <app-input
-                    formControlName="slug"
+                    [formField]="productForm.form.slug"
                     [label]="'slug' | translate"
                     [placeholder]="'slug' | translate"
                   />
@@ -99,7 +98,7 @@ import { ProductFormStore } from '../store/product-form';
 
               <div>
                 <app-textarea
-                  formControlName="description"
+                  [formField]="productForm.form.description"
                   [label]="'description' | translate"
                   [placeholder]="'description' | translate"
                   [rows]="3"
@@ -110,39 +109,39 @@ import { ProductFormStore } from '../store/product-form';
                 <div>
                   <app-input
                     type="number"
-                    formControlName="price"
+                    [formField]="productForm.form.price"
                     [label]="'price' | translate"
                   />
-                  <app-form-field [control]="productForm.form.get('price')!" />
+                  <app-signal-form-field [field]="productForm.form.price" />
                 </div>
                 <div>
                   <app-input
-                    formControlName="fabric"
+                    [formField]="productForm.form.fabric"
                     [label]="'fabric' | translate"
                     [placeholder]="'fabric' | translate"
                   />
                 </div>
                 <div>
                   <app-select
-                    formControlName="categoryId"
+                    [formField]="productForm.form.categoryId"
                     [label]="'category' | translate"
                     [placeholder]="'selectCategory' | translate"
                     [options]="categoryOptions()"
                     [clearable]="true"
                   />
-                  <app-form-field
-                    [control]="productForm.form.get('categoryId')!"
+                  <app-signal-form-field
+                    [field]="productForm.form.categoryId"
                   />
                 </div>
               </div>
 
               <div class="flex flex-wrap gap-8">
                 <app-toggle
-                  formControlName="isActive"
+                  [formField]="productForm.form.isActive"
                   [label]="'isActive' | translate"
                 />
                 <app-toggle
-                  formControlName="isFeatured"
+                  [formField]="productForm.form.isFeatured"
                   [label]="'isFeatured' | translate"
                 />
               </div>
@@ -155,19 +154,12 @@ import { ProductFormStore } from '../store/product-form';
             >
               {{ 'images' | translate }}
             </h2>
-            <div
-              formArrayName="images"
-              class="grid grid-cols-3 gap-3 sm:grid-cols-4"
-            >
-              @for (
-                image of productForm.images.controls;
-                track image;
-                let i = $index
-              ) {
+            <div class="grid grid-cols-3 gap-3 sm:grid-cols-4">
+              @for (image of productForm.images; track image; let i = $index) {
                 <div
                   class="relative aspect-square overflow-hidden rounded-lg border border-slate-200 dark:border-slate-700"
                 >
-                  <img [src]="image.value" class="h-full w-full object-cover" />
+                  <img [src]="image" class="h-full w-full object-cover" />
                   <button
                     type="button"
                     class="absolute top-1 end-1 flex h-6 w-6 items-center justify-center rounded-full bg-white/90 text-slate-700 shadow hover:bg-white"
@@ -239,35 +231,28 @@ import { ProductFormStore } from '../store/product-form';
               </app-button>
             </div>
 
-            <div formArrayName="variants" class="mt-4 flex flex-col gap-4">
+            <div class="mt-4 flex flex-col gap-4">
               @for (
-                variant of productForm.variants.controls;
+                variant of productForm.form.variants;
                 track $index;
                 let i = $index
               ) {
-                <div
-                  class="grid grid-cols-1 gap-4 sm:grid-cols-3"
-                  [formGroupName]="i"
-                >
+                <div class="grid grid-cols-1 gap-4 sm:grid-cols-3">
                   <div>
                     <app-input
-                      formControlName="size"
+                      [formField]="variant.size"
                       [label]="'size' | translate"
                       placeholder="M"
                     />
-                    <app-form-field
-                      [control]="productForm.variants.controls[i].get('size')!"
-                    />
+                    <app-signal-form-field [field]="variant.size" />
                   </div>
                   <div>
                     <app-input
                       type="number"
-                      formControlName="stock"
+                      [formField]="variant.stock"
                       [label]="'stock' | translate"
                     />
-                    <app-form-field
-                      [control]="productForm.variants.controls[i].get('stock')!"
-                    />
+                    <app-signal-form-field [field]="variant.stock" />
                   </div>
                   <div class="flex items-end justify-end pb-2">
                     <app-button
@@ -306,7 +291,7 @@ import { ProductFormStore } from '../store/product-form';
               {{ 'cancel' | translate }}
             </app-button>
           </div>
-        </app-form>
+        </app-signal-form>
       }
     </div>
   `,
@@ -356,9 +341,11 @@ export class AdminProductFormComponent implements OnInit {
     }));
 
   onSubmit() {
-    this.store.save({
-      id: this.#productId() ?? undefined,
-      payload: this.productForm.payload,
+    void submit(this.productForm.form, async () => {
+      this.store.save({
+        id: this.#productId() ?? undefined,
+        payload: this.productForm.payload,
+      });
     });
   }
 
