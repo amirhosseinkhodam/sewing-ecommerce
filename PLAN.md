@@ -483,7 +483,7 @@ Only admin can change status. (Phase 8: SMS sent to customer on each transition.
 - [x] Migrate customer order history/detail and checkout queries/mutations
 - [x] Migrate admin categories and product lists/writes to TanStack Query; migrate category form to Signal Forms
 - [x] Migrate remaining admin product/portfolio forms, portfolio, orders, and messages to queries and mutations
-- [ ] Migrate customer profile reads/writes to queries and mutations (`AuthStore` still owns the session + profile via SignalStore, by design)
+- [x] Migrate customer profile reads/writes to queries and mutations (`AuthStore` now holds only the session tokens plus login/register loading; `user`/`profileLoading` are computed from a `profile` query seeded by login, registration, and the profile PATCH, and the auth interceptor attaches the JWT to `/api/auth/me` and `/api/auth/profile`)
 - [x] Migrate remaining admin product/portfolio forms to Angular Signal Forms; retain validation and accessibility (Reactive Forms are now fully gone from the app; the unused `PasswordFormService` and `shared/validators` were deleted rather than ported)
 - [ ] Adopt Spartan primitives for shared controls when appropriate while preserving `app-*` APIs and visual/RTL behavior
 - [ ] Check lint, development build, and critical login/cart/checkout/admin flows before Phase 6

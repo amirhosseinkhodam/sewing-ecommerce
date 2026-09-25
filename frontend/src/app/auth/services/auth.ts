@@ -5,6 +5,7 @@ import type {
   AuthPayloadModel,
   AuthResponseModel,
   RegisterPayloadModel,
+  UpdateProfilePayloadModel,
 } from '../models/auth';
 
 @Service()
@@ -36,7 +37,7 @@ export class AuthService {
     return this.#http.get<UserModel>(`${this.#baseUrl}/me`);
   }
 
-  updateProfile(payload: Partial<UserModel>) {
+  updateProfile(payload: UpdateProfilePayloadModel) {
     return this.#http.patch<UserModel>(`${this.#baseUrl}/profile`, payload);
   }
 }

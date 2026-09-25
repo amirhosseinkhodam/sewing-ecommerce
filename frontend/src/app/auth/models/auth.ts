@@ -13,6 +13,13 @@ export interface RegisterPayloadModel {
   readonly phone: string;
 }
 
+export interface UpdateProfilePayloadModel {
+  readonly firstName: string;
+  readonly lastName: string;
+  readonly email: string;
+  readonly phone: string;
+}
+
 export interface AuthResponseModel {
   readonly accessToken: string;
   readonly refreshToken: string;

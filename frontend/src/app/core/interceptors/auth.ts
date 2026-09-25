@@ -3,7 +3,7 @@ import {
   type HttpInterceptorFn,
 } from '@angular/common/http';
 import { inject } from '@angular/core';
-import { catchError, finalize, switchMap, throwError } from 'rxjs';
+import { catchError, finalize, shareReplay, switchMap, throwError } from 'rxjs';
 import { AuthStore } from '@auth/store/auth';
 import { AuthService } from '@auth/services/auth';
 
@@ -11,13 +11,27 @@ let refreshPending:
   | import('rxjs').Observable<import('@auth/models/auth').AuthResponseModel>
   | null = null;
 
+/**
+ * The only unauthenticated auth endpoints. `/api/auth/me` and
+ * `/api/auth/profile` are behind `JwtAuthGuard` and must carry the token —
+ * and refresh is excluded here so a 401 on it cannot retry itself.
+ */
+const PUBLIC_AUTH_PATHS = [
+  '/api/auth/login',
+  '/api/auth/register',
+  '/api/auth/refresh',
+];
+
 export const authInterceptor: HttpInterceptorFn = (req, next) => {
   const path = req.url.split(/[?#]/)[0];
-  if (path.startsWith('/api/auth/')) {
+  if (PUBLIC_AUTH_PATHS.includes(path)) {
     return next(req);
   }
 
   const auth = inject(AuthStore);
+  // Both must be resolved here: `catchError` runs outside the injection
+  // context, where `inject()` throws NG0203.
+  const authService = inject(AuthService);
   const token = auth.accessToken();
 
   if (token) {
@@ -30,12 +44,14 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
         return throwError(() => error);
       }
 
+      // One refresh per burst of 401s; `shareReplay` lets every queued
+      // request reuse the single in-flight call and its result.
       if (!refreshPending) {
-        const authService = inject(AuthService);
         refreshPending = authService.refresh(auth.refreshToken()!).pipe(
           finalize(() => {
             refreshPending = null;
           }),
+          shareReplay({ bufferSize: 1, refCount: true }),
         );
       }
 

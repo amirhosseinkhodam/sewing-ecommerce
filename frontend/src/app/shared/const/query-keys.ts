@@ -5,6 +5,7 @@
  * public read — so the keys live in one place rather than as inline strings.
  */
 export const QUERY_KEYS = {
+  profile: 'profile',
   cart: 'cart',
   addresses: 'addresses',
   categories: 'categories',
