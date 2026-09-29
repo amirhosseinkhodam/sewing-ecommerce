@@ -1,12 +1,11 @@
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { HugeiconsIconComponent } from '@hugeicons/angular';
-import {
-  Delete01Icon,
-  Edit01Icon,
-  Image01Icon,
-  PlusSignIcon,
-} from '@hugeicons/core-free-icons';
+import Delete01Icon from '@hugeicons/core-free-icons/Delete01Icon';
+import Edit01Icon from '@hugeicons/core-free-icons/Edit01Icon';
+import Image01Icon from '@hugeicons/core-free-icons/Image01Icon';
+import PlusSignIcon from '@hugeicons/core-free-icons/PlusSignIcon';
+
 import type { PortfolioModel } from '@domain/models/portfolio';
 import { ButtonComponent } from '@shared/components/button';
 import { CardComponent } from '@shared/components/card';

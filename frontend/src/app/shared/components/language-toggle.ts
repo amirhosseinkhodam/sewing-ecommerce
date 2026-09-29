@@ -1,6 +1,7 @@
 import { Component, inject, ChangeDetectionStrategy } from '@angular/core';
 import { HugeiconsIconComponent } from '@hugeicons/angular';
-import { TranslateIcon } from '@hugeicons/core-free-icons';
+import TranslateIcon from '@hugeicons/core-free-icons/TranslateIcon';
+
 import { LanguageService } from '../services/language';
 import { LanguageOptionModel } from '../models/language';
 import { ThemeService } from '../services/theme';

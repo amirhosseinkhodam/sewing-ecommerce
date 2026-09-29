@@ -1,12 +1,11 @@
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { FormField, submit } from '@angular/forms/signals';
 import { HugeiconsIconComponent } from '@hugeicons/angular';
-import {
-  Location01Icon,
-  Mail01Icon,
-  SmartPhone01Icon,
-  Clock01Icon,
-} from '@hugeicons/core-free-icons';
+import Clock01Icon from '@hugeicons/core-free-icons/Clock01Icon';
+import Location01Icon from '@hugeicons/core-free-icons/Location01Icon';
+import Mail01Icon from '@hugeicons/core-free-icons/Mail01Icon';
+import SmartPhone01Icon from '@hugeicons/core-free-icons/SmartPhone01Icon';
+
 import { ButtonComponent } from '@shared/components/button';
 import { CardComponent } from '@shared/components/card';
 import { SignalFormComponent } from '@shared/components/signal-form';

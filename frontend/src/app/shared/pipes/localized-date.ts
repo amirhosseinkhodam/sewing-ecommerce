@@ -1,6 +1,6 @@
 import { Pipe, PipeTransform, inject } from '@angular/core';
-import { format } from 'date-fns';
-import { formatDate } from 'date-fns-jalali';
+import { format } from 'date-fns/format';
+import { format as formatJalali } from 'date-fns-jalali/format';
 import { LanguageService } from '../services/language';
 
 @Pipe({ name: 'localizedDate' })
@@ -14,7 +14,7 @@ export class LocalizedDatePipe implements PipeTransform {
     if (!value) return '';
     const date = new Date(value);
     return this.#languageService.currentLanguage() === 'fa'
-      ? formatDate(date, formatStr)
+      ? formatJalali(date, formatStr)
       : format(date, formatStr);
   }
 }

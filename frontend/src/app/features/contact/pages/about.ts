@@ -1,12 +1,11 @@
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { HugeiconsIconComponent } from '@hugeicons/angular';
-import {
-  Clock01Icon,
-  Location01Icon,
-  Scissor01Icon,
-  SmartPhone01Icon,
-} from '@hugeicons/core-free-icons';
+import Clock01Icon from '@hugeicons/core-free-icons/Clock01Icon';
+import Location01Icon from '@hugeicons/core-free-icons/Location01Icon';
+import Scissor01Icon from '@hugeicons/core-free-icons/Scissor01Icon';
+import SmartPhone01Icon from '@hugeicons/core-free-icons/SmartPhone01Icon';
+
 import { ButtonComponent } from '@shared/components/button';
 import { CardComponent } from '@shared/components/card';
 import { TranslatePipe } from '@shared/pipes/translate';

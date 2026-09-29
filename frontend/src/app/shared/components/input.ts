@@ -10,13 +10,17 @@ import {
 } from '@angular/core';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 import type { FormValueControl } from '@angular/forms/signals';
+import { BrnLabel } from '@spartan-ng/brain/label';
+import { uniqueId } from '../utils/unique-id';
 
 @Component({
   selector: 'app-input',
-  imports: [],
+  imports: [BrnLabel],
   template: `
     @if (label()) {
       <label
+        brnLabel
+        [for]="inputId"
         class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5"
       >
         {{ label() }}
@@ -24,6 +28,7 @@ import type { FormValueControl } from '@angular/forms/signals';
     }
     <input
       #inputElement
+      [id]="inputId"
       [type]="type()"
       [placeholder]="placeholder()"
       [disabled]="disabled()"
@@ -53,6 +58,8 @@ export class InputComponent
 {
   readonly value = model('');
   readonly touch = output<void>();
+  /** Associates the label with the control for screen readers and click-to-focus. */
+  readonly inputId = uniqueId('app-input');
   readonly type = input<
     'text' | 'email' | 'password' | 'number' | 'textarea' | 'search' | 'tel'
   >('text');

@@ -485,8 +485,10 @@ Only admin can change status. (Phase 8: SMS sent to customer on each transition.
 - [x] Migrate remaining admin product/portfolio forms, portfolio, orders, and messages to queries and mutations
 - [x] Migrate customer profile reads/writes to queries and mutations (`AuthStore` now holds only the session tokens plus login/register loading; `user`/`profileLoading` are computed from a `profile` query seeded by login, registration, and the profile PATCH, and the auth interceptor attaches the JWT to `/api/auth/me` and `/api/auth/profile`)
 - [x] Migrate remaining admin product/portfolio forms to Angular Signal Forms; retain validation and accessibility (Reactive Forms are now fully gone from the app; the unused `PasswordFormService` and `shared/validators` were deleted rather than ported)
-- [ ] Adopt Spartan primitives for shared controls when appropriate while preserving `app-*` APIs and visual/RTL behavior
+- [x] Adopt Spartan primitives for shared controls when appropriate while preserving `app-*` APIs and visual/RTL behavior (`app-button` → `BrnButton`, `app-toggle` → `BrnSwitch`/`BrnSwitchThumb`, `app-modal` + `ModalService` → `BrnDialogService`/`BrnDialogRef`, `app-input`/`app-textarea` → `BrnLabel`, `app-select` → ng-select `labelForId`; only the headless `@spartan-ng/brain` package is installed, so styled shells remain custom Tailwind)
 - [ ] Check lint, development build, and critical login/cart/checkout/admin flows before Phase 6
+  - [x] Lint and builds green (`npm run lint` 0 errors; `npm run build` backend + production frontend)
+  - [ ] Manual pass over the critical flows (login, cart, checkout, admin)
 
 ### Phase 6 — Admin Dashboard (2 days)
 - [ ] Backend: Dashboard stats endpoint

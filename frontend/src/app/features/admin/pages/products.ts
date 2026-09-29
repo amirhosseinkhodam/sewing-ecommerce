@@ -1,12 +1,11 @@
 import { Component, inject, ChangeDetectionStrategy } from '@angular/core';
 import { Router } from '@angular/router';
 import { HugeiconsIconComponent } from '@hugeicons/angular';
-import {
-  PlusSignIcon,
-  Edit01Icon,
-  Delete01Icon,
-  Image01Icon,
-} from '@hugeicons/core-free-icons';
+import Delete01Icon from '@hugeicons/core-free-icons/Delete01Icon';
+import Edit01Icon from '@hugeicons/core-free-icons/Edit01Icon';
+import Image01Icon from '@hugeicons/core-free-icons/Image01Icon';
+import PlusSignIcon from '@hugeicons/core-free-icons/PlusSignIcon';
+
 import { ButtonComponent } from '@shared/components/button';
 import { CardComponent } from '@shared/components/card';
 import { InputComponent } from '@shared/components/input';

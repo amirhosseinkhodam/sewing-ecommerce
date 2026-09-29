@@ -8,9 +8,11 @@ import {
 } from '@angular/core';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 import type { FormCheckboxControl } from '@angular/forms/signals';
+import { BrnSwitch, BrnSwitchThumb } from '@spartan-ng/brain/switch';
 
 @Component({
   selector: 'app-toggle',
+  imports: [BrnSwitch, BrnSwitchThumb],
   template: `
     <label [class]="computedClasses()">
       @if (label()) {
@@ -18,16 +20,14 @@ import type { FormCheckboxControl } from '@angular/forms/signals';
           {{ label() }}
         </span>
       }
-      <button
-        type="button"
-        role="switch"
-        [attr.aria-checked]="checked()"
+      <brn-switch
+        [checked]="checked()"
         [disabled]="disabled()"
         [class]="switchClasses()"
-        (click)="onToggle()"
+        (checkedChange)="onToggle($event)"
       >
-        <span [class]="thumbClasses()"></span>
-      </button>
+        <brn-switch-thumb [class]="thumbClasses()" />
+      </brn-switch>
     </label>
   `,
   changeDetection: ChangeDetectionStrategy.Eager,
@@ -53,13 +53,12 @@ export class ToggleComponent
   #onChange: (value: boolean) => void = () => {};
   #onTouched: () => void = () => {};
 
-  onToggle(): void {
-    if (this.disabled()) return;
-    this.checked.update((value) => !value);
-    this.#onChange(this.checked());
+  onToggle(value: boolean): void {
+    this.checked.set(value);
+    this.#onChange(value);
     this.#onTouched();
     this.touch.emit();
-    this.change.emit(this.checked());
+    this.change.emit(value);
   }
 
   writeValue(value: boolean): void {
@@ -75,7 +74,7 @@ export class ToggleComponent
   }
 
   setDisabledState(): void {
-    // Handled by [disabled] on the button
+    // Handled by [disabled] on the BrnSwitch
   }
 
   readonly computedClasses = () => {

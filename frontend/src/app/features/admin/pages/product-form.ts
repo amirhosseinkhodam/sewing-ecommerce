@@ -11,11 +11,10 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { FormField, submit } from '@angular/forms/signals';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { HugeiconsIconComponent } from '@hugeicons/angular';
-import {
-  Upload04Icon,
-  Delete01Icon,
-  PlusSignIcon,
-} from '@hugeicons/core-free-icons';
+import Delete01Icon from '@hugeicons/core-free-icons/Delete01Icon';
+import PlusSignIcon from '@hugeicons/core-free-icons/PlusSignIcon';
+import Upload04Icon from '@hugeicons/core-free-icons/Upload04Icon';
+
 import { ButtonComponent } from '@shared/components/button';
 import { CardComponent } from '@shared/components/card';
 import { SignalFormComponent } from '@shared/components/signal-form';

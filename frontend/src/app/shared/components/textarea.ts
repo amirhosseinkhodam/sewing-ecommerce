@@ -10,13 +10,17 @@ import {
 } from '@angular/core';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 import type { FormValueControl } from '@angular/forms/signals';
+import { BrnLabel } from '@spartan-ng/brain/label';
+import { uniqueId } from '../utils/unique-id';
 
 @Component({
   selector: 'app-textarea',
-  imports: [],
+  imports: [BrnLabel],
   template: `
     @if (label()) {
       <label
+        brnLabel
+        [for]="textareaId"
         class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5"
       >
         {{ label() }}
@@ -24,6 +28,7 @@ import type { FormValueControl } from '@angular/forms/signals';
     }
     <textarea
       #textareaElement
+      [id]="textareaId"
       [rows]="rows()"
       [placeholder]="placeholder()"
       [disabled]="disabled()"
@@ -48,6 +53,8 @@ export class TextareaComponent
 {
   readonly value = model('');
   readonly touch = output<void>();
+  /** Associates the label with the control for screen readers and click-to-focus. */
+  readonly textareaId = uniqueId('app-textarea');
   readonly rows = input<number>(4);
   readonly placeholder = input<string>();
   readonly disabled = input<boolean>(false);

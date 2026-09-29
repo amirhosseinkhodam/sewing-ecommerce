@@ -5,7 +5,8 @@ import {
   ChangeDetectionStrategy,
 } from '@angular/core';
 import { HugeiconsIconComponent } from '@hugeicons/angular';
-import { Image01Icon } from '@hugeicons/core-free-icons';
+import Image01Icon from '@hugeicons/core-free-icons/Image01Icon';
+
 import type { ProductModel } from '../models/product';
 import { CardComponent } from '@shared/components/card';
 import { LocalizedNumberPipe } from '@shared/pipes/localized-number';

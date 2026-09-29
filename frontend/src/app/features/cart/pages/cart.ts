@@ -1,11 +1,10 @@
 import { Component, inject, ChangeDetectionStrategy } from '@angular/core';
 import { Router } from '@angular/router';
 import { HugeiconsIconComponent } from '@hugeicons/angular';
-import {
-  Image01Icon,
-  MinusSignIcon,
-  Add01Icon,
-} from '@hugeicons/core-free-icons';
+import Add01Icon from '@hugeicons/core-free-icons/Add01Icon';
+import Image01Icon from '@hugeicons/core-free-icons/Image01Icon';
+import MinusSignIcon from '@hugeicons/core-free-icons/MinusSignIcon';
+
 import type { CartItemModel } from '@domain/models/cart';
 import { ButtonComponent } from '@shared/components/button';
 import { CardComponent } from '@shared/components/card';

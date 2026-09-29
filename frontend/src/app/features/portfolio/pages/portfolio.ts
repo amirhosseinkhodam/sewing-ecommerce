@@ -1,7 +1,8 @@
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { HugeiconsIconComponent } from '@hugeicons/angular';
-import { Image01Icon } from '@hugeicons/core-free-icons';
+import Image01Icon from '@hugeicons/core-free-icons/Image01Icon';
+
 import type { PortfolioModel } from '@domain/models/portfolio';
 import { ButtonComponent } from '@shared/components/button';
 import { LoadingSpinnerComponent } from '@shared/components/loading-spinner';

@@ -6,11 +6,10 @@ import {
 } from '@angular/core';
 import { FormField, submit } from '@angular/forms/signals';
 import { HugeiconsIconComponent } from '@hugeicons/angular';
-import {
-  PlusSignIcon,
-  Edit01Icon,
-  Delete01Icon,
-} from '@hugeicons/core-free-icons';
+import Delete01Icon from '@hugeicons/core-free-icons/Delete01Icon';
+import Edit01Icon from '@hugeicons/core-free-icons/Edit01Icon';
+import PlusSignIcon from '@hugeicons/core-free-icons/PlusSignIcon';
+
 import { ButtonComponent } from '@shared/components/button';
 import { CardComponent } from '@shared/components/card';
 import { SignalFormComponent } from '@shared/components/signal-form';

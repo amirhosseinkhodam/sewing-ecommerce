@@ -1,6 +1,8 @@
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { HugeiconsIconComponent } from '@hugeicons/angular';
-import { Delete01Icon, MailOpen01Icon } from '@hugeicons/core-free-icons';
+import Delete01Icon from '@hugeicons/core-free-icons/Delete01Icon';
+import MailOpen01Icon from '@hugeicons/core-free-icons/MailOpen01Icon';
+
 import type { ContactMessageModel } from '@domain/models/contact';
 import { ButtonComponent } from '@shared/components/button';
 import { CardComponent } from '@shared/components/card';

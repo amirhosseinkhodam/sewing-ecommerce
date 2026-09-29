@@ -1,14 +1,13 @@
 import { Component, ChangeDetectionStrategy } from '@angular/core';
 import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { HugeiconsIconComponent } from '@hugeicons/angular';
-import {
-  BoxIcon,
-  Tag01Icon,
-  Settings01Icon,
-  ShoppingBag01Icon,
-  Image01Icon,
-  Mail01Icon,
-} from '@hugeicons/core-free-icons';
+import BoxIcon from '@hugeicons/core-free-icons/BoxIcon';
+import Image01Icon from '@hugeicons/core-free-icons/Image01Icon';
+import Mail01Icon from '@hugeicons/core-free-icons/Mail01Icon';
+import Settings01Icon from '@hugeicons/core-free-icons/Settings01Icon';
+import ShoppingBag01Icon from '@hugeicons/core-free-icons/ShoppingBag01Icon';
+import Tag01Icon from '@hugeicons/core-free-icons/Tag01Icon';
+
 import { TranslatePipe } from '@shared/pipes/translate';
 
 @Component({

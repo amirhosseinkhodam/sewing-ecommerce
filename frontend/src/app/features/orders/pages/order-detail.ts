@@ -9,7 +9,8 @@ import {
 } from '@angular/core';
 import { Router } from '@angular/router';
 import { HugeiconsIconComponent } from '@hugeicons/angular';
-import { Image01Icon } from '@hugeicons/core-free-icons';
+import Image01Icon from '@hugeicons/core-free-icons/Image01Icon';
+
 import { ButtonComponent } from '@shared/components/button';
 import { CardComponent } from '@shared/components/card';
 import { LoadingSpinnerComponent } from '@shared/components/loading-spinner';

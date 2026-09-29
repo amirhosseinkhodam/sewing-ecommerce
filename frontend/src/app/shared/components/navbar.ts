@@ -10,11 +10,10 @@ import {
 } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { HugeiconsIconComponent } from '@hugeicons/angular';
-import {
-  ShoppingCart01Icon,
-  Cancel01Icon,
-  Menu01Icon,
-} from '@hugeicons/core-free-icons';
+import Cancel01Icon from '@hugeicons/core-free-icons/Cancel01Icon';
+import Menu01Icon from '@hugeicons/core-free-icons/Menu01Icon';
+import ShoppingCart01Icon from '@hugeicons/core-free-icons/ShoppingCart01Icon';
+
 import { TranslatePipe } from '../pipes/translate';
 import { ThemeToggleComponent } from './theme-toggle';
 import { LanguageToggleComponent } from './language-toggle';

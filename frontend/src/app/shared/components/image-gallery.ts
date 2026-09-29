@@ -5,7 +5,7 @@ import {
   ChangeDetectionStrategy,
 } from '@angular/core';
 import { HugeiconsIconComponent } from '@hugeicons/angular';
-import { Image01Icon } from '@hugeicons/core-free-icons';
+import Image01Icon from '@hugeicons/core-free-icons/Image01Icon';
 
 @Component({
   selector: 'app-image-gallery',

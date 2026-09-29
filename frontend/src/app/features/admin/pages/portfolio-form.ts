@@ -12,7 +12,9 @@ import { FormField, submit } from '@angular/forms/signals';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Router } from '@angular/router';
 import { HugeiconsIconComponent } from '@hugeicons/angular';
-import { Delete01Icon, Upload04Icon } from '@hugeicons/core-free-icons';
+import Delete01Icon from '@hugeicons/core-free-icons/Delete01Icon';
+import Upload04Icon from '@hugeicons/core-free-icons/Upload04Icon';
+
 import { UploadService } from '@core/services/upload';
 import { ButtonComponent } from '@shared/components/button';
 import { CardComponent } from '@shared/components/card';

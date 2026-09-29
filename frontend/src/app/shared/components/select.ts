@@ -16,6 +16,7 @@ import {
 import type { FormValueControl } from '@angular/forms/signals';
 import { NgSelectModule } from '@ng-select/ng-select';
 import { SelectOption } from '../models/select';
+import { uniqueId } from '../utils/unique-id';
 
 @Component({
   selector: 'app-select',
@@ -23,12 +24,14 @@ import { SelectOption } from '../models/select';
   template: `
     @if (label()) {
       <label
+        [for]="selectId"
         class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5"
       >
         {{ label() }}
       </label>
     }
     <ng-select
+      [labelForId]="selectId"
       [items]="options()"
       [bindLabel]="'label'"
       [bindValue]="'value'"
@@ -62,6 +65,8 @@ export class SelectComponent
    */
   readonly value = model<string | number | null>(null);
   readonly touch = output<void>();
+  /** ng-select's `labelForId` puts this on its inner input, so the label links up. */
+  readonly selectId = uniqueId('app-select');
   readonly disabled = input<boolean>(false);
   readonly cssClass = input<string>();
   readonly clearable = input<boolean>(true);

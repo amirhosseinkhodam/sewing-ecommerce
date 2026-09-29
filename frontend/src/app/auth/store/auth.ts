@@ -1,5 +1,4 @@
 import { computed, inject } from '@angular/core';
-import { HttpErrorResponse } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { tapResponse } from '@ngrx/operators';
 import { QueryClient } from '@tanstack/angular-query-experimental';
@@ -13,8 +12,8 @@ import {
 } from '@ngrx/signals';
 import { rxMethod } from '@ngrx/signals/rxjs-interop';
 import { pipe, switchMap, tap } from 'rxjs';
-import { NotificationService } from '@shared/services/notification';
 import { QUERY_KEYS } from '@shared/const/query-keys';
+import { injectMutationFeedback } from '@shared/utils/mutation-feedback';
 import { USER_ROLES } from '@domain/const/user-roles';
 import type { UserModel } from '@domain/models/user';
 import { LoginRequestModel, RegisterPayloadModel } from '../models/auth';
@@ -57,7 +56,7 @@ export const AuthStore = signalStore(
       store,
       authService = inject(AuthService),
       router = inject(Router),
-      notification = inject(NotificationService),
+      feedback = injectMutationFeedback(),
       queryClient = inject(QueryClient),
     ) => {
       /**
@@ -93,12 +92,9 @@ export const AuthStore = signalStore(
                     startSession(response);
                     router.navigateByUrl(returnUrl ?? '/');
                   },
-                  error: (err: HttpErrorResponse) => {
+                  error: (err: unknown) => {
                     patchState(store, { loading: false });
-                    notification.show(
-                      'error',
-                      err.error?.message ?? 'login failed',
-                    );
+                    feedback.error(err, 'loginFailed');
                   },
                 }),
               ),
@@ -115,12 +111,9 @@ export const AuthStore = signalStore(
                     startSession(response);
                     router.navigateByUrl('/');
                   },
-                  error: (err: HttpErrorResponse) => {
+                  error: (err: unknown) => {
                     patchState(store, { loading: false });
-                    notification.show(
-                      'error',
-                      err.error?.message ?? 'registration failed',
-                    );
+                    feedback.error(err, 'registerFailed');
                   },
                 }),
               ),

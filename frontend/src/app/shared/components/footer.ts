@@ -1,7 +1,9 @@
 import { Component, ChangeDetectionStrategy } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { HugeiconsIconComponent } from '@hugeicons/angular';
-import { MapPinIcon, TelephoneIcon } from '@hugeicons/core-free-icons';
+import MapPinIcon from '@hugeicons/core-free-icons/MapPinIcon';
+import TelephoneIcon from '@hugeicons/core-free-icons/TelephoneIcon';
+
 import { TranslatePipe } from '../pipes/translate';
 
 @Component({

@@ -1,6 +1,8 @@
 import { Component, inject, ChangeDetectionStrategy } from '@angular/core';
 import { HugeiconsIconComponent } from '@hugeicons/angular';
-import { Sun01Icon, Moon02Icon } from '@hugeicons/core-free-icons';
+import Moon02Icon from '@hugeicons/core-free-icons/Moon02Icon';
+import Sun01Icon from '@hugeicons/core-free-icons/Sun01Icon';
+
 import { ThemeService } from '../services/theme';
 
 @Component({
