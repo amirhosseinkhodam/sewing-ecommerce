@@ -176,7 +176,7 @@ export class AddressesComponent {
   }
 
   onDelete(address: AddressModel) {
-    this.#modal
+    void this.#modal
       .open({
         title: 'confirmDeleteTitle',
         description: 'confirmDeleteAddress',

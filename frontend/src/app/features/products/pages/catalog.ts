@@ -100,7 +100,7 @@ export class CatalogComponent {
   readonly #router = inject(Router);
 
   onProductClick(product: ProductModel) {
-    this.#router.navigate(['/products', product.slug]);
+    void this.#router.navigate(['/products', product.slug]);
   }
 
   onPageChange(page: number) {

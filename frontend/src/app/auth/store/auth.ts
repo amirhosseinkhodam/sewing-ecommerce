@@ -90,7 +90,7 @@ export const AuthStore = signalStore(
                 tapResponse({
                   next: (response) => {
                     startSession(response);
-                    router.navigateByUrl(returnUrl ?? '/');
+                    void router.navigateByUrl(returnUrl ?? '/');
                   },
                   error: (err: unknown) => {
                     patchState(store, { loading: false });
@@ -109,7 +109,7 @@ export const AuthStore = signalStore(
                 tapResponse({
                   next: (response) => {
                     startSession(response);
-                    router.navigateByUrl('/');
+                    void router.navigateByUrl('/');
                   },
                   error: (err: unknown) => {
                     patchState(store, { loading: false });
@@ -131,7 +131,7 @@ export const AuthStore = signalStore(
           localStorage.removeItem('accessToken');
           localStorage.removeItem('refreshToken');
           patchState(store, { accessToken: null, refreshToken: null });
-          router.navigateByUrl('/');
+          void router.navigateByUrl('/');
         },
       };
     },

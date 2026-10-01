@@ -40,6 +40,6 @@ export class NotFoundComponent {
   readonly #router = inject(Router);
 
   onGoHome() {
-    this.#router.navigate(['/']);
+    void this.#router.navigate(['/']);
   }
 }

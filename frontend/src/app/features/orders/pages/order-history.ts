@@ -179,11 +179,11 @@ export class OrderHistoryComponent {
   }
 
   onStartShopping() {
-    this.#router.navigate(['/products']);
+    void this.#router.navigate(['/products']);
   }
 
   onView(id: string) {
-    this.#router.navigate(['/orders', id]);
+    void this.#router.navigate(['/orders', id]);
   }
 
   onPage(page: number) {

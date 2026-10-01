@@ -173,7 +173,7 @@ export class PortfolioComponent {
   }
 
   onView(item: PortfolioModel) {
-    this.#router.navigate(['/portfolio', item.slug]);
+    void this.#router.navigate(['/portfolio', item.slug]);
   }
 
   onPage(page: number) {

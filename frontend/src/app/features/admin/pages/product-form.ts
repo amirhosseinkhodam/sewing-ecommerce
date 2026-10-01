@@ -376,6 +376,6 @@ export class AdminProductFormComponent implements OnInit {
   }
 
   onCancel() {
-    this.#router.navigate(['/admin/products']);
+    void this.#router.navigate(['/admin/products']);
   }
 }

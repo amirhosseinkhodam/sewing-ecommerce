@@ -225,15 +225,15 @@ export class AdminPortfolioComponent {
   #searchInput = '';
 
   onNew() {
-    this.#router.navigate(['/admin/portfolio/new']);
+    void this.#router.navigate(['/admin/portfolio/new']);
   }
 
   onEdit(item: PortfolioModel) {
-    this.#router.navigate(['/admin/portfolio', item.id, 'edit']);
+    void this.#router.navigate(['/admin/portfolio', item.id, 'edit']);
   }
 
   onDelete(item: PortfolioModel) {
-    this.#modal
+    void this.#modal
       .open({
         title: 'confirmDeleteTitle',
         description: 'confirmDeletePortfolio',

@@ -286,6 +286,6 @@ export class AdminPortfolioFormComponent implements OnInit {
   }
 
   onCancel() {
-    this.#router.navigate(['/admin/portfolio']);
+    void this.#router.navigate(['/admin/portfolio']);
   }
 }

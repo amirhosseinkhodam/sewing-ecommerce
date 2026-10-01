@@ -237,15 +237,15 @@ export class AdminProductsComponent {
   #searchInput = '';
 
   onNew() {
-    this.#router.navigate(['/admin/products/new']);
+    void this.#router.navigate(['/admin/products/new']);
   }
 
   onEdit(product: ProductModel) {
-    this.#router.navigate(['/admin/products', product.id, 'edit']);
+    void this.#router.navigate(['/admin/products', product.id, 'edit']);
   }
 
   onDelete(product: ProductModel) {
-    this.#modal
+    void this.#modal
       .open({
         title: 'confirmDeleteTitle',
         description: 'confirmDeleteProduct',

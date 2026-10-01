@@ -190,7 +190,7 @@ export class ProductDetailComponent implements OnInit {
         'success',
         this.#languageService.translate('addedToCart'),
       );
-      this.#router.navigate([], {
+      void this.#router.navigate([], {
         relativeTo: this.#route,
         queryParams: {},
         replaceUrl: true,
@@ -237,7 +237,7 @@ export class ProductDetailComponent implements OnInit {
         this.#languageService.translate('loginToAddToCart'),
       );
       const variant = this.selectedVariant();
-      this.#router.navigate(['/login'], {
+      void this.#router.navigate(['/login'], {
         queryParams: {
           returnUrl: this.#router.url,
           ...(variant ? { variantId: variant.id, autoAdd: '1' } : {}),
@@ -259,6 +259,6 @@ export class ProductDetailComponent implements OnInit {
   }
 
   onBack() {
-    this.#router.navigate(['/products']);
+    void this.#router.navigate(['/products']);
   }
 }

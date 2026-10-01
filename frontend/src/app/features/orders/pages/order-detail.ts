@@ -394,7 +394,7 @@ export class OrderDetailComponent implements OnInit {
   }
 
   onCancel(id: string) {
-    this.#modal
+    void this.#modal
       .open({
         title: 'cancelOrder',
         description: 'confirmCancelOrder',
@@ -407,6 +407,6 @@ export class OrderDetailComponent implements OnInit {
   }
 
   onBack() {
-    this.#router.navigate(['/orders']);
+    void this.#router.navigate(['/orders']);
   }
 }

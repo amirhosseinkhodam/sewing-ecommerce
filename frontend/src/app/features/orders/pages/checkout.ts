@@ -466,6 +466,6 @@ export class CheckoutComponent {
   }
 
   onStartShopping() {
-    this.#router.navigate(['/products']);
+    void this.#router.navigate(['/products']);
   }
 }

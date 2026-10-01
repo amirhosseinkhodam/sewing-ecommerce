@@ -202,7 +202,7 @@ export class CartComponent {
   }
 
   onStartShopping() {
-    this.#router.navigate(['/products']);
+    void this.#router.navigate(['/products']);
   }
 
   onIncrease(item: CartItemModel) {
@@ -216,7 +216,7 @@ export class CartComponent {
   }
 
   onRemove(item: CartItemModel) {
-    this.#modal
+    void this.#modal
       .open({
         title: 'removeFromCart',
         description: 'confirmRemoveFromCart',
@@ -234,6 +234,6 @@ export class CartComponent {
   }
 
   onCheckout() {
-    this.#router.navigate(['/checkout']);
+    void this.#router.navigate(['/checkout']);
   }
 }

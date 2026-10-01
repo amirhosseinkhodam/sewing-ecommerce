@@ -288,10 +288,10 @@ export class AdminDashboardComponent {
   }
 
   onOpenOrder(order: AdminOrderModel) {
-    this.#router.navigate(['/admin/orders', order.id]);
+    void this.#router.navigate(['/admin/orders', order.id]);
   }
 
   onAllOrders() {
-    this.#router.navigate(['/admin/orders']);
+    void this.#router.navigate(['/admin/orders']);
   }
 }

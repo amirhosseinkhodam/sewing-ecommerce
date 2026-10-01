@@ -216,7 +216,7 @@ export class AdminMessagesComponent {
   }
 
   onDelete(message: ContactMessageModel) {
-    this.#modal
+    void this.#modal
       .open({
         title: 'confirmDeleteTitle',
         description: 'confirmDeleteMessage',

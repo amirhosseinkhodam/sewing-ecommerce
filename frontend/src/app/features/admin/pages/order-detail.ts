@@ -375,7 +375,7 @@ export class AdminOrderDetailComponent implements OnInit {
 
     // Cancelling restores stock and cannot be undone, so confirm it.
     if (status === 'CANCELLED') {
-      this.#modal
+      void this.#modal
         .open({
           title: 'cancelOrder',
           description: 'confirmCancelOrderAdmin',
@@ -399,6 +399,6 @@ export class AdminOrderDetailComponent implements OnInit {
   }
 
   onBack() {
-    this.#router.navigate(['/admin/orders']);
+    void this.#router.navigate(['/admin/orders']);
   }
 }

@@ -249,7 +249,7 @@ export class AdminOrdersComponent {
   }
 
   onView(order: AdminOrderModel) {
-    this.#router.navigate(['/admin/orders', order.id]);
+    void this.#router.navigate(['/admin/orders', order.id]);
   }
 
   onPageChange(page: number) {

@@ -146,10 +146,10 @@ export class AboutComponent {
   readonly #router = inject(Router);
 
   onPortfolio() {
-    this.#router.navigate(['/portfolio']);
+    void this.#router.navigate(['/portfolio']);
   }
 
   onContact() {
-    this.#router.navigate(['/contact']);
+    void this.#router.navigate(['/contact']);
   }
 }

@@ -96,10 +96,10 @@ export class PortfolioDetailComponent implements OnInit {
   }
 
   onBack() {
-    this.#router.navigate(['/portfolio']);
+    void this.#router.navigate(['/portfolio']);
   }
 
   onContact() {
-    this.#router.navigate(['/contact']);
+    void this.#router.navigate(['/contact']);
   }
 }
