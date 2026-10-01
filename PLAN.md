@@ -525,7 +525,7 @@ Only admin can change status. (Phase 8: SMS sent to customer on each transition.
   - [x] 404 page (`features/errors/pages/not-found.ts`, wired as the wildcard route)
   - [x] 500 page (`features/errors/pages/server-error.ts`, eager `/error` route; `withNavigationErrorHandler` redirects failed navigations there with `skipLocationChange`)
 - [x] Empty states: no products, no orders, no messages, empty cart — shared `EmptyStateComponent` used across list/error states
-- [ ] Responsive audit (mobile/tablet/desktop)
+- [x] Responsive audit (mobile/tablet/desktop) — headless pass over every public, customer, and admin route at 375/768/1280 (plus 320 for the navbar) in fa and en: no horizontal overflow; fixed the ng-select placeholder overlapping the value and the logged-in navbar overflowing on small phones (brand truncates, avatar dropdown moves into the mobile menu below `md`)
 - [x] Image lazy loading, code splitting — every list/thumbnail/receipt `<img>` has `loading="lazy"`, the gallery's main image (detail-page LCP) gets `fetchpriority="high"`; every route is `loadComponent` except the eager `/error` fallback
 - [ ] Build + deploy
 

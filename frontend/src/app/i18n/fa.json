@@ -31,6 +31,8 @@
   "darkMode": "حالت تاریک",
   "toggleDarkMode": "تغییر حالت تاریک",
   "switchLanguage": "تغییر زبان ({{language}})",
+  "openMenu": "باز کردن منو",
+  "closeMenu": "بستن منو",
   "homeTagline": "خیاطی سفارشی و دوخت لباس بر اساس سفارش شما.",
   "language": "زبان",
   "quickLinks": "دسترسی سریع",

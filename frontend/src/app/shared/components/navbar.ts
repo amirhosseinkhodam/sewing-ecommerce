@@ -36,10 +36,10 @@ import { CartStore } from '../../features/cart/store/cart';
     >
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex items-center justify-between h-16">
-          <div class="flex items-center gap-8">
+          <div class="flex min-w-0 items-center gap-8">
             <a
               routerLink="/"
-              class="text-xl font-bold text-slate-900 dark:text-white"
+              class="truncate text-xl font-bold text-slate-900 dark:text-white"
             >
               {{ 'appName' | translate }}
             </a>
@@ -72,7 +72,7 @@ import { CartStore } from '../../features/cart/store/cart';
             </div>
           </div>
 
-          <div class="flex items-center gap-3">
+          <div class="flex shrink-0 items-center gap-1.5 sm:gap-3">
             <app-theme-toggle />
             <app-language-toggle />
 
@@ -99,7 +99,7 @@ import { CartStore } from '../../features/cart/store/cart';
             </a>
 
             @if (store.isLoggedIn()) {
-              <div class="relative" #dropdownContainer>
+              <div class="relative hidden md:block" #dropdownContainer>
                 <button
                   type="button"
                   class="flex items-center gap-2 p-2 text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white transition-colors rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800"
@@ -183,7 +183,9 @@ import { CartStore } from '../../features/cart/store/cart';
               type="button"
               class="md:hidden p-2 text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white"
               (click)="mobileMenuOpen.set(!mobileMenuOpen())"
-              [attr.aria-label]="mobileMenuOpen() ? 'Close menu' : 'Open menu'"
+              [attr.aria-label]="
+                (mobileMenuOpen() ? 'closeMenu' : 'openMenu') | translate
+              "
             >
               @if (mobileMenuOpen()) {
                 <hugeicons-icon
@@ -289,7 +291,7 @@ import { CartStore } from '../../features/cart/store/cart';
                 }
                 <button
                   type="button"
-                  class="w-full text-left px-3 py-2 text-sm font-medium text-red-600 dark:text-red-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors"
+                  class="w-full text-start px-3 py-2 text-sm font-medium text-red-600 dark:text-red-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors"
                   (click)="mobileMenuOpen.set(false); store.logout()"
                 >
                   {{ 'logout' | translate }}
