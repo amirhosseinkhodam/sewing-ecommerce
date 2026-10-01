@@ -13,9 +13,9 @@ import { ButtonComponent } from '@shared/components/button';
 import { CardComponent } from '@shared/components/card';
 import { EmptyStateComponent } from '@shared/components/empty-state';
 import { InputComponent } from '@shared/components/input';
-import { LoadingSpinnerComponent } from '@shared/components/loading-spinner';
 import { SignalFormComponent } from '@shared/components/signal-form';
 import { SignalFormFieldComponent } from '@shared/components/signal-form-field';
+import { SkeletonTableComponent } from '@shared/components/skeleton-table';
 import { TextareaComponent } from '@shared/components/textarea';
 import { ToggleComponent } from '@shared/components/toggle';
 import { TranslatePipe } from '@shared/pipes/translate';
@@ -32,10 +32,10 @@ import { AdminCategoryStore } from '../store/category';
     ButtonComponent,
     CardComponent,
     EmptyStateComponent,
-    LoadingSpinnerComponent,
     SignalFormComponent,
     SignalFormFieldComponent,
     InputComponent,
+    SkeletonTableComponent,
     TextareaComponent,
     ToggleComponent,
     TranslatePipe,
@@ -134,12 +134,7 @@ import { AdminCategoryStore } from '../store/category';
       }
 
       @if (store.loading()) {
-        <div class="flex justify-center py-16">
-          <app-loading-spinner
-            size="lg"
-            cssClass="text-slate-400 dark:text-slate-500"
-          />
-        </div>
+        <app-skeleton-table [columns]="5" />
       } @else if (store.error()) {
         <app-empty-state
           titleKey="couldNotLoadData"

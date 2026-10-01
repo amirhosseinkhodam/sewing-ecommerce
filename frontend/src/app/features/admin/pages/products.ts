@@ -9,7 +9,7 @@ import { ButtonComponent } from '@shared/components/button';
 import { CardComponent } from '@shared/components/card';
 import { EmptyStateComponent } from '@shared/components/empty-state';
 import { InputComponent } from '@shared/components/input';
-import { LoadingSpinnerComponent } from '@shared/components/loading-spinner';
+import { SkeletonTableComponent } from '@shared/components/skeleton-table';
 import { LocalizedNumberPipe } from '@shared/pipes/localized-number';
 import { TranslatePipe } from '@shared/pipes/translate';
 import { ModalService } from '@shared/services/modal';
@@ -24,8 +24,8 @@ import { AdminProductStore } from '../store/product';
     CardComponent,
     EmptyStateComponent,
     InputComponent,
-    LoadingSpinnerComponent,
     LocalizedNumberPipe,
+    SkeletonTableComponent,
     TranslatePipe,
   ],
   providers: [AdminProductStore],
@@ -55,12 +55,7 @@ import { AdminProductStore } from '../store/product';
       />
 
       @if (store.loading()) {
-        <div class="flex justify-center py-16">
-          <app-loading-spinner
-            size="lg"
-            cssClass="text-slate-400 dark:text-slate-500"
-          />
-        </div>
+        <app-skeleton-table [columns]="5" />
       } @else if (store.error()) {
         <app-empty-state
           titleKey="couldNotLoadData"

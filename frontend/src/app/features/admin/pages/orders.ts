@@ -10,8 +10,8 @@ import { ButtonComponent } from '@shared/components/button';
 import { CardComponent } from '@shared/components/card';
 import { EmptyStateComponent } from '@shared/components/empty-state';
 import { InputComponent } from '@shared/components/input';
-import { LoadingSpinnerComponent } from '@shared/components/loading-spinner';
 import { SelectComponent } from '@shared/components/select';
+import { SkeletonTableComponent } from '@shared/components/skeleton-table';
 import type { SelectOption } from '@shared/models/select';
 import { LocalizedDatePipe } from '@shared/pipes/localized-date';
 import { LocalizedNumberPipe } from '@shared/pipes/localized-number';
@@ -31,11 +31,11 @@ import { AdminOrderStore } from '../store/order';
     CardComponent,
     EmptyStateComponent,
     InputComponent,
-    LoadingSpinnerComponent,
     LocalizedDatePipe,
     LocalizedNumberPipe,
     OrderStatusBadgeComponent,
     SelectComponent,
+    SkeletonTableComponent,
     TranslatePipe,
   ],
   providers: [AdminOrderStore],
@@ -66,12 +66,7 @@ import { AdminOrderStore } from '../store/order';
       </div>
 
       @if (store.loading()) {
-        <div class="flex justify-center py-16">
-          <app-loading-spinner
-            size="lg"
-            cssClass="text-slate-400 dark:text-slate-500"
-          />
-        </div>
+        <app-skeleton-table [columns]="7" />
       } @else if (store.error()) {
         <app-empty-state
           titleKey="couldNotLoadData"
