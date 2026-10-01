@@ -108,7 +108,8 @@ Order
 ├── id (uuid, PK)
 ├── userId (FK -> User)
 ├── items: OrderItem[]
-├── totalAmount: DECIMAL
+├── totalAmount: DECIMAL  (items subtotal + shippingAmount)
+├── shippingAmount: DECIMAL  (snapshotted from ShopSetting at order time)
 ├── status: PENDING | CONFIRMED | PROCESSING | SHIPPED | DELIVERED | CANCELLED
 ├── shippingMethod: POST | COURIER
 ├── shippingAddressId (FK -> Address)
@@ -134,6 +135,15 @@ ContactMessage
 ├── name / email / phone
 ├── message
 ├── isRead
+├── createdAt / updatedAt
+
+ShopSetting (single row, id = 'default')
+├── id (PK, defaults to 'default' so the row is a singleton)
+├── shopName / businessHours
+├── bankCardNumber / bankCardHolder
+├── shopPhone / shopEmail / shopAddress
+├── postPrice: DECIMAL / postEtaDays: INT
+├── courierPrice: DECIMAL / courierEtaDays: INT
 ├── createdAt / updatedAt
 ```
 
@@ -308,11 +318,15 @@ frontend/src/app/
 - `PATCH /api/admin/orders/:id/payment` — confirm/reject card-to-card payment
 - `GET /POST /api/admin/portfolio` — list includes inactive items
 - `GET /PATCH/DELETE /api/admin/portfolio/:id`
-- `GET /api/admin/customers`
+- `GET /api/admin/customers` — paginated; filters: `search` (name/email/phone), `role`; rows carry `orderCount` and `totalSpent` (cancelled orders excluded)
 - `GET /api/admin/messages` — paginated; filter: `isRead`; response carries `unreadCount`
 - `PATCH /api/admin/messages/:id/read`
 - `DELETE /api/admin/messages/:id`
-- `GET /api/admin/dashboard/stats`
+- `GET /api/admin/dashboard/stats` — `days` (1–365, default 30) sets the trend window; returns shop totals, all-time and in-range revenue, dense daily trend, and status/payment breakdowns
+- `GET /PATCH /api/admin/settings`
+
+**Settings (public read)**
+- `GET /api/settings` — the shop's own details; unauthenticated, since Contact/About show them to guests and checkout shows the card and rates to customers
 
 **Upload**
 - `POST /api/upload` — single
@@ -491,10 +505,12 @@ Only admin can change status. (Phase 8: SMS sent to customer on each transition.
   - [ ] Manual pass over the critical flows (login, cart, checkout, admin)
 
 ### Phase 6 — Admin Dashboard (2 days)
-- [ ] Backend: Dashboard stats endpoint
-- [ ] Frontend: DashboardPage (stats cards, charts, recent orders)
-- [ ] Frontend: CustomerListPage
-- [ ] Frontend: SettingsPage (shop name, business hours, bank card info, shipping rates) — also the home for the Phase 4/5 placeholder consts: `orders/const/bank-card.ts`, `contact/const/shop-contact.ts`, and the About page copy
+- [x] Backend: Dashboard stats endpoint (`GET /api/admin/dashboard/stats?days=`), customer list (`GET /api/admin/customers`), and settings (`GET /api/settings` public, `GET/PATCH /api/admin/settings`)
+- [x] Backend: `ShopSetting` singleton + `Order.shippingAmount` snapshot — `OrdersService` resolves the shipping rate server-side, so a later rate change can never rewrite what an order was charged
+- [x] Frontend: DashboardPage (stat cards, inline-SVG orders trend, status/payment breakdowns, recent orders)
+- [x] Frontend: CustomerListPage (search, role filter, pagination, aggregate order count/spend)
+- [x] Frontend: SettingsPage (shop name, business hours, bank card info, shipping rates) — the Phase 4/5 placeholder consts `orders/const/bank-card.ts` and `contact/const/shop-contact.ts` are deleted and `orders/const/shipping-options.ts` is now a factory over the settings row; order detail, checkout, Contact, and About read from the shared `settings` query
+- [ ] Manual pass over the new admin screens (dashboard, customers, settings) and the settings-driven checkout/order-detail/contact reads
 - [x] Admin layout (sidebar + header) — done in Phase 2, extended in Phases 4–5
 - [x] ~~Admin: MessagesPage~~ — delivered in Phase 5
 

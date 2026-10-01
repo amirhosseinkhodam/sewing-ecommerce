@@ -9,9 +9,12 @@ import { CartModule } from './cart/cart.module';
 import { CategoriesModule } from './categories/categories.module';
 import { PrismaModule } from './common/prisma/prisma.module';
 import { ContactModule } from './contact/contact.module';
+import { CustomersModule } from './customers/customers.module';
+import { DashboardModule } from './dashboard/dashboard.module';
 import { OrdersModule } from './orders/orders.module';
 import { PortfolioModule } from './portfolio/portfolio.module';
 import { ProductsModule } from './products/products.module';
+import { SettingsModule } from './settings/settings.module';
 import { UploadModule } from './upload/upload.module';
 
 @Module({
@@ -31,6 +34,9 @@ import { UploadModule } from './upload/upload.module';
     OrdersModule,
     PortfolioModule,
     ContactModule,
+    SettingsModule,
+    CustomersModule,
+    DashboardModule,
   ],
   controllers: [AppController],
 })

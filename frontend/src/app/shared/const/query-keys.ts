@@ -15,6 +15,7 @@ export const QUERY_KEYS = {
   portfolioItem: 'portfolio-item',
   orders: 'orders',
   order: 'order',
+  settings: 'settings',
   adminCategories: 'admin-categories',
   adminProducts: 'admin-products',
   adminProduct: 'admin-product',
@@ -23,6 +24,9 @@ export const QUERY_KEYS = {
   adminOrders: 'admin-orders',
   adminOrder: 'admin-order',
   adminMessages: 'admin-messages',
+  adminSettings: 'admin-settings',
+  adminCustomers: 'admin-customers',
+  adminDashboard: 'admin-dashboard',
 } as const;
 
 export type QueryKey = (typeof QUERY_KEYS)[keyof typeof QUERY_KEYS];

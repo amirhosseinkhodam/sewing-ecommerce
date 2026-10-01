@@ -11,6 +11,7 @@ import type {
 } from '../../../shared/models/order';
 import { OrderStatus, Prisma } from '../generated/prisma/client';
 import { PrismaService } from '../common/prisma/prisma.service';
+import { SettingsService } from '../settings/settings.service';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { OrderQueryDto } from './dto/order-query.dto';
 import { UpdateOrderStatusDto } from './dto/update-order-status.dto';
@@ -47,9 +48,11 @@ type AdminOrderRow = Prisma.OrderGetPayload<{
 @Injectable()
 export class OrdersService {
   readonly #prisma: PrismaService;
+  readonly #settings: SettingsService;
 
-  constructor(prisma: PrismaService) {
+  constructor(prisma: PrismaService, settings: SettingsService) {
     this.#prisma = prisma;
+    this.#settings = settings;
   }
 
   async create(userId: string, dto: CreateOrderDto): Promise<OrderModel> {
@@ -81,8 +84,16 @@ export class OrdersService {
       }
     }
 
+    // The rate is resolved server-side so the amount charged always matches the
+    // rate in settings, never one a caller supplied. It is snapshotted onto
+    // the order alongside the address, so later rate changes cannot rewrite
+    // what an existing order was charged.
+    const shippingAmount = Number(
+      (await this.#settings.get()).shippingRates[dto.shippingMethod].price,
+    );
+
     const order = await this.#prisma.$transaction(async (tx) => {
-      const totalAmount = cart.items.reduce(
+      const itemsSubtotal = cart.items.reduce(
         (sum, item) =>
           sum +
           Number(item.variant.price ?? item.product.price) * item.quantity,
@@ -92,7 +103,8 @@ export class OrdersService {
       const created = await tx.order.create({
         data: {
           userId,
-          totalAmount,
+          totalAmount: itemsSubtotal + shippingAmount,
+          shippingAmount,
           status: 'PENDING',
           shippingMethod: dto.shippingMethod,
           shippingAddressId: dto.shippingAddressId,
@@ -393,6 +405,7 @@ export class OrdersService {
         phone: order.shippingPhone,
       },
       totalAmount: String(order.totalAmount),
+      shippingAmount: String(order.shippingAmount),
       status: order.status,
       shippingMethod: order.shippingMethod,
       paymentMethod: order.paymentMethod,

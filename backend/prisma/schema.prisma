@@ -173,6 +173,11 @@ model Order {
   createdAt         DateTime        @default(now())
   updatedAt         DateTime        @updatedAt
 
+  // `totalAmount` is the items subtotal plus this shipping charge. It is
+  // snapshotted so a later rate change in ShopSetting never rewrites the
+  // amount a customer was actually charged.
+  shippingAmount Decimal @default(0)
+
   // Shipping address is snapshotted the same way OrderItem snapshots product
   // data: deleting an address must never rewrite delivered order history.
   shippingLabel       String
@@ -218,4 +223,24 @@ model ContactMessage {
   isRead    Boolean  @default(false)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+/// Single-row table for the shop's own editable details (Phase 6). The fixed
+/// `id` makes it a singleton, so lookups are a `findUnique` and the admin form
+/// always edits row `SETTINGS_ID` instead of creating a second one.
+model ShopSetting {
+  id             String   @id @default("default")
+  shopName       String
+  bankCardNumber String
+  bankCardHolder String
+  shopPhone      String
+  shopEmail      String
+  shopAddress    String
+  businessHours  String
+  postPrice      Decimal
+  postEtaDays    Int      @default(5)
+  courierPrice   Decimal
+  courierEtaDays Int      @default(2)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
 }

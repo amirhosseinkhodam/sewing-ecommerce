@@ -17,7 +17,8 @@ import { LocalizedNumberPipe } from '@shared/pipes/localized-number';
 import { TranslatePipe } from '@shared/pipes/translate';
 import { AddressFormComponent } from '../../addresses/components/address-form';
 import { CartStore } from '../../cart/store/cart';
-import { SHIPPING_OPTIONS } from '../const/shipping-options';
+import { injectShopSettingsQuery } from '../../settings/query/settings';
+import { shippingOptions as buildShippingOptions } from '../const/shipping-options';
 import { CheckoutStore } from '../store/checkout';
 
 @Component({
@@ -166,7 +167,7 @@ import { CheckoutStore } from '../store/checkout';
                     {{ 'shippingMethod' | translate }}
                   </h2>
                   <div class="flex flex-col gap-3">
-                    @for (option of shippingOptions; track option.method) {
+                    @for (option of shippingOptions(); track option.method) {
                       <button
                         type="button"
                         class="flex items-center justify-between rounded-card border p-4 transition-colors"
@@ -373,7 +374,16 @@ export class CheckoutComponent {
     'reviewOrder',
   ] as const;
 
-  readonly shippingOptions = SHIPPING_OPTIONS;
+  /**
+   * Rates are admin-editable, so the options are derived from settings rather
+   * than a const. Empty until the row loads, which also keeps the step's
+   * "continue" disabled until a real price is on screen.
+   */
+  readonly #settingsQuery = injectShopSettingsQuery();
+  readonly shippingOptions = computed(() => {
+    const settings = this.#settingsQuery.data();
+    return settings ? buildShippingOptions(settings) : [];
+  });
 
   readonly #router = inject(Router);
 
@@ -390,8 +400,9 @@ export class CheckoutComponent {
 
   readonly selectedShippingOption = computed(
     () =>
-      SHIPPING_OPTIONS.find((o) => o.method === this.selectedShipping()) ??
-      null,
+      this.shippingOptions().find(
+        (option) => option.method === this.selectedShipping(),
+      ) ?? null,
   );
 
   readonly grandTotal = computed(

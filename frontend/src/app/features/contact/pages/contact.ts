@@ -1,4 +1,9 @@
-import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  inject,
+} from '@angular/core';
 import { FormField, submit } from '@angular/forms/signals';
 import { HugeiconsIconComponent } from '@hugeicons/angular';
 import Clock01Icon from '@hugeicons/core-free-icons/Clock01Icon';
@@ -13,7 +18,7 @@ import { SignalFormFieldComponent } from '@shared/components/signal-form-field';
 import { InputComponent } from '@shared/components/input';
 import { TextareaComponent } from '@shared/components/textarea';
 import { TranslatePipe } from '@shared/pipes/translate';
-import { SHOP_CONTACT } from '../const/shop-contact';
+import { injectShopSettingsQuery } from '../../settings/query/settings';
 import { ContactFormService } from '../forms/contact';
 import { injectSubmitContactMutation } from '../mutation/contact';
 
@@ -119,7 +124,7 @@ import { injectSubmitContactMutation } from '../mutation/contact';
                   {{ 'address' | translate }}
                 </p>
                 <p class="text-sm text-slate-900 dark:text-slate-100 mt-0.5">
-                  {{ shop.address }}
+                  {{ shop()?.shopAddress }}
                 </p>
               </div>
             </div>
@@ -140,7 +145,7 @@ import { injectSubmitContactMutation } from '../mutation/contact';
                   class="text-sm text-slate-900 dark:text-slate-100 mt-0.5"
                   dir="ltr"
                 >
-                  {{ shop.phone }}
+                  {{ shop()?.shopPhone }}
                 </p>
               </div>
             </div>
@@ -161,7 +166,7 @@ import { injectSubmitContactMutation } from '../mutation/contact';
                   class="text-sm text-slate-900 dark:text-slate-100 mt-0.5"
                   dir="ltr"
                 >
-                  {{ shop.email }}
+                  {{ shop()?.shopEmail }}
                 </p>
               </div>
             </div>
@@ -179,7 +184,7 @@ import { injectSubmitContactMutation } from '../mutation/contact';
                   {{ 'workingHours' | translate }}
                 </p>
                 <p class="text-sm text-slate-900 dark:text-slate-100 mt-0.5">
-                  {{ 'shopWorkingHours' | translate }}
+                  {{ shop()?.businessHours }}
                 </p>
               </div>
             </div>
@@ -198,7 +203,9 @@ export class ContactComponent {
     SmartPhone01Icon,
     Clock01Icon,
   };
-  readonly shop = SHOP_CONTACT;
+  /** Shop details are admin-editable, so they are read from settings. */
+  readonly #settingsQuery = injectShopSettingsQuery();
+  readonly shop = computed(() => this.#settingsQuery.data() ?? null);
 
   readonly submitMessage = injectSubmitContactMutation({
     onSuccess: () => this.contactForm.resetForm(),

@@ -30,6 +30,8 @@ export interface OrderModel {
   readonly shippingAddressId: string;
   readonly shippingAddress: OrderShippingAddressModel;
   readonly totalAmount: string;
+  /** Snapshotted shipping charge; `totalAmount` is items + this. */
+  readonly shippingAmount: string;
   readonly status: OrderStatus;
   readonly shippingMethod: ShippingMethod;
   readonly paymentMethod: PaymentMethod;

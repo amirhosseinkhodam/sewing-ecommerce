@@ -1,4 +1,9 @@
-import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  inject,
+} from '@angular/core';
 import { Router } from '@angular/router';
 import { HugeiconsIconComponent } from '@hugeicons/angular';
 import Clock01Icon from '@hugeicons/core-free-icons/Clock01Icon';
@@ -9,7 +14,7 @@ import SmartPhone01Icon from '@hugeicons/core-free-icons/SmartPhone01Icon';
 import { ButtonComponent } from '@shared/components/button';
 import { CardComponent } from '@shared/components/card';
 import { TranslatePipe } from '@shared/pipes/translate';
-import { SHOP_CONTACT } from '../const/shop-contact';
+import { injectShopSettingsQuery } from '../../settings/query/settings';
 
 /**
  * Static content page. Copy lives in the i18n dictionaries (owner's decision);
@@ -72,7 +77,7 @@ import { SHOP_CONTACT } from '../const/shop-contact';
                 {{ 'address' | translate }}
               </p>
               <p class="text-sm text-slate-900 dark:text-slate-100 mt-0.5">
-                {{ shop.address }}
+                {{ shop()?.shopAddress }}
               </p>
             </div>
           </div>
@@ -92,7 +97,7 @@ import { SHOP_CONTACT } from '../const/shop-contact';
                 class="text-sm text-slate-900 dark:text-slate-100 mt-0.5"
                 dir="ltr"
               >
-                {{ shop.phone }}
+                {{ shop()?.shopPhone }}
               </p>
             </div>
           </div>
@@ -109,7 +114,7 @@ import { SHOP_CONTACT } from '../const/shop-contact';
                 {{ 'workingHours' | translate }}
               </p>
               <p class="text-sm text-slate-900 dark:text-slate-100 mt-0.5">
-                {{ 'shopWorkingHours' | translate }}
+                {{ shop()?.businessHours }}
               </p>
             </div>
           </div>
@@ -134,7 +139,9 @@ export class AboutComponent {
     SmartPhone01Icon,
     Clock01Icon,
   };
-  readonly shop = SHOP_CONTACT;
+  /** Shop details are admin-editable, so they are read from settings. */
+  readonly #settingsQuery = injectShopSettingsQuery();
+  readonly shop = computed(() => this.#settingsQuery.data() ?? null);
 
   readonly #router = inject(Router);
 

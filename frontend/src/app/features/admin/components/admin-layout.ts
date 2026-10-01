@@ -2,11 +2,13 @@ import { Component, ChangeDetectionStrategy } from '@angular/core';
 import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { HugeiconsIconComponent } from '@hugeicons/angular';
 import BoxIcon from '@hugeicons/core-free-icons/BoxIcon';
+import DashboardSquare01Icon from '@hugeicons/core-free-icons/DashboardSquare01Icon';
 import Image01Icon from '@hugeicons/core-free-icons/Image01Icon';
 import Mail01Icon from '@hugeicons/core-free-icons/Mail01Icon';
 import Settings01Icon from '@hugeicons/core-free-icons/Settings01Icon';
 import ShoppingBag01Icon from '@hugeicons/core-free-icons/ShoppingBag01Icon';
 import Tag01Icon from '@hugeicons/core-free-icons/Tag01Icon';
+import UserGroupIcon from '@hugeicons/core-free-icons/UserGroupIcon';
 
 import { TranslatePipe } from '@shared/pipes/translate';
 
@@ -25,6 +27,20 @@ import { TranslatePipe } from '@shared/pipes/translate';
       <div class="flex flex-col gap-8 lg:flex-row">
         <aside class="shrink-0 lg:w-56">
           <nav class="flex flex-row gap-1 overflow-x-auto lg:flex-col">
+            <a
+              routerLink="/admin"
+              [routerLinkActiveOptions]="{ exact: true }"
+              routerLinkActive="!bg-slate-100 dark:!bg-slate-700 !text-slate-900 dark:!text-slate-100"
+              class="flex shrink-0 items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-slate-600 dark:text-slate-300 transition-colors hover:bg-slate-100 dark:hover:bg-slate-800"
+            >
+              <hugeicons-icon
+                [icon]="icons.DashboardSquare01Icon"
+                [size]="18"
+                color="currentColor"
+                [strokeWidth]="1.5"
+              />
+              {{ 'dashboard' | translate }}
+            </a>
             <a
               routerLink="/admin/products"
               routerLinkActive="!bg-slate-100 dark:!bg-slate-700 !text-slate-900 dark:!text-slate-100"
@@ -91,8 +107,22 @@ import { TranslatePipe } from '@shared/pipes/translate';
               {{ 'messages' | translate }}
             </a>
             <a
-              routerLink="/settings"
-              class="flex shrink-0 items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-slate-400 dark:text-slate-500 pointer-events-none"
+              routerLink="/admin/customers"
+              routerLinkActive="!bg-slate-100 dark:!bg-slate-700 !text-slate-900 dark:!text-slate-100"
+              class="flex shrink-0 items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-slate-600 dark:text-slate-300 transition-colors hover:bg-slate-100 dark:hover:bg-slate-800"
+            >
+              <hugeicons-icon
+                [icon]="icons.UserGroupIcon"
+                [size]="18"
+                color="currentColor"
+                [strokeWidth]="1.5"
+              />
+              {{ 'manageCustomers' | translate }}
+            </a>
+            <a
+              routerLink="/admin/settings"
+              routerLinkActive="!bg-slate-100 dark:!bg-slate-700 !text-slate-900 dark:!text-slate-100"
+              class="flex shrink-0 items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-slate-600 dark:text-slate-300 transition-colors hover:bg-slate-100 dark:hover:bg-slate-800"
             >
               <hugeicons-icon
                 [icon]="icons.Settings01Icon"
@@ -115,10 +145,12 @@ import { TranslatePipe } from '@shared/pipes/translate';
 export class AdminLayoutComponent {
   readonly icons = {
     BoxIcon,
+    DashboardSquare01Icon,
     Tag01Icon,
     Settings01Icon,
     ShoppingBag01Icon,
     Image01Icon,
     Mail01Icon,
+    UserGroupIcon,
   };
 }

@@ -109,7 +109,13 @@ export const routes: Routes = [
         (m) => m.AdminLayoutComponent,
       ),
     children: [
-      { path: '', redirectTo: 'products', pathMatch: 'full' },
+      {
+        path: '',
+        loadComponent: () =>
+          import('./features/admin/pages/dashboard').then(
+            (m) => m.AdminDashboardComponent,
+          ),
+      },
       {
         path: 'products',
         loadComponent: () =>
@@ -178,6 +184,20 @@ export const routes: Routes = [
         loadComponent: () =>
           import('./features/admin/pages/messages').then(
             (m) => m.AdminMessagesComponent,
+          ),
+      },
+      {
+        path: 'customers',
+        loadComponent: () =>
+          import('./features/admin/pages/customers').then(
+            (m) => m.AdminCustomersComponent,
+          ),
+      },
+      {
+        path: 'settings',
+        loadComponent: () =>
+          import('./features/admin/pages/settings').then(
+            (m) => m.AdminSettingsComponent,
           ),
       },
     ],

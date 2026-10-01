@@ -21,7 +21,7 @@ import { LanguageService } from '@shared/services/language';
 import { ModalService } from '@shared/services/modal';
 import { NotificationService } from '@shared/services/notification';
 import { UploadService } from '../../../core/services/upload';
-import { BANK_CARD } from '../const/bank-card';
+import { injectShopSettingsQuery } from '../../settings/query/settings';
 import { OrderStatusBadgeComponent } from '../components/order-status-badge';
 import { OrderStore } from '../store/order';
 
@@ -82,27 +82,30 @@ import { OrderStore } from '../store/order';
             <div
               class="flex flex-col gap-3 rounded-lg bg-slate-50 dark:bg-slate-900/40 p-4"
             >
-              <div class="flex items-center justify-between gap-3">
-                <span class="text-sm text-slate-500 dark:text-slate-400">
-                  {{ 'cardNumber' | translate }}
-                </span>
-                <span
-                  class="font-mono text-sm font-medium text-slate-900 dark:text-slate-100"
-                  dir="ltr"
-                >
-                  {{ bankCard.cardNumber }}
-                </span>
-              </div>
-              <div class="flex items-center justify-between gap-3">
-                <span class="text-sm text-slate-500 dark:text-slate-400">
-                  {{ 'cardHolder' | translate }}
-                </span>
-                <span
-                  class="text-sm font-medium text-slate-900 dark:text-slate-100"
-                >
-                  {{ bankCard.cardHolder }}
-                </span>
-              </div>
+              <!-- Card details come from shop settings, so they wait on it. -->
+              @if (bankCard(); as card) {
+                <div class="flex items-center justify-between gap-3">
+                  <span class="text-sm text-slate-500 dark:text-slate-400">
+                    {{ 'cardNumber' | translate }}
+                  </span>
+                  <span
+                    class="font-mono text-sm font-medium text-slate-900 dark:text-slate-100"
+                    dir="ltr"
+                  >
+                    {{ card.bankCardNumber }}
+                  </span>
+                </div>
+                <div class="flex items-center justify-between gap-3">
+                  <span class="text-sm text-slate-500 dark:text-slate-400">
+                    {{ 'cardHolder' | translate }}
+                  </span>
+                  <span
+                    class="text-sm font-medium text-slate-900 dark:text-slate-100"
+                  >
+                    {{ card.bankCardHolder }}
+                  </span>
+                </div>
+              }
               <div
                 class="flex items-center justify-between gap-3 border-t border-slate-200 dark:border-slate-700 pt-3"
               >
@@ -200,8 +203,28 @@ import { OrderStore } from '../store/order';
               </div>
             }
           </div>
+          <!-- Shipping was snapshotted at order time, so the breakdown is
+               read off the order rather than recomputed from settings. -->
           <div
-            class="flex justify-between font-bold text-slate-900 dark:text-slate-100 border-t border-slate-200 dark:border-slate-700 pt-4 mt-4"
+            class="flex justify-between text-sm text-slate-600 dark:text-slate-300 border-t border-slate-200 dark:border-slate-700 pt-4 mt-4"
+          >
+            <span>{{ 'subtotal' | translate }}</span>
+            <span>
+              {{ itemsSubtotal(order) | localizedNumber }}
+              {{ 'currencyToman' | translate }}
+            </span>
+          </div>
+          <div
+            class="flex justify-between text-sm text-slate-600 dark:text-slate-300 mt-2"
+          >
+            <span>{{ 'shippingCost' | translate }}</span>
+            <span>
+              {{ toNumber(order.shippingAmount) | localizedNumber }}
+              {{ 'currencyToman' | translate }}
+            </span>
+          </div>
+          <div
+            class="flex justify-between font-bold text-slate-900 dark:text-slate-100 border-t border-slate-200 dark:border-slate-700 pt-3 mt-3"
           >
             <span>{{ 'grandTotal' | translate }}</span>
             <span>
@@ -285,7 +308,14 @@ export class OrderDetailComponent implements OnInit {
   readonly store = inject(OrderStore);
 
   readonly icons = { Image01Icon };
-  readonly bankCard = BANK_CARD;
+
+  /**
+   * The destination card comes from shop settings rather than a const, so the
+   * admin can change it without a deploy. The panel is only rendered once the
+   * row has loaded.
+   */
+  readonly #settingsQuery = injectShopSettingsQuery();
+  readonly bankCard = computed(() => this.#settingsQuery.data() ?? null);
 
   readonly uploading = signal(false);
 
@@ -316,6 +346,17 @@ export class OrderDetailComponent implements OnInit {
 
   toNumber(value: string): number {
     return Number(value);
+  }
+
+  /**
+   * Items total, derived by backing the snapshotted shipping charge out of the
+   * order total — the API sends the two amounts, not a separate subtotal.
+   */
+  itemsSubtotal(order: {
+    totalAmount: string;
+    shippingAmount: string;
+  }): number {
+    return Number(order.totalAmount) - Number(order.shippingAmount);
   }
 
   shortId(id: string): string {
