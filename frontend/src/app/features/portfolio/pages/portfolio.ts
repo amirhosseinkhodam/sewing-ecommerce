@@ -5,8 +5,8 @@ import { HugeiconsIconComponent } from '@hugeicons/angular';
 import Image01Icon from '@hugeicons/core-free-icons/Image01Icon';
 import { ButtonComponent } from '@shared/components/button';
 import { EmptyStateComponent } from '@shared/components/empty-state';
-import { LoadingSpinnerComponent } from '@shared/components/loading-spinner';
 import { SelectComponent } from '@shared/components/select';
+import { SkeletonGridComponent } from '@shared/components/skeleton-grid';
 import type { SelectOption } from '@shared/models/select';
 import { LocalizedNumberPipe } from '@shared/pipes/localized-number';
 import { TranslatePipe } from '@shared/pipes/translate';
@@ -19,9 +19,9 @@ import { PortfolioStore } from '../store/portfolio';
     ButtonComponent,
     EmptyStateComponent,
     HugeiconsIconComponent,
-    LoadingSpinnerComponent,
     LocalizedNumberPipe,
     SelectComponent,
+    SkeletonGridComponent,
     TranslatePipe,
   ],
   providers: [PortfolioStore],
@@ -49,12 +49,10 @@ import { PortfolioStore } from '../store/portfolio';
       </div>
 
       @if (store.loading() && store.items().length === 0) {
-        <div class="flex justify-center py-20">
-          <app-loading-spinner
-            size="lg"
-            cssClass="text-slate-400 dark:text-slate-500"
-          />
-        </div>
+        <app-skeleton-grid
+          [count]="6"
+          cssClass="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3"
+        />
       } @else if (store.error()) {
         <app-empty-state
           titleKey="couldNotLoadData"

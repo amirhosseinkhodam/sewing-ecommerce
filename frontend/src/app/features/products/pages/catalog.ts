@@ -2,7 +2,7 @@ import { Component, inject, ChangeDetectionStrategy } from '@angular/core';
 import { Router } from '@angular/router';
 import { ButtonComponent } from '@shared/components/button';
 import { EmptyStateComponent } from '@shared/components/empty-state';
-import { LoadingSpinnerComponent } from '@shared/components/loading-spinner';
+import { SkeletonGridComponent } from '@shared/components/skeleton-grid';
 import { TranslatePipe } from '@shared/pipes/translate';
 import type { ProductModel } from '../models/product';
 import { ProductCardComponent } from '../components/product-card';
@@ -14,7 +14,7 @@ import { CatalogStore } from '../store/catalog';
   imports: [
     ButtonComponent,
     EmptyStateComponent,
-    LoadingSpinnerComponent,
+    SkeletonGridComponent,
     ProductCardComponent,
     ProductFilterComponent,
     TranslatePipe,
@@ -37,12 +37,10 @@ import { CatalogStore } from '../store/catalog';
       </div>
 
       @if (store.loading()) {
-        <div class="flex justify-center py-20">
-          <app-loading-spinner
-            size="lg"
-            cssClass="text-slate-400 dark:text-slate-500"
-          />
-        </div>
+        <app-skeleton-grid
+          [count]="8"
+          cssClass="mt-6 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4"
+        />
       } @else if (store.error()) {
         <app-empty-state
           titleKey="couldNotLoadData"
