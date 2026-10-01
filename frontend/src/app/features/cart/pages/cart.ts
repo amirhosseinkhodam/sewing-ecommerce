@@ -85,6 +85,7 @@ import { CartStore } from '../store/cart';
               >
                 @if (item.productImage; as image) {
                   <img
+                    loading="lazy"
                     [src]="image"
                     [alt]="item.productName"
                     class="w-20 h-20 rounded-lg object-cover bg-slate-100 dark:bg-slate-700"

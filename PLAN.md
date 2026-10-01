@@ -524,7 +524,7 @@ Only admin can change status. (Phase 8: SMS sent to customer on each transition.
   - [x] 500 page (`features/errors/pages/server-error.ts`, eager `/error` route; `withNavigationErrorHandler` redirects failed navigations there with `skipLocationChange`)
 - [x] Empty states: no products, no orders, no messages, empty cart — shared `EmptyStateComponent` used across list/error states
 - [ ] Responsive audit (mobile/tablet/desktop)
-- [ ] Image lazy loading, code splitting
+- [x] Image lazy loading, code splitting — every list/thumbnail/receipt `<img>` has `loading="lazy"`, the gallery's main image (detail-page LCP) gets `fetchpriority="high"`; every route is `loadComponent` except the eager `/error` fallback
 - [ ] Build + deploy
 
 ### Phase 8 — Paid Services (2 days)

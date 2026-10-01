@@ -108,6 +108,7 @@ import { OrderStore } from '../store/order';
                 @for (item of previewItems(order); track item.id) {
                   @if (item.productImage; as image) {
                     <img
+                      loading="lazy"
                       [src]="image"
                       [alt]="item.productName"
                       class="w-12 h-12 rounded-lg object-cover bg-slate-100 dark:bg-slate-700"

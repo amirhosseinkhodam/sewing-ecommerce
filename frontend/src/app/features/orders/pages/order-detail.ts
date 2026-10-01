@@ -149,6 +149,7 @@ import { OrderStore } from '../store/order';
                   {{ 'receiptUploaded' | translate }}
                 </p>
                 <img
+                  loading="lazy"
                   [src]="receipt"
                   [alt]="'uploadReceipt' | translate"
                   class="max-h-64 rounded-lg border border-slate-200 dark:border-slate-700 object-contain"
@@ -188,6 +189,7 @@ import { OrderStore } from '../store/order';
               <div class="flex items-center gap-4">
                 @if (item.productImage; as image) {
                   <img
+                    loading="lazy"
                     [src]="image"
                     [alt]="item.productName"
                     class="w-16 h-16 rounded-lg object-cover bg-slate-100 dark:bg-slate-700"

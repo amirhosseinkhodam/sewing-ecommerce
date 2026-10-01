@@ -183,7 +183,11 @@ import { ProductFormStore } from '../store/product-form';
                 <div
                   class="relative aspect-square overflow-hidden rounded-lg border border-slate-200 dark:border-slate-700"
                 >
-                  <img [src]="image" class="h-full w-full object-cover" />
+                  <img
+                    loading="lazy"
+                    [src]="image"
+                    class="h-full w-full object-cover"
+                  />
                   <button
                     type="button"
                     class="absolute top-1 end-1 flex h-6 w-6 items-center justify-center rounded-full bg-white/90 text-slate-700 shadow hover:bg-white"

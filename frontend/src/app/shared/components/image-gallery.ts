@@ -18,6 +18,7 @@ import Image01Icon from '@hugeicons/core-free-icons/Image01Icon';
       >
         @if (images().length > 0) {
           <img
+            fetchpriority="high"
             [src]="images()[activeIndex()]"
             [alt]="alt()"
             class="h-full w-full object-cover"
@@ -50,6 +51,7 @@ import Image01Icon from '@hugeicons/core-free-icons/Image01Icon';
               (click)="activeIndex.set(i)"
             >
               <img
+                loading="lazy"
                 [src]="image"
                 [alt]="alt()"
                 class="h-full w-full object-cover"

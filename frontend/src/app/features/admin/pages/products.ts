@@ -99,6 +99,7 @@ import { AdminProductStore } from '../store/product';
                         >
                           @if (product.images[0]; as image) {
                             <img
+                              loading="lazy"
                               [src]="image"
                               [alt]="product.name"
                               class="h-full w-full object-cover"

@@ -116,6 +116,7 @@ const NEXT_STATUSES: Readonly<Record<OrderStatus, readonly OrderStatus[]>> = {
                   <div class="flex items-center gap-4">
                     @if (item.productImage; as image) {
                       <img
+                        loading="lazy"
                         [src]="image"
                         [alt]="item.productName"
                         class="w-14 h-14 rounded-lg object-cover bg-slate-100 dark:bg-slate-700"
@@ -209,6 +210,7 @@ const NEXT_STATUSES: Readonly<Record<OrderStatus, readonly OrderStatus[]>> = {
               </h2>
               @if (order.paymentReceipt; as receipt) {
                 <img
+                  loading="lazy"
                   [src]="receipt"
                   [alt]="'paymentReceipt' | translate"
                   class="max-h-96 rounded-lg border border-slate-200 dark:border-slate-700 object-contain"

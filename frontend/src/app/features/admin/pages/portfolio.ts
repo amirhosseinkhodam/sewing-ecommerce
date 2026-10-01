@@ -88,6 +88,7 @@ import { AdminPortfolioStore } from '../store/portfolio';
                     <td class="px-4 py-3">
                       @if (item.images[0]; as image) {
                         <img
+                          loading="lazy"
                           [src]="image"
                           [alt]="item.title"
                           class="h-12 w-12 rounded-lg object-cover bg-slate-100 dark:bg-slate-700"
