@@ -64,4 +64,12 @@ export class OrderStore {
   cancelOrder(id: string): void {
     this.#cancelMutation.mutate(id);
   }
+
+  reload(): void {
+    if (this.#id()) {
+      void this.#orderQuery.refetch();
+    } else {
+      void this.#ordersQuery.refetch();
+    }
+  }
 }

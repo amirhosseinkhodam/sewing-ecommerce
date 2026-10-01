@@ -83,4 +83,12 @@ export class AdminOrderStore {
   updatePaymentStatus(value: UpdatePaymentStatusModel): void {
     this.#paymentMutation.mutate(value);
   }
+
+  reload(): void {
+    if (this.#id()) {
+      void this.#orderQuery.refetch();
+    } else {
+      void this.#ordersQuery.refetch();
+    }
+  }
 }

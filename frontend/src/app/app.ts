@@ -1,8 +1,20 @@
-import { Component, ChangeDetectionStrategy } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  DestroyRef,
+  inject,
+} from '@angular/core';
+import {
+  ActivatedRoute,
+  NavigationEnd,
+  Router,
+  RouterOutlet,
+} from '@angular/router';
+import { filter } from 'rxjs';
 import { FooterComponent } from './shared/components/footer';
 import { NavbarComponent } from './shared/components/navbar';
 import { NotificationComponent } from './shared/components/notification';
+import { SeoService, type PageSeoModel } from './shared/services/seo';
 
 @Component({
   selector: 'app-root',
@@ -24,4 +36,36 @@ import { NotificationComponent } from './shared/components/notification';
     </div>
   `,
 })
-export class AppComponent {}
+export class AppComponent {
+  readonly #router = inject(Router);
+  readonly #activatedRoute = inject(ActivatedRoute);
+  readonly #seo = inject(SeoService);
+
+  constructor() {
+    // Child route data wins over a parent's (e.g. an admin page's own
+    // titleKey over the `/admin` shell's bare `noindex`), so data objects
+    // along the active chain are merged outer to inner before being applied.
+    const subscription = this.#router.events
+      .pipe(filter((event) => event instanceof NavigationEnd))
+      .subscribe(() => this.#seo.setPage(this.#resolvePageSeo()));
+    inject(DestroyRef).onDestroy(() => subscription.unsubscribe());
+
+    // The route is already active on first load, so run once immediately —
+    // NavigationEnd only fires on subsequent navigations.
+    this.#seo.setPage(this.#resolvePageSeo());
+  }
+
+  #resolvePageSeo(): PageSeoModel {
+    let route = this.#activatedRoute.root;
+    let data: Record<string, unknown> = {};
+    while (route.firstChild) {
+      route = route.firstChild;
+      data = { ...data, ...route.snapshot.data };
+    }
+    return {
+      titleKey: (data['titleKey'] as string) ?? 'appName',
+      descriptionKey: (data['descriptionKey'] as string) ?? 'seo.home',
+      noindex: Boolean(data['noindex']),
+    };
+  }
+}

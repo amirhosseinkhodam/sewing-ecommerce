@@ -1,11 +1,11 @@
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { Router } from '@angular/router';
+import type { OrderModel } from '@domain/models/order';
 import { HugeiconsIconComponent } from '@hugeicons/angular';
 import Image01Icon from '@hugeicons/core-free-icons/Image01Icon';
-
-import type { OrderModel } from '@domain/models/order';
 import { ButtonComponent } from '@shared/components/button';
 import { CardComponent } from '@shared/components/card';
+import { EmptyStateComponent } from '@shared/components/empty-state';
 import { LoadingSpinnerComponent } from '@shared/components/loading-spinner';
 import { LocalizedDatePipe } from '@shared/pipes/localized-date';
 import { LocalizedNumberPipe } from '@shared/pipes/localized-number';
@@ -18,6 +18,7 @@ import { OrderStore } from '../store/order';
   imports: [
     ButtonComponent,
     CardComponent,
+    EmptyStateComponent,
     HugeiconsIconComponent,
     LoadingSpinnerComponent,
     LocalizedDatePipe,
@@ -41,25 +42,18 @@ import { OrderStore } from '../store/order';
           />
         </div>
       } @else if (store.error()) {
-        <div
-          class="rounded-card border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 p-10 text-center"
-        >
-          {{ 'couldNotLoadData' | translate }}
-        </div>
+        <app-empty-state
+          titleKey="couldNotLoadData"
+          actionLabelKey="refresh"
+          (actionClick)="store.reload()"
+        />
       } @else if (store.orders().length === 0) {
-        <div
-          class="flex flex-col items-center gap-4 rounded-card border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 p-10 text-center"
-        >
-          <p class="text-lg font-medium text-slate-900 dark:text-slate-100">
-            {{ 'noOrders' | translate }}
-          </p>
-          <p class="text-sm text-slate-500 dark:text-slate-400">
-            {{ 'noOrdersMessage' | translate }}
-          </p>
-          <app-button variant="primary" (buttonClick)="onStartShopping()">
-            {{ 'startShopping' | translate }}
-          </app-button>
-        </div>
+        <app-empty-state
+          titleKey="noOrders"
+          messageKey="noOrdersMessage"
+          actionLabelKey="startShopping"
+          (actionClick)="onStartShopping()"
+        />
       } @else {
         <div class="flex flex-col gap-4">
           @for (order of store.orders(); track order.id) {

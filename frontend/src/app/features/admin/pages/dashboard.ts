@@ -1,5 +1,6 @@
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { Router } from '@angular/router';
+import type { AdminOrderModel } from '@domain/models/order';
 import BoxIcon from '@hugeicons/core-free-icons/BoxIcon';
 import Image01Icon from '@hugeicons/core-free-icons/Image01Icon';
 import Mail01Icon from '@hugeicons/core-free-icons/Mail01Icon';
@@ -7,10 +8,9 @@ import MoneyBag02Icon from '@hugeicons/core-free-icons/MoneyBag02Icon';
 import ShoppingBag01Icon from '@hugeicons/core-free-icons/ShoppingBag01Icon';
 import Tag01Icon from '@hugeicons/core-free-icons/Tag01Icon';
 import UserGroupIcon from '@hugeicons/core-free-icons/UserGroupIcon';
-
-import type { AdminOrderModel } from '@domain/models/order';
 import { ButtonComponent } from '@shared/components/button';
 import { CardComponent } from '@shared/components/card';
+import { EmptyStateComponent } from '@shared/components/empty-state';
 import { LoadingSpinnerComponent } from '@shared/components/loading-spinner';
 import { SelectComponent } from '@shared/components/select';
 import type { SelectOption } from '@shared/models/select';
@@ -34,6 +34,7 @@ const RANGE_DAYS = [7, 30, 90] as const;
   imports: [
     ButtonComponent,
     CardComponent,
+    EmptyStateComponent,
     LoadingSpinnerComponent,
     LocalizedDatePipe,
     LocalizedNumberPipe,
@@ -68,6 +69,12 @@ const RANGE_DAYS = [7, 30, 90] as const;
             cssClass="text-slate-400 dark:text-slate-500"
           />
         </div>
+      } @else if (store.error()) {
+        <app-empty-state
+          titleKey="couldNotLoadData"
+          actionLabelKey="refresh"
+          (actionClick)="store.reload()"
+        />
       } @else if (store.stats(); as stats) {
         <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
           <app-stat-card

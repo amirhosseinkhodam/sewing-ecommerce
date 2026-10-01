@@ -16,6 +16,7 @@ export class AdminProductStore {
     () => this.#productsQuery.data()?.totalPages ?? 1,
   );
   readonly loading = computed(() => this.#productsQuery.isPending());
+  readonly error = computed(() => this.#productsQuery.error()?.message ?? null);
 
   readonly #removeMutation = injectRemoveProductMutation();
 
@@ -29,5 +30,9 @@ export class AdminProductStore {
 
   removeProduct(id: string): void {
     this.#removeMutation.mutate(id);
+  }
+
+  reload(): void {
+    void this.#productsQuery.refetch();
   }
 }

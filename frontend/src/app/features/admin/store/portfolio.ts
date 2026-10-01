@@ -19,6 +19,7 @@ export class AdminPortfolioStore {
     () => this.#itemsQuery.data()?.totalPages ?? 0,
   );
   readonly loading = computed(() => this.#itemsQuery.isPending());
+  readonly error = computed(() => this.#itemsQuery.error()?.message ?? null);
 
   readonly #removeMutation = injectRemovePortfolioMutation();
 
@@ -33,5 +34,9 @@ export class AdminPortfolioStore {
 
   removeItem(id: string): void {
     this.#removeMutation.mutate(id);
+  }
+
+  reload(): void {
+    void this.#itemsQuery.refetch();
   }
 }

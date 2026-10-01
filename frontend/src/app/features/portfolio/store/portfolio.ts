@@ -48,4 +48,12 @@ export class PortfolioStore {
     this.category.set(category);
     this.page.set(1);
   }
+
+  reload(): void {
+    if (this.#slug()) {
+      void this.#itemQuery.refetch();
+    } else {
+      void this.#listQuery.refetch();
+    }
+  }
 }

@@ -2,7 +2,23 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <title>Angular App</title>
+    <!--
+      This is a pure SPA (no SSR): `SeoService` overwrites these tags per
+      route once Angular bootstraps, but a crawler or link-unfurler that
+      doesn't execute JS only ever sees this static fallback, so it stays a
+      reasonable description of the shop rather than placeholder text.
+    -->
+    <title>Sewing Shop</title>
+    <meta
+      name="description"
+      content="Custom-made clothing and tailoring, made to order."
+    />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Sewing Shop" />
+    <meta
+      property="og:description"
+      content="Custom-made clothing and tailoring, made to order."
+    />
     <base href="/" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />

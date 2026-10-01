@@ -1,10 +1,10 @@
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { Router } from '@angular/router';
+import type { PortfolioModel } from '@domain/models/portfolio';
 import { HugeiconsIconComponent } from '@hugeicons/angular';
 import Image01Icon from '@hugeicons/core-free-icons/Image01Icon';
-
-import type { PortfolioModel } from '@domain/models/portfolio';
 import { ButtonComponent } from '@shared/components/button';
+import { EmptyStateComponent } from '@shared/components/empty-state';
 import { LoadingSpinnerComponent } from '@shared/components/loading-spinner';
 import { SelectComponent } from '@shared/components/select';
 import type { SelectOption } from '@shared/models/select';
@@ -17,6 +17,7 @@ import { PortfolioStore } from '../store/portfolio';
   selector: 'app-portfolio',
   imports: [
     ButtonComponent,
+    EmptyStateComponent,
     HugeiconsIconComponent,
     LoadingSpinnerComponent,
     LocalizedNumberPipe,
@@ -55,22 +56,16 @@ import { PortfolioStore } from '../store/portfolio';
           />
         </div>
       } @else if (store.error()) {
-        <div
-          class="flex flex-col items-center gap-4 rounded-card border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 p-10 text-center"
-        >
-          <p>{{ 'couldNotLoadData' | translate }}</p>
-        </div>
+        <app-empty-state
+          titleKey="couldNotLoadData"
+          actionLabelKey="refresh"
+          (actionClick)="store.reload()"
+        />
       } @else if (store.items().length === 0) {
-        <div
-          class="flex flex-col items-center gap-3 rounded-card border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 p-10 text-center"
-        >
-          <p class="text-lg font-medium text-slate-900 dark:text-slate-100">
-            {{ 'noPortfolioItems' | translate }}
-          </p>
-          <p class="text-sm text-slate-500 dark:text-slate-400">
-            {{ 'noPortfolioItemsMessage' | translate }}
-          </p>
-        </div>
+        <app-empty-state
+          titleKey="noPortfolioItems"
+          messageKey="noPortfolioItemsMessage"
+        />
       } @else {
         <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
           @for (item of store.items(); track item.id) {

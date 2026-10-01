@@ -8,6 +8,7 @@ import { FormField, submit } from '@angular/forms/signals';
 
 import { ButtonComponent } from '@shared/components/button';
 import { CardComponent } from '@shared/components/card';
+import { EmptyStateComponent } from '@shared/components/empty-state';
 import { InputComponent } from '@shared/components/input';
 import { LoadingSpinnerComponent } from '@shared/components/loading-spinner';
 import { SignalFormComponent } from '@shared/components/signal-form';
@@ -22,6 +23,7 @@ import { AdminSettingsStore } from '../store/settings';
   imports: [
     ButtonComponent,
     CardComponent,
+    EmptyStateComponent,
     FormField,
     InputComponent,
     LoadingSpinnerComponent,
@@ -50,6 +52,12 @@ import { AdminSettingsStore } from '../store/settings';
             cssClass="text-slate-400 dark:text-slate-500"
           />
         </div>
+      } @else if (store.error()) {
+        <app-empty-state
+          titleKey="couldNotLoadData"
+          actionLabelKey="refresh"
+          (actionClick)="store.reload()"
+        />
       } @else {
         <app-signal-form
           (formSubmit)="onSubmit()"

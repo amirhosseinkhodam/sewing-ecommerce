@@ -26,6 +26,7 @@ export class AdminMessageStore {
     () => this.#messagesQuery.data()?.totalPages ?? 0,
   );
   readonly loading = computed(() => this.#messagesQuery.isPending());
+  readonly error = computed(() => this.#messagesQuery.error()?.message ?? null);
 
   readonly #markReadMutation = injectMarkMessageReadMutation();
   readonly #removeMutation = injectRemoveMessageMutation();
@@ -45,5 +46,9 @@ export class AdminMessageStore {
 
   removeMessage(id: string): void {
     this.#removeMutation.mutate(id);
+  }
+
+  reload(): void {
+    void this.#messagesQuery.refetch();
   }
 }

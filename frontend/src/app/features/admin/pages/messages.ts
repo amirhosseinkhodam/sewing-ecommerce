@@ -1,11 +1,11 @@
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import type { ContactMessageModel } from '@domain/models/contact';
 import { HugeiconsIconComponent } from '@hugeicons/angular';
 import Delete01Icon from '@hugeicons/core-free-icons/Delete01Icon';
 import MailOpen01Icon from '@hugeicons/core-free-icons/MailOpen01Icon';
-
-import type { ContactMessageModel } from '@domain/models/contact';
 import { ButtonComponent } from '@shared/components/button';
 import { CardComponent } from '@shared/components/card';
+import { EmptyStateComponent } from '@shared/components/empty-state';
 import { LoadingSpinnerComponent } from '@shared/components/loading-spinner';
 import { SelectComponent } from '@shared/components/select';
 import type { SelectOption } from '@shared/models/select';
@@ -27,6 +27,7 @@ const READ_FILTERS = {
   imports: [
     ButtonComponent,
     CardComponent,
+    EmptyStateComponent,
     HugeiconsIconComponent,
     LoadingSpinnerComponent,
     LocalizedDatePipe,
@@ -66,14 +67,14 @@ const READ_FILTERS = {
             cssClass="text-slate-400 dark:text-slate-500"
           />
         </div>
+      } @else if (store.error()) {
+        <app-empty-state
+          titleKey="couldNotLoadData"
+          actionLabelKey="refresh"
+          (actionClick)="store.reload()"
+        />
       } @else if (store.messages().length === 0) {
-        <app-card variant="bordered">
-          <p
-            class="py-8 text-center text-sm text-slate-500 dark:text-slate-400"
-          >
-            {{ 'noMessages' | translate }}
-          </p>
-        </app-card>
+        <app-empty-state titleKey="noMessages" />
       } @else {
         <div class="flex flex-col gap-4">
           @for (message of store.messages(); track message.id) {

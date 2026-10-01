@@ -12,11 +12,16 @@ export class AdminSettingsStore {
   readonly #settingsQuery = injectShopSettingsQuery();
   readonly settings = computed(() => this.#settingsQuery.data() ?? null);
   readonly loading = computed(() => this.#settingsQuery.isPending());
+  readonly error = computed(() => this.#settingsQuery.error()?.message ?? null);
 
   readonly #updateMutation = injectUpdateSettingsMutation();
   readonly saving = computed(() => this.#updateMutation.isPending());
 
   save(payload: UpdateShopSettingsPayloadModel): void {
     this.#updateMutation.mutate(payload);
+  }
+
+  reload(): void {
+    void this.#settingsQuery.refetch();
   }
 }

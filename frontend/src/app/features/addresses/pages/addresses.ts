@@ -7,6 +7,7 @@ import {
 import type { AddressModel, AddressPayloadModel } from '@domain/models/address';
 import { ButtonComponent } from '@shared/components/button';
 import { CardComponent } from '@shared/components/card';
+import { EmptyStateComponent } from '@shared/components/empty-state';
 import { LoadingSpinnerComponent } from '@shared/components/loading-spinner';
 import { TranslatePipe } from '@shared/pipes/translate';
 import { ModalService } from '@shared/services/modal';
@@ -18,6 +19,7 @@ import { AddressesStore } from '../store/addresses';
   imports: [
     ButtonComponent,
     CardComponent,
+    EmptyStateComponent,
     LoadingSpinnerComponent,
     AddressFormComponent,
     TranslatePipe,
@@ -44,20 +46,19 @@ import { AddressesStore } from '../store/addresses';
             cssClass="text-slate-400 dark:text-slate-500"
           />
         </div>
+      } @else if (store.error()) {
+        <app-empty-state
+          titleKey="couldNotLoadData"
+          actionLabelKey="refresh"
+          (actionClick)="store.reload()"
+        />
       } @else if (store.addresses().length === 0 && !formOpen()) {
-        <div
-          class="flex flex-col items-center gap-4 rounded-card border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 p-10 text-center"
-        >
-          <p class="text-lg font-medium text-slate-900 dark:text-slate-100">
-            {{ 'noAddresses' | translate }}
-          </p>
-          <p class="text-sm text-slate-500 dark:text-slate-400">
-            {{ 'noAddressesMessage' | translate }}
-          </p>
-          <app-button variant="primary" (buttonClick)="onAdd()">
-            {{ 'addAddress' | translate }}
-          </app-button>
-        </div>
+        <app-empty-state
+          titleKey="noAddresses"
+          messageKey="noAddressesMessage"
+          actionLabelKey="addAddress"
+          (actionClick)="onAdd()"
+        />
       } @else {
         <div class="flex flex-col gap-6">
           @if (formOpen()) {

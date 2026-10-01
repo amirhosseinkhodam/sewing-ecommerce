@@ -22,6 +22,9 @@ export class AdminCustomerStore {
     () => this.#customersQuery.data()?.totalPages ?? 0,
   );
   readonly loading = computed(() => this.#customersQuery.isPending());
+  readonly error = computed(
+    () => this.#customersQuery.error()?.message ?? null,
+  );
 
   setPage(page: number): void {
     this.page.set(page);
@@ -35,5 +38,9 @@ export class AdminCustomerStore {
   setRole(role: UserRole | null): void {
     this.role.set(role);
     this.page.set(1);
+  }
+
+  reload(): void {
+    void this.#customersQuery.refetch();
   }
 }

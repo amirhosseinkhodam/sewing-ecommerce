@@ -1,13 +1,13 @@
-import { Component, inject, ChangeDetectionStrategy } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { Router } from '@angular/router';
+import type { CartItemModel } from '@domain/models/cart';
 import { HugeiconsIconComponent } from '@hugeicons/angular';
 import Add01Icon from '@hugeicons/core-free-icons/Add01Icon';
 import Image01Icon from '@hugeicons/core-free-icons/Image01Icon';
 import MinusSignIcon from '@hugeicons/core-free-icons/MinusSignIcon';
-
-import type { CartItemModel } from '@domain/models/cart';
 import { ButtonComponent } from '@shared/components/button';
 import { CardComponent } from '@shared/components/card';
+import { EmptyStateComponent } from '@shared/components/empty-state';
 import { LoadingSpinnerComponent } from '@shared/components/loading-spinner';
 import { LocalizedNumberPipe } from '@shared/pipes/localized-number';
 import { TranslatePipe } from '@shared/pipes/translate';
@@ -21,6 +21,7 @@ import { CartStore } from '../store/cart';
   imports: [
     ButtonComponent,
     CardComponent,
+    EmptyStateComponent,
     HugeiconsIconComponent,
     LoadingSpinnerComponent,
     LocalizedNumberPipe,
@@ -40,20 +41,19 @@ import { CartStore } from '../store/cart';
             cssClass="text-slate-400 dark:text-slate-500"
           />
         </div>
+      } @else if (store.error()) {
+        <app-empty-state
+          titleKey="couldNotLoadData"
+          actionLabelKey="refresh"
+          (actionClick)="store.reload()"
+        />
       } @else if (store.items().length === 0) {
-        <div
-          class="flex flex-col items-center gap-4 rounded-card border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 p-10 text-center"
-        >
-          <p class="text-lg font-medium text-slate-900 dark:text-slate-100">
-            {{ 'cartEmpty' | translate }}
-          </p>
-          <p class="text-sm text-slate-500 dark:text-slate-400">
-            {{ 'cartEmptyMessage' | translate }}
-          </p>
-          <app-button variant="primary" (buttonClick)="onStartShopping()">
-            {{ 'startShopping' | translate }}
-          </app-button>
-        </div>
+        <app-empty-state
+          titleKey="cartEmpty"
+          messageKey="cartEmptyMessage"
+          actionLabelKey="startShopping"
+          (actionClick)="onStartShopping()"
+        />
       } @else {
         <div class="grid grid-cols-1 gap-6 lg:grid-cols-3">
           <div class="lg:col-span-2 flex flex-col gap-4">

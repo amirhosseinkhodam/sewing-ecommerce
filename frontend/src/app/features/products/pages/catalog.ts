@@ -1,6 +1,7 @@
 import { Component, inject, ChangeDetectionStrategy } from '@angular/core';
 import { Router } from '@angular/router';
 import { ButtonComponent } from '@shared/components/button';
+import { EmptyStateComponent } from '@shared/components/empty-state';
 import { LoadingSpinnerComponent } from '@shared/components/loading-spinner';
 import { TranslatePipe } from '@shared/pipes/translate';
 import type { ProductModel } from '../models/product';
@@ -12,6 +13,7 @@ import { CatalogStore } from '../store/catalog';
   selector: 'app-catalog',
   imports: [
     ButtonComponent,
+    EmptyStateComponent,
     LoadingSpinnerComponent,
     ProductCardComponent,
     ProductFilterComponent,
@@ -42,24 +44,14 @@ import { CatalogStore } from '../store/catalog';
           />
         </div>
       } @else if (store.error()) {
-        <div
-          class="mt-10 flex flex-col items-center gap-4 rounded-card border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 p-10 text-center"
-        >
-          <p class="text-slate-500 dark:text-slate-400">
-            {{ 'couldNotLoadData' | translate }}
-          </p>
-          <app-button variant="primary" (buttonClick)="store.loadProducts()">
-            {{ 'refresh' | translate }}
-          </app-button>
-        </div>
+        <app-empty-state
+          titleKey="couldNotLoadData"
+          actionLabelKey="refresh"
+          cssClass="mt-10"
+          (actionClick)="store.loadProducts()"
+        />
       } @else if (store.products().length === 0) {
-        <div
-          class="mt-10 rounded-card border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 p-10 text-center"
-        >
-          <p class="text-slate-500 dark:text-slate-400">
-            {{ 'noProductsFound' | translate }}
-          </p>
-        </div>
+        <app-empty-state titleKey="noProductsFound" cssClass="mt-10" />
       } @else {
         <div class="mt-6 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
           @for (product of store.products(); track product.id) {

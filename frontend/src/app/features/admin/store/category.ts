@@ -11,6 +11,9 @@ export class AdminCategoryStore {
   readonly #categoriesQuery = injectAdminCategoriesQuery();
   readonly categories = computed(() => this.#categoriesQuery.data() ?? []);
   readonly loading = computed(() => this.#categoriesQuery.isPending());
+  readonly error = computed(
+    () => this.#categoriesQuery.error()?.message ?? null,
+  );
 
   readonly #saveMutation = injectSaveCategoryMutation();
   readonly #removeMutation = injectRemoveCategoryMutation();
@@ -22,5 +25,9 @@ export class AdminCategoryStore {
 
   removeCategory(id: string): void {
     this.#removeMutation.mutate(id);
+  }
+
+  reload(): void {
+    void this.#categoriesQuery.refetch();
   }
 }

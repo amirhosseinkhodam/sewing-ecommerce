@@ -1,24 +1,25 @@
 import {
+  ChangeDetectionStrategy,
   Component,
   inject,
   signal,
-  ChangeDetectionStrategy,
 } from '@angular/core';
 import { FormField, submit } from '@angular/forms/signals';
 import { HugeiconsIconComponent } from '@hugeicons/angular';
 import Delete01Icon from '@hugeicons/core-free-icons/Delete01Icon';
 import Edit01Icon from '@hugeicons/core-free-icons/Edit01Icon';
 import PlusSignIcon from '@hugeicons/core-free-icons/PlusSignIcon';
-
 import { ButtonComponent } from '@shared/components/button';
 import { CardComponent } from '@shared/components/card';
+import { EmptyStateComponent } from '@shared/components/empty-state';
+import { InputComponent } from '@shared/components/input';
+import { LoadingSpinnerComponent } from '@shared/components/loading-spinner';
 import { SignalFormComponent } from '@shared/components/signal-form';
 import { SignalFormFieldComponent } from '@shared/components/signal-form-field';
-import { InputComponent } from '@shared/components/input';
 import { TextareaComponent } from '@shared/components/textarea';
 import { ToggleComponent } from '@shared/components/toggle';
-import { ModalService } from '@shared/services/modal';
 import { TranslatePipe } from '@shared/pipes/translate';
+import { ModalService } from '@shared/services/modal';
 import type { CategoryModel } from '../../products/models/product';
 import { CategoryFormService } from '../forms/category';
 import { AdminCategoryStore } from '../store/category';
@@ -30,6 +31,8 @@ import { AdminCategoryStore } from '../store/category';
     HugeiconsIconComponent,
     ButtonComponent,
     CardComponent,
+    EmptyStateComponent,
+    LoadingSpinnerComponent,
     SignalFormComponent,
     SignalFormFieldComponent,
     InputComponent,
@@ -130,106 +133,121 @@ import { AdminCategoryStore } from '../store/category';
         </app-card>
       }
 
-      <app-card variant="bordered" padding="none">
-        <div class="overflow-x-auto">
-          <table class="w-full text-sm">
-            <thead>
-              <tr
-                class="border-b border-slate-200 dark:border-slate-700 text-start text-slate-500 dark:text-slate-400"
-              >
-                <th class="px-4 py-3 text-start font-medium">
-                  {{ 'categoryName' | translate }}
-                </th>
-                <th class="px-4 py-3 text-start font-medium">
-                  {{ 'slug' | translate }}
-                </th>
-                <th class="px-4 py-3 text-start font-medium">
-                  {{ 'sortOrder' | translate }}
-                </th>
-                <th class="px-4 py-3 text-start font-medium">
-                  {{ 'isActive' | translate }}
-                </th>
-                <th class="px-4 py-3 text-end font-medium">
-                  {{ 'actions' | translate }}
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              @for (category of store.categories(); track category.id) {
-                <tr
-                  class="border-b border-slate-100 dark:border-slate-800 last:border-0"
-                >
-                  <td
-                    class="px-4 py-3 font-medium text-slate-900 dark:text-slate-100"
-                  >
-                    {{ category.name }}
-                  </td>
-                  <td class="px-4 py-3 text-slate-500 dark:text-slate-400">
-                    {{ category.slug }}
-                  </td>
-                  <td class="px-4 py-3 text-slate-500 dark:text-slate-400">
-                    {{ category.sortOrder }}
-                  </td>
-                  <td class="px-4 py-3">
-                    <span
-                      class="rounded-full px-2 py-0.5 text-xs font-medium"
-                      [class]="
-                        category.isActive
-                          ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400'
-                          : 'bg-slate-100 dark:bg-slate-700 text-slate-500 dark:text-slate-400'
-                      "
-                    >
-                      {{
-                        category.isActive
-                          ? ('yes' | translate)
-                          : ('no' | translate)
-                      }}
-                    </span>
-                  </td>
-                  <td class="px-4 py-3">
-                    <div class="flex justify-end gap-2">
-                      <app-button
-                        variant="ghost"
-                        ariaLabel="Edit"
-                        (buttonClick)="onEdit(category)"
-                      >
-                        <hugeicons-icon
-                          [icon]="icons.Edit01Icon"
-                          [size]="18"
-                          color="currentColor"
-                          [strokeWidth]="1.5"
-                        />
-                      </app-button>
-                      <app-button
-                        variant="ghost"
-                        ariaLabel="Delete"
-                        cssClass="!text-red-600 dark:!text-red-400"
-                        (buttonClick)="onDelete(category)"
-                      >
-                        <hugeicons-icon
-                          [icon]="icons.Delete01Icon"
-                          [size]="18"
-                          color="currentColor"
-                          [strokeWidth]="1.5"
-                        />
-                      </app-button>
-                    </div>
-                  </td>
-                </tr>
-              } @empty {
-                <tr>
-                  <td
-                    colspan="5"
-                    class="px-4 py-10 text-center text-slate-500 dark:text-slate-400"
-                  >
-                    {{ 'noData' | translate }}
-                  </td>
-                </tr>
-              }
-            </tbody>
-          </table>
+      @if (store.loading()) {
+        <div class="flex justify-center py-16">
+          <app-loading-spinner
+            size="lg"
+            cssClass="text-slate-400 dark:text-slate-500"
+          />
         </div>
-      </app-card>
+      } @else if (store.error()) {
+        <app-empty-state
+          titleKey="couldNotLoadData"
+          actionLabelKey="refresh"
+          (actionClick)="store.reload()"
+        />
+      } @else {
+        <app-card variant="bordered" padding="none">
+          <div class="overflow-x-auto">
+            <table class="w-full text-sm">
+              <thead>
+                <tr
+                  class="border-b border-slate-200 dark:border-slate-700 text-start text-slate-500 dark:text-slate-400"
+                >
+                  <th class="px-4 py-3 text-start font-medium">
+                    {{ 'categoryName' | translate }}
+                  </th>
+                  <th class="px-4 py-3 text-start font-medium">
+                    {{ 'slug' | translate }}
+                  </th>
+                  <th class="px-4 py-3 text-start font-medium">
+                    {{ 'sortOrder' | translate }}
+                  </th>
+                  <th class="px-4 py-3 text-start font-medium">
+                    {{ 'isActive' | translate }}
+                  </th>
+                  <th class="px-4 py-3 text-end font-medium">
+                    {{ 'actions' | translate }}
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (category of store.categories(); track category.id) {
+                  <tr
+                    class="border-b border-slate-100 dark:border-slate-800 last:border-0"
+                  >
+                    <td
+                      class="px-4 py-3 font-medium text-slate-900 dark:text-slate-100"
+                    >
+                      {{ category.name }}
+                    </td>
+                    <td class="px-4 py-3 text-slate-500 dark:text-slate-400">
+                      {{ category.slug }}
+                    </td>
+                    <td class="px-4 py-3 text-slate-500 dark:text-slate-400">
+                      {{ category.sortOrder }}
+                    </td>
+                    <td class="px-4 py-3">
+                      <span
+                        class="rounded-full px-2 py-0.5 text-xs font-medium"
+                        [class]="
+                          category.isActive
+                            ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400'
+                            : 'bg-slate-100 dark:bg-slate-700 text-slate-500 dark:text-slate-400'
+                        "
+                      >
+                        {{
+                          category.isActive
+                            ? ('yes' | translate)
+                            : ('no' | translate)
+                        }}
+                      </span>
+                    </td>
+                    <td class="px-4 py-3">
+                      <div class="flex justify-end gap-2">
+                        <app-button
+                          variant="ghost"
+                          ariaLabel="Edit"
+                          (buttonClick)="onEdit(category)"
+                        >
+                          <hugeicons-icon
+                            [icon]="icons.Edit01Icon"
+                            [size]="18"
+                            color="currentColor"
+                            [strokeWidth]="1.5"
+                          />
+                        </app-button>
+                        <app-button
+                          variant="ghost"
+                          ariaLabel="Delete"
+                          cssClass="!text-red-600 dark:!text-red-400"
+                          (buttonClick)="onDelete(category)"
+                        >
+                          <hugeicons-icon
+                            [icon]="icons.Delete01Icon"
+                            [size]="18"
+                            color="currentColor"
+                            [strokeWidth]="1.5"
+                          />
+                        </app-button>
+                      </div>
+                    </td>
+                  </tr>
+                } @empty {
+                  <tr>
+                    <td
+                      colspan="5"
+                      class="px-4 py-10 text-center text-slate-500 dark:text-slate-400"
+                    >
+                      {{ 'noData' | translate }}
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        </app-card>
+      }
     </div>
   `,
 })

@@ -8,6 +8,7 @@ import {
 import type { AdminOrderModel } from '@domain/models/order';
 import { ButtonComponent } from '@shared/components/button';
 import { CardComponent } from '@shared/components/card';
+import { EmptyStateComponent } from '@shared/components/empty-state';
 import { InputComponent } from '@shared/components/input';
 import { LoadingSpinnerComponent } from '@shared/components/loading-spinner';
 import { SelectComponent } from '@shared/components/select';
@@ -28,6 +29,7 @@ import { AdminOrderStore } from '../store/order';
   imports: [
     ButtonComponent,
     CardComponent,
+    EmptyStateComponent,
     InputComponent,
     LoadingSpinnerComponent,
     LocalizedDatePipe,
@@ -70,6 +72,12 @@ import { AdminOrderStore } from '../store/order';
             cssClass="text-slate-400 dark:text-slate-500"
           />
         </div>
+      } @else if (store.error()) {
+        <app-empty-state
+          titleKey="couldNotLoadData"
+          actionLabelKey="refresh"
+          (actionClick)="store.reload()"
+        />
       } @else {
         <app-card variant="bordered" padding="none">
           <div class="overflow-x-auto">

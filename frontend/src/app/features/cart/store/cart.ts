@@ -31,6 +31,7 @@ export class CartStore {
   readonly loading = computed(
     () => this.#auth.isLoggedIn() && this.#cartQuery.isPending(),
   );
+  readonly error = computed(() => this.#cartQuery.error()?.message ?? null);
 
   readonly #addMutation = injectAddCartItemMutation();
   readonly #updateMutation = injectUpdateCartItemMutation();
@@ -56,6 +57,10 @@ export class CartStore {
 
   removeItem(itemId: string): void {
     this.#removeMutation.mutate(itemId);
+  }
+
+  reload(): void {
+    void this.#cartQuery.refetch();
   }
 
   /** Clears the cached cart after checkout, without a server round trip. */

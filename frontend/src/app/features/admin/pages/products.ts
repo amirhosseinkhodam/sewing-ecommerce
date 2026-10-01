@@ -1,13 +1,13 @@
-import { Component, inject, ChangeDetectionStrategy } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { HugeiconsIconComponent } from '@hugeicons/angular';
 import Delete01Icon from '@hugeicons/core-free-icons/Delete01Icon';
 import Edit01Icon from '@hugeicons/core-free-icons/Edit01Icon';
 import Image01Icon from '@hugeicons/core-free-icons/Image01Icon';
 import PlusSignIcon from '@hugeicons/core-free-icons/PlusSignIcon';
-
 import { ButtonComponent } from '@shared/components/button';
 import { CardComponent } from '@shared/components/card';
+import { EmptyStateComponent } from '@shared/components/empty-state';
 import { InputComponent } from '@shared/components/input';
 import { LoadingSpinnerComponent } from '@shared/components/loading-spinner';
 import { LocalizedNumberPipe } from '@shared/pipes/localized-number';
@@ -22,6 +22,7 @@ import { AdminProductStore } from '../store/product';
     HugeiconsIconComponent,
     ButtonComponent,
     CardComponent,
+    EmptyStateComponent,
     InputComponent,
     LoadingSpinnerComponent,
     LocalizedNumberPipe,
@@ -60,6 +61,12 @@ import { AdminProductStore } from '../store/product';
             cssClass="text-slate-400 dark:text-slate-500"
           />
         </div>
+      } @else if (store.error()) {
+        <app-empty-state
+          titleKey="couldNotLoadData"
+          actionLabelKey="refresh"
+          (actionClick)="store.reload()"
+        />
       } @else {
         <app-card variant="bordered" padding="none">
           <div class="overflow-x-auto">

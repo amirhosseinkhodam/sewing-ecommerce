@@ -11,6 +11,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ButtonComponent } from '@shared/components/button';
 import { CardComponent } from '@shared/components/card';
+import { EmptyStateComponent } from '@shared/components/empty-state';
 import { ImageGalleryComponent } from '@shared/components/image-gallery';
 import { LoadingSpinnerComponent } from '@shared/components/loading-spinner';
 import { LocalizedNumberPipe } from '@shared/pipes/localized-number';
@@ -28,6 +29,7 @@ import { ProductDetailStore } from '../store/product-detail';
   imports: [
     ButtonComponent,
     CardComponent,
+    EmptyStateComponent,
     ImageGalleryComponent,
     LoadingSpinnerComponent,
     SizeSelectorComponent,
@@ -50,16 +52,11 @@ import { ProductDetailStore } from '../store/product-detail';
           />
         </div>
       } @else if (store.error()) {
-        <div
-          class="flex flex-col items-center gap-4 rounded-card border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 p-10 text-center"
-        >
-          <p class="text-slate-500 dark:text-slate-400">
-            {{ 'couldNotLoadData' | translate }}
-          </p>
-          <app-button variant="primary" (buttonClick)="onBack()">
-            {{ 'backToProducts' | translate }}
-          </app-button>
-        </div>
+        <app-empty-state
+          titleKey="couldNotLoadData"
+          actionLabelKey="backToProducts"
+          (actionClick)="onBack()"
+        />
       } @else {
         @if (store.product(); as product) {
           <div class="grid grid-cols-1 gap-8 lg:grid-cols-2">

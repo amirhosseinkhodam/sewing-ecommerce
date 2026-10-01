@@ -15,6 +15,7 @@ export class AdminDashboardStore {
   }));
   readonly stats = computed(() => this.#statsQuery.data() ?? null);
   readonly loading = computed(() => this.#statsQuery.isPending());
+  readonly error = computed(() => this.#statsQuery.error()?.message ?? null);
 
   /**
    * "Recent orders" is the first page of the admin order list, so it reuses
@@ -31,5 +32,9 @@ export class AdminDashboardStore {
 
   setDays(days: number): void {
     this.days.set(days);
+  }
+
+  reload(): void {
+    void this.#statsQuery.refetch();
   }
 }

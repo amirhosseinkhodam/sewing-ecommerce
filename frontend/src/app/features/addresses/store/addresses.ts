@@ -12,6 +12,9 @@ export class AddressesStore {
   readonly #addressesQuery = injectAddressesQuery();
   readonly addresses = computed(() => this.#addressesQuery.data() ?? []);
   readonly loading = computed(() => this.#addressesQuery.isPending());
+  readonly error = computed(
+    () => this.#addressesQuery.error()?.message ?? null,
+  );
 
   readonly #saveMutation = injectSaveAddressMutation();
   readonly #removeMutation = injectRemoveAddressMutation();
@@ -27,5 +30,9 @@ export class AddressesStore {
 
   setDefault(id: string): void {
     this.#defaultMutation.mutate(id);
+  }
+
+  reload(): void {
+    void this.#addressesQuery.refetch();
   }
 }
