@@ -3,11 +3,12 @@ import { HugeiconsIconComponent } from '@hugeicons/angular';
 import Moon02Icon from '@hugeicons/core-free-icons/Moon02Icon';
 import Sun01Icon from '@hugeicons/core-free-icons/Sun01Icon';
 
+import { TranslatePipe } from '../pipes/translate';
 import { ThemeService } from '../services/theme';
 
 @Component({
   selector: 'app-theme-toggle',
-  imports: [HugeiconsIconComponent],
+  imports: [HugeiconsIconComponent, TranslatePipe],
   changeDetection: ChangeDetectionStrategy.Eager,
   template: `
     <button
@@ -16,7 +17,7 @@ import { ThemeService } from '../services/theme';
       [class.dark]="theme.isDark()"
       role="switch"
       [attr.aria-checked]="theme.isDark()"
-      aria-label="Toggle dark mode"
+      [attr.aria-label]="'toggleDarkMode' | translate"
     >
       <span
         class="relative flex items-center w-16 h-9 rounded-full bg-gradient-to-br from-sky-300 to-sky-400 dark:from-slate-800 dark:to-slate-700 transition-colors duration-300 ease-in-out overflow-hidden"

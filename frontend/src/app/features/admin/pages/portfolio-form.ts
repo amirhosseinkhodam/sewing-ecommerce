@@ -163,6 +163,7 @@ import { PortfolioFormStore } from '../store/portfolio-form';
                   <img
                     loading="lazy"
                     [src]="image"
+                    [alt]="'image' | translate"
                     class="h-full w-full object-cover"
                   />
                   <button

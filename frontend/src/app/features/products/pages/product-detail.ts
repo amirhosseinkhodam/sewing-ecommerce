@@ -41,7 +41,10 @@ import { ProductDetailStore } from '../store/product-detail';
   template: `
     <div class="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
       <app-button variant="ghost" cssClass="mb-6" (buttonClick)="onBack()">
-        &larr; {{ 'backToProducts' | translate }}
+        <span class="inline-block rtl:rotate-180" aria-hidden="true"
+          >&larr;</span
+        >
+        {{ 'backToProducts' | translate }}
       </app-button>
 
       @if (store.loading()) {
