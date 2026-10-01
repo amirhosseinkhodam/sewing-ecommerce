@@ -515,11 +515,14 @@ Only admin can change status. (Phase 8: SMS sent to customer on each transition.
 - [x] ~~Admin: MessagesPage~~ — delivered in Phase 5
 
 ### Phase 7 — Polish + Launch (3 days)
-- [ ] SEO meta tags for all pages (Title, Description, OG tags)
+- [x] SEO meta tags for all pages (Title, Description, OG tags) — `SeoService` (Title + Meta) driven by route `data`, admin routes carry `noindex`, `index.html` has static fallback tags
 - [ ] Complete i18n pass (all Persian text verified)
-- [ ] Loading skeletons for all data-fetching pages
+- [x] Loading skeletons for all data-fetching pages — shared `app-skeleton`/`app-skeleton-table`/`app-skeleton-grid` primitives replace the bouncing-dot spinner across catalog/portfolio grids, all 5 admin tables, 4 detail pages, the dashboard, 3 admin forms, and cart/order-history/addresses/messages/checkout row lists
 - [ ] Error boundaries: API failure -> inline error + retry button, 404 page, 500 page
-- [ ] Empty states: no products, no orders, no messages, empty cart
+  - [x] Inline error + retry button on every store that reads server state (cart, addresses, and six admin stores gained `error`/`reload()`)
+  - [x] 404 page (`features/errors/pages/not-found.ts`, wired as the wildcard route)
+  - [ ] 500 page
+- [x] Empty states: no products, no orders, no messages, empty cart — shared `EmptyStateComponent` used across list/error states
 - [ ] Responsive audit (mobile/tablet/desktop)
 - [ ] Image lazy loading, code splitting
 - [ ] Build + deploy
