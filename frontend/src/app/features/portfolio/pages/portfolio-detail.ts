@@ -8,7 +8,7 @@ import {
 import { Router } from '@angular/router';
 import { ButtonComponent } from '@shared/components/button';
 import { ImageGalleryComponent } from '@shared/components/image-gallery';
-import { LoadingSpinnerComponent } from '@shared/components/loading-spinner';
+import { SkeletonComponent } from '@shared/components/skeleton';
 import { LocalizedDatePipe } from '@shared/pipes/localized-date';
 import { TranslatePipe } from '@shared/pipes/translate';
 import { PortfolioStore } from '../store/portfolio';
@@ -18,7 +18,7 @@ import { PortfolioStore } from '../store/portfolio';
   imports: [
     ButtonComponent,
     ImageGalleryComponent,
-    LoadingSpinnerComponent,
+    SkeletonComponent,
     LocalizedDatePipe,
     TranslatePipe,
   ],
@@ -27,11 +27,19 @@ import { PortfolioStore } from '../store/portfolio';
   template: `
     <div class="mx-auto max-w-5xl px-4 py-8 sm:px-6 lg:px-8">
       @if (store.loading() && !store.item()) {
-        <div class="flex justify-center py-20">
-          <app-loading-spinner
-            size="lg"
-            cssClass="text-slate-400 dark:text-slate-500"
-          />
+        <div
+          class="grid grid-cols-1 gap-8 lg:grid-cols-2"
+          role="status"
+          aria-live="polite"
+        >
+          <span class="sr-only">{{ 'loading' | translate }}</span>
+          <app-skeleton cssClass="aspect-square w-full rounded-card" />
+          <div class="flex flex-col gap-3">
+            <app-skeleton cssClass="h-8 w-3/4" />
+            <app-skeleton cssClass="h-4 w-32" />
+            <app-skeleton cssClass="h-3 w-24" />
+            <app-skeleton cssClass="mt-4 h-24 w-full" />
+          </div>
         </div>
       } @else if (store.item(); as item) {
         <div class="grid grid-cols-1 gap-8 lg:grid-cols-2">

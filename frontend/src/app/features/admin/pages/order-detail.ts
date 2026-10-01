@@ -15,8 +15,8 @@ import type { OrderStatus } from '@domain/const/order-statuses';
 import { ButtonComponent } from '@shared/components/button';
 import { CardComponent } from '@shared/components/card';
 import { InputComponent } from '@shared/components/input';
-import { LoadingSpinnerComponent } from '@shared/components/loading-spinner';
 import { SelectComponent } from '@shared/components/select';
+import { SkeletonComponent } from '@shared/components/skeleton';
 import type { SelectOption } from '@shared/models/select';
 import { LocalizedDatePipe } from '@shared/pipes/localized-date';
 import { LocalizedNumberPipe } from '@shared/pipes/localized-number';
@@ -49,11 +49,11 @@ const NEXT_STATUSES: Readonly<Record<OrderStatus, readonly OrderStatus[]>> = {
     CardComponent,
     HugeiconsIconComponent,
     InputComponent,
-    LoadingSpinnerComponent,
     LocalizedDatePipe,
     LocalizedNumberPipe,
     OrderStatusBadgeComponent,
     SelectComponent,
+    SkeletonComponent,
     TranslatePipe,
   ],
   providers: [AdminOrderStore],
@@ -61,11 +61,28 @@ const NEXT_STATUSES: Readonly<Record<OrderStatus, readonly OrderStatus[]>> = {
   template: `
     <div class="flex flex-col gap-6">
       @if (store.loading() && !store.order()) {
-        <div class="flex justify-center py-16">
-          <app-loading-spinner
-            size="lg"
-            cssClass="text-slate-400 dark:text-slate-500"
-          />
+        <div role="status" aria-live="polite">
+          <span class="sr-only">{{ 'loading' | translate }}</span>
+          <div class="flex flex-wrap items-start justify-between gap-4">
+            <div class="flex flex-col gap-2">
+              <app-skeleton cssClass="h-7 w-40" />
+              <app-skeleton cssClass="h-4 w-28" />
+            </div>
+            <app-skeleton cssClass="h-6 w-24" />
+          </div>
+          <app-card variant="bordered" cssClass="mt-6">
+            <div class="flex flex-col gap-4">
+              @for (row of [1, 2, 3]; track row) {
+                <div class="flex items-center gap-4">
+                  <app-skeleton cssClass="h-16 w-16 rounded-lg shrink-0" />
+                  <div class="flex flex-1 flex-col gap-2">
+                    <app-skeleton cssClass="h-4 w-1/2" />
+                    <app-skeleton cssClass="h-3 w-1/3" />
+                  </div>
+                </div>
+              }
+            </div>
+          </app-card>
         </div>
       } @else if (store.order(); as order) {
         <div class="flex flex-wrap items-start justify-between gap-4">

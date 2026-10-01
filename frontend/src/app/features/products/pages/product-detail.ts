@@ -13,7 +13,7 @@ import { ButtonComponent } from '@shared/components/button';
 import { CardComponent } from '@shared/components/card';
 import { EmptyStateComponent } from '@shared/components/empty-state';
 import { ImageGalleryComponent } from '@shared/components/image-gallery';
-import { LoadingSpinnerComponent } from '@shared/components/loading-spinner';
+import { SkeletonComponent } from '@shared/components/skeleton';
 import { LocalizedNumberPipe } from '@shared/pipes/localized-number';
 import { TranslatePipe } from '@shared/pipes/translate';
 import { NotificationService } from '@shared/services/notification';
@@ -31,8 +31,8 @@ import { ProductDetailStore } from '../store/product-detail';
     CardComponent,
     EmptyStateComponent,
     ImageGalleryComponent,
-    LoadingSpinnerComponent,
     SizeSelectorComponent,
+    SkeletonComponent,
     LocalizedNumberPipe,
     TranslatePipe,
   ],
@@ -45,11 +45,29 @@ import { ProductDetailStore } from '../store/product-detail';
       </app-button>
 
       @if (store.loading()) {
-        <div class="flex justify-center py-20">
-          <app-loading-spinner
-            size="lg"
-            cssClass="text-slate-400 dark:text-slate-500"
-          />
+        <div
+          class="grid grid-cols-1 gap-8 lg:grid-cols-2"
+          role="status"
+          aria-live="polite"
+        >
+          <span class="sr-only">{{ 'loading' | translate }}</span>
+          <app-skeleton cssClass="aspect-square w-full rounded-card" />
+          <div class="flex flex-col gap-6">
+            <div class="flex flex-col gap-2">
+              <app-skeleton cssClass="h-4 w-24" />
+              <app-skeleton cssClass="h-8 w-3/4" />
+            </div>
+            <app-skeleton cssClass="h-8 w-40" />
+            <div class="flex flex-col gap-2">
+              <app-skeleton cssClass="h-4 w-16" />
+              <app-skeleton cssClass="h-5 w-32" />
+            </div>
+            <div class="flex flex-col gap-2">
+              <app-skeleton cssClass="h-4 w-16" />
+              <app-skeleton cssClass="h-10 w-full" />
+            </div>
+            <app-skeleton cssClass="h-12 w-full rounded-control" />
+          </div>
         </div>
       } @else if (store.error()) {
         <app-empty-state

@@ -13,7 +13,7 @@ import Image01Icon from '@hugeicons/core-free-icons/Image01Icon';
 
 import { ButtonComponent } from '@shared/components/button';
 import { CardComponent } from '@shared/components/card';
-import { LoadingSpinnerComponent } from '@shared/components/loading-spinner';
+import { SkeletonComponent } from '@shared/components/skeleton';
 import { LocalizedDatePipe } from '@shared/pipes/localized-date';
 import { LocalizedNumberPipe } from '@shared/pipes/localized-number';
 import { TranslatePipe } from '@shared/pipes/translate';
@@ -31,7 +31,7 @@ import { OrderStore } from '../store/order';
     ButtonComponent,
     CardComponent,
     HugeiconsIconComponent,
-    LoadingSpinnerComponent,
+    SkeletonComponent,
     LocalizedDatePipe,
     LocalizedNumberPipe,
     OrderStatusBadgeComponent,
@@ -42,11 +42,33 @@ import { OrderStore } from '../store/order';
   template: `
     <div class="mx-auto max-w-4xl px-4 py-8 sm:px-6 lg:px-8">
       @if (store.loading() && !store.order()) {
-        <div class="flex justify-center py-20">
-          <app-loading-spinner
-            size="lg"
-            cssClass="text-slate-400 dark:text-slate-500"
-          />
+        <div class="flex flex-col gap-6" role="status" aria-live="polite">
+          <span class="sr-only">{{ 'loading' | translate }}</span>
+          <div class="flex flex-wrap items-start justify-between gap-4">
+            <div class="flex flex-col gap-2">
+              <app-skeleton cssClass="h-7 w-40" />
+              <app-skeleton cssClass="h-4 w-28" />
+            </div>
+            <app-skeleton cssClass="h-6 w-24" />
+          </div>
+          <app-card variant="bordered">
+            <div class="flex flex-col gap-4">
+              @for (row of [1, 2, 3]; track row) {
+                <div class="flex items-center gap-4">
+                  <app-skeleton cssClass="h-16 w-16 rounded-lg shrink-0" />
+                  <div class="flex flex-1 flex-col gap-2">
+                    <app-skeleton cssClass="h-4 w-1/2" />
+                    <app-skeleton cssClass="h-3 w-1/3" />
+                  </div>
+                </div>
+              }
+            </div>
+          </app-card>
+          <app-card variant="bordered">
+            <app-skeleton cssClass="h-4 w-1/3" />
+            <app-skeleton cssClass="mt-3 h-4 w-2/3" />
+            <app-skeleton cssClass="mt-2 h-4 w-1/2" />
+          </app-card>
         </div>
       } @else if (store.order(); as order) {
         <div class="flex flex-wrap items-start justify-between gap-4 mb-6">
