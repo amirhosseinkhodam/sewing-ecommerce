@@ -11,8 +11,9 @@ import UserGroupIcon from '@hugeicons/core-free-icons/UserGroupIcon';
 import { ButtonComponent } from '@shared/components/button';
 import { CardComponent } from '@shared/components/card';
 import { EmptyStateComponent } from '@shared/components/empty-state';
-import { LoadingSpinnerComponent } from '@shared/components/loading-spinner';
 import { SelectComponent } from '@shared/components/select';
+import { SkeletonComponent } from '@shared/components/skeleton';
+import { SkeletonTableComponent } from '@shared/components/skeleton-table';
 import type { SelectOption } from '@shared/models/select';
 import { LocalizedDatePipe } from '@shared/pipes/localized-date';
 import { LocalizedNumberPipe } from '@shared/pipes/localized-number';
@@ -35,11 +36,12 @@ const RANGE_DAYS = [7, 30, 90] as const;
     ButtonComponent,
     CardComponent,
     EmptyStateComponent,
-    LoadingSpinnerComponent,
     LocalizedDatePipe,
     LocalizedNumberPipe,
     OrderStatusBadgeComponent,
     SelectComponent,
+    SkeletonComponent,
+    SkeletonTableComponent,
     StatCardComponent,
     TranslatePipe,
     TrendChartComponent,
@@ -63,11 +65,54 @@ const RANGE_DAYS = [7, 30, 90] as const;
       </div>
 
       @if (store.loading()) {
-        <div class="flex justify-center py-20">
-          <app-loading-spinner
-            size="lg"
-            cssClass="text-slate-400 dark:text-slate-500"
-          />
+        <div role="status" aria-live="polite" class="flex flex-col gap-6">
+          <span class="sr-only">{{ 'loading' | translate }}</span>
+          <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            @for (tile of [1, 2, 3, 4]; track tile) {
+              <app-card variant="bordered">
+                <div class="flex items-start justify-between gap-3">
+                  <div class="flex flex-col gap-2">
+                    <app-skeleton cssClass="h-3 w-20" />
+                    <app-skeleton cssClass="h-7 w-16" />
+                  </div>
+                  <app-skeleton cssClass="h-9 w-9 rounded-lg shrink-0" />
+                </div>
+              </app-card>
+            }
+          </div>
+          <div class="grid grid-cols-1 gap-4 sm:grid-cols-3">
+            @for (tile of [1, 2, 3]; track tile) {
+              <app-card variant="bordered">
+                <div class="flex items-start justify-between gap-3">
+                  <div class="flex flex-col gap-2">
+                    <app-skeleton cssClass="h-3 w-20" />
+                    <app-skeleton cssClass="h-7 w-16" />
+                  </div>
+                  <app-skeleton cssClass="h-9 w-9 rounded-lg shrink-0" />
+                </div>
+              </app-card>
+            }
+          </div>
+          <app-card variant="bordered">
+            <app-skeleton cssClass="mb-4 h-5 w-32" />
+            <app-skeleton cssClass="h-48 w-full" />
+          </app-card>
+          <div class="grid grid-cols-1 gap-4 lg:grid-cols-2">
+            @for (col of [1, 2]; track col) {
+              <app-card variant="bordered">
+                <app-skeleton cssClass="mb-4 h-5 w-32" />
+                <div class="flex flex-col gap-3">
+                  @for (row of [1, 2, 3, 4]; track row) {
+                    <div class="flex items-center justify-between gap-3">
+                      <app-skeleton cssClass="h-5 w-20 rounded-full" />
+                      <app-skeleton cssClass="h-4 w-6" />
+                    </div>
+                  }
+                </div>
+              </app-card>
+            }
+          </div>
+          <app-skeleton-table [columns]="5" [rows]="5" [showHeader]="false" />
         </div>
       } @else if (store.error()) {
         <app-empty-state
