@@ -12,7 +12,10 @@ import {
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
 import {
   provideRouter,
+  RedirectCommand,
+  Router,
   withComponentInputBinding,
+  withNavigationErrorHandler,
   withViewTransitions,
 } from '@angular/router';
 import { AppComponent } from './app/app';
@@ -24,7 +27,19 @@ import { LanguageService } from './app/shared/services/language';
 bootstrapApplication(AppComponent, {
   providers: [
     provideBrowserGlobalErrorListeners(),
-    provideRouter(routes, withComponentInputBinding(), withViewTransitions()),
+    provideRouter(
+      routes,
+      withComponentInputBinding(),
+      withViewTransitions(),
+      // A failed navigation (chunk load, throwing guard/resolver) lands on the
+      // 500 page while the address bar keeps the URL the user asked for.
+      withNavigationErrorHandler(
+        () =>
+          new RedirectCommand(inject(Router).parseUrl('/error'), {
+            skipLocationChange: true,
+          }),
+      ),
+    ),
     provideHttpClient(withInterceptors([authInterceptor])),
     provideTanStackQuery(
       new QueryClient({

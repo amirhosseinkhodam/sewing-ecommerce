@@ -272,6 +272,8 @@
   "pageNotFound": "Page not found",
   "pageNotFoundMessage": "The page you are looking for does not exist or has been moved.",
   "goHome": "Go to homepage",
+  "serverError": "Something went wrong",
+  "serverErrorMessage": "We couldn't load this page. Please try again in a moment.",
   "seo": {
     "home": "Custom-made clothing and tailoring, made to order.",
     "products": "Browse our catalog of custom sewn garments and fabrics.",
@@ -289,7 +291,8 @@
     "orderDetail": "Order details, items, and payment status.",
     "profile": "View and edit your account details.",
     "admin": "Shop administration.",
-    "notFound": "The page you are looking for does not exist."
+    "notFound": "The page you are looking for does not exist.",
+    "serverError": "An unexpected error occurred."
   },
   "validation": {
     "required": "This field is required",

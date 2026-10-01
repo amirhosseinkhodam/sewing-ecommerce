@@ -1,5 +1,6 @@
 import { Routes } from '@angular/router';
 import { adminGuard, authGuard } from './core/guards/auth';
+import { ServerErrorComponent } from './features/errors/pages/server-error';
 
 // Each route's `data` carries `titleKey`/`descriptionKey`/`noindex` (see
 // `PageSeoModel` in shared/services/seo.ts), read by `AppComponent`'s
@@ -239,6 +240,17 @@ export const routes: Routes = [
           ),
       },
     ],
+  },
+  {
+    path: 'error',
+    data: {
+      titleKey: 'serverError',
+      descriptionKey: 'seo.serverError',
+      noindex: true,
+    },
+    // Eager, not lazy: this page is the fallback when a lazy chunk fails to
+    // load, so it can't depend on fetching a chunk itself.
+    component: ServerErrorComponent,
   },
   {
     path: '**',
