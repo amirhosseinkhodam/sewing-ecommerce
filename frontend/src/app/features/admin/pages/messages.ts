@@ -6,8 +6,8 @@ import MailOpen01Icon from '@hugeicons/core-free-icons/MailOpen01Icon';
 import { ButtonComponent } from '@shared/components/button';
 import { CardComponent } from '@shared/components/card';
 import { EmptyStateComponent } from '@shared/components/empty-state';
-import { LoadingSpinnerComponent } from '@shared/components/loading-spinner';
 import { SelectComponent } from '@shared/components/select';
+import { SkeletonComponent } from '@shared/components/skeleton';
 import type { SelectOption } from '@shared/models/select';
 import { LocalizedDatePipe } from '@shared/pipes/localized-date';
 import { LocalizedNumberPipe } from '@shared/pipes/localized-number';
@@ -29,10 +29,10 @@ const READ_FILTERS = {
     CardComponent,
     EmptyStateComponent,
     HugeiconsIconComponent,
-    LoadingSpinnerComponent,
     LocalizedDatePipe,
     LocalizedNumberPipe,
     SelectComponent,
+    SkeletonComponent,
     TranslatePipe,
   ],
   providers: [AdminMessageStore],
@@ -61,11 +61,25 @@ const READ_FILTERS = {
       </div>
 
       @if (store.loading()) {
-        <div class="flex justify-center py-16">
-          <app-loading-spinner
-            size="lg"
-            cssClass="text-slate-400 dark:text-slate-500"
-          />
+        <div class="flex flex-col gap-4" role="status" aria-live="polite">
+          <span class="sr-only">{{ 'loading' | translate }}</span>
+          @for (row of [1, 2, 3, 4]; track row) {
+            <app-card variant="bordered">
+              <div class="flex flex-wrap items-start justify-between gap-3">
+                <div class="flex flex-col gap-2">
+                  <app-skeleton cssClass="h-4 w-32" />
+                  <app-skeleton cssClass="h-3 w-48" />
+                  <app-skeleton cssClass="h-3 w-24" />
+                </div>
+              </div>
+              <div
+                class="mt-4 pt-4 border-t border-slate-200 dark:border-slate-700"
+              >
+                <app-skeleton cssClass="h-4 w-full" />
+                <app-skeleton cssClass="mt-2 h-4 w-2/3" />
+              </div>
+            </app-card>
+          }
         </div>
       } @else if (store.error()) {
         <app-empty-state

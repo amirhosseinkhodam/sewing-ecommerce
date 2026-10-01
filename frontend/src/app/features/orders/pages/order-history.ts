@@ -6,7 +6,7 @@ import Image01Icon from '@hugeicons/core-free-icons/Image01Icon';
 import { ButtonComponent } from '@shared/components/button';
 import { CardComponent } from '@shared/components/card';
 import { EmptyStateComponent } from '@shared/components/empty-state';
-import { LoadingSpinnerComponent } from '@shared/components/loading-spinner';
+import { SkeletonComponent } from '@shared/components/skeleton';
 import { LocalizedDatePipe } from '@shared/pipes/localized-date';
 import { LocalizedNumberPipe } from '@shared/pipes/localized-number';
 import { TranslatePipe } from '@shared/pipes/translate';
@@ -20,10 +20,10 @@ import { OrderStore } from '../store/order';
     CardComponent,
     EmptyStateComponent,
     HugeiconsIconComponent,
-    LoadingSpinnerComponent,
     LocalizedDatePipe,
     LocalizedNumberPipe,
     OrderStatusBadgeComponent,
+    SkeletonComponent,
     TranslatePipe,
   ],
   providers: [OrderStore],
@@ -35,11 +35,33 @@ import { OrderStore } from '../store/order';
       </h1>
 
       @if (store.loading() && store.orders().length === 0) {
-        <div class="flex justify-center py-20">
-          <app-loading-spinner
-            size="lg"
-            cssClass="text-slate-400 dark:text-slate-500"
-          />
+        <div class="flex flex-col gap-4" role="status" aria-live="polite">
+          <span class="sr-only">{{ 'loading' | translate }}</span>
+          @for (row of [1, 2, 3]; track row) {
+            <app-card variant="bordered">
+              <div class="flex flex-wrap items-start justify-between gap-4">
+                <div class="flex flex-col gap-2">
+                  <app-skeleton cssClass="h-3 w-20" />
+                  <app-skeleton cssClass="h-4 w-28" />
+                  <app-skeleton cssClass="h-3 w-24" />
+                </div>
+                <app-skeleton cssClass="h-6 w-20" />
+              </div>
+              <div
+                class="flex items-center gap-3 mt-4 pt-4 border-t border-slate-200 dark:border-slate-700"
+              >
+                @for (thumb of [1, 2, 3]; track thumb) {
+                  <app-skeleton cssClass="h-12 w-12 rounded-lg" />
+                }
+              </div>
+              <div
+                class="flex flex-wrap items-center justify-between gap-3 mt-4 pt-4 border-t border-slate-200 dark:border-slate-700"
+              >
+                <app-skeleton cssClass="h-5 w-24" />
+                <app-skeleton cssClass="h-9 w-28" />
+              </div>
+            </app-card>
+          }
         </div>
       } @else if (store.error()) {
         <app-empty-state

@@ -8,7 +8,7 @@ import type { AddressModel, AddressPayloadModel } from '@domain/models/address';
 import { ButtonComponent } from '@shared/components/button';
 import { CardComponent } from '@shared/components/card';
 import { EmptyStateComponent } from '@shared/components/empty-state';
-import { LoadingSpinnerComponent } from '@shared/components/loading-spinner';
+import { SkeletonComponent } from '@shared/components/skeleton';
 import { TranslatePipe } from '@shared/pipes/translate';
 import { ModalService } from '@shared/services/modal';
 import { AddressFormComponent } from '../components/address-form';
@@ -20,8 +20,8 @@ import { AddressesStore } from '../store/addresses';
     ButtonComponent,
     CardComponent,
     EmptyStateComponent,
-    LoadingSpinnerComponent,
     AddressFormComponent,
+    SkeletonComponent,
     TranslatePipe,
   ],
   providers: [AddressesStore],
@@ -40,11 +40,20 @@ import { AddressesStore } from '../store/addresses';
       </div>
 
       @if (store.loading() && store.addresses().length === 0) {
-        <div class="flex justify-center py-20">
-          <app-loading-spinner
-            size="lg"
-            cssClass="text-slate-400 dark:text-slate-500"
-          />
+        <div
+          class="grid grid-cols-1 gap-4 md:grid-cols-2"
+          role="status"
+          aria-live="polite"
+        >
+          <span class="sr-only">{{ 'loading' | translate }}</span>
+          @for (card of [1, 2, 3, 4]; track card) {
+            <app-card variant="bordered">
+              <app-skeleton cssClass="h-4 w-32" />
+              <app-skeleton cssClass="mt-3 h-3 w-40" />
+              <app-skeleton cssClass="mt-2 h-3 w-full" />
+              <app-skeleton cssClass="mt-2 h-3 w-24" />
+            </app-card>
+          }
         </div>
       } @else if (store.error()) {
         <app-empty-state

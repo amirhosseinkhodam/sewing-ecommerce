@@ -8,7 +8,7 @@ import MinusSignIcon from '@hugeicons/core-free-icons/MinusSignIcon';
 import { ButtonComponent } from '@shared/components/button';
 import { CardComponent } from '@shared/components/card';
 import { EmptyStateComponent } from '@shared/components/empty-state';
-import { LoadingSpinnerComponent } from '@shared/components/loading-spinner';
+import { SkeletonComponent } from '@shared/components/skeleton';
 import { LocalizedNumberPipe } from '@shared/pipes/localized-number';
 import { TranslatePipe } from '@shared/pipes/translate';
 import { LanguageService } from '@shared/services/language';
@@ -23,7 +23,7 @@ import { CartStore } from '../store/cart';
     CardComponent,
     EmptyStateComponent,
     HugeiconsIconComponent,
-    LoadingSpinnerComponent,
+    SkeletonComponent,
     LocalizedNumberPipe,
     TranslatePipe,
   ],
@@ -35,11 +35,33 @@ import { CartStore } from '../store/cart';
       </h1>
 
       @if (store.loading() && store.items().length === 0) {
-        <div class="flex justify-center py-20">
-          <app-loading-spinner
-            size="lg"
-            cssClass="text-slate-400 dark:text-slate-500"
-          />
+        <div
+          class="grid grid-cols-1 gap-6 lg:grid-cols-3"
+          role="status"
+          aria-live="polite"
+        >
+          <span class="sr-only">{{ 'loading' | translate }}</span>
+          <div class="lg:col-span-2 flex flex-col gap-4">
+            @for (row of [1, 2, 3]; track row) {
+              <div
+                class="flex items-center gap-4 rounded-card border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 p-4"
+              >
+                <app-skeleton cssClass="h-20 w-20 rounded-lg shrink-0" />
+                <div class="flex flex-1 flex-col gap-2">
+                  <app-skeleton cssClass="h-4 w-1/2" />
+                  <app-skeleton cssClass="h-3 w-1/4" />
+                  <app-skeleton cssClass="h-8 w-28" />
+                </div>
+                <app-skeleton cssClass="h-4 w-16 shrink-0" />
+              </div>
+            }
+          </div>
+          <app-card variant="bordered" cssClass="h-fit">
+            <app-skeleton cssClass="mb-4 h-5 w-32" />
+            <app-skeleton cssClass="h-4 w-full" />
+            <app-skeleton cssClass="mt-3 h-5 w-full" />
+            <app-skeleton cssClass="mt-6 h-12 w-full rounded-control" />
+          </app-card>
         </div>
       } @else if (store.error()) {
         <app-empty-state

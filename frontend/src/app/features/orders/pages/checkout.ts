@@ -12,7 +12,7 @@ import { PAYMENT_METHODS } from '@domain/const/payment-methods';
 import type { ShippingMethod } from '@domain/const/shipping-methods';
 import { ButtonComponent } from '@shared/components/button';
 import { CardComponent } from '@shared/components/card';
-import { LoadingSpinnerComponent } from '@shared/components/loading-spinner';
+import { SkeletonComponent } from '@shared/components/skeleton';
 import { LocalizedNumberPipe } from '@shared/pipes/localized-number';
 import { TranslatePipe } from '@shared/pipes/translate';
 import { AddressFormComponent } from '../../addresses/components/address-form';
@@ -26,7 +26,7 @@ import { CheckoutStore } from '../store/checkout';
   imports: [
     ButtonComponent,
     CardComponent,
-    LoadingSpinnerComponent,
+    SkeletonComponent,
     LocalizedNumberPipe,
     AddressFormComponent,
     TranslatePipe,
@@ -90,10 +90,21 @@ import { CheckoutStore } from '../store/checkout';
                     {{ 'shippingAddress' | translate }}
                   </h2>
                   @if (checkoutStore.loadingAddresses()) {
-                    <div class="flex justify-center py-10">
-                      <app-loading-spinner
-                        cssClass="text-slate-400 dark:text-slate-500"
-                      />
+                    <div
+                      class="flex flex-col gap-3"
+                      role="status"
+                      aria-live="polite"
+                    >
+                      <span class="sr-only">{{ 'loading' | translate }}</span>
+                      @for (row of [1, 2]; track row) {
+                        <div
+                          class="rounded-card border border-slate-200 dark:border-slate-700 p-4"
+                        >
+                          <app-skeleton cssClass="h-4 w-32" />
+                          <app-skeleton cssClass="mt-2 h-3 w-48" />
+                          <app-skeleton cssClass="mt-1 h-3 w-full" />
+                        </div>
+                      }
                     </div>
                   } @else {
                     @if (formOpen()) {
