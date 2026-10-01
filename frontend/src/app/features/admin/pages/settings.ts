@@ -5,14 +5,13 @@ import {
   inject,
 } from '@angular/core';
 import { FormField, submit } from '@angular/forms/signals';
-
 import { ButtonComponent } from '@shared/components/button';
 import { CardComponent } from '@shared/components/card';
 import { EmptyStateComponent } from '@shared/components/empty-state';
 import { InputComponent } from '@shared/components/input';
-import { LoadingSpinnerComponent } from '@shared/components/loading-spinner';
 import { SignalFormComponent } from '@shared/components/signal-form';
 import { SignalFormFieldComponent } from '@shared/components/signal-form-field';
+import { SkeletonComponent } from '@shared/components/skeleton';
 import { TextareaComponent } from '@shared/components/textarea';
 import { TranslatePipe } from '@shared/pipes/translate';
 import { SettingsFormService } from '../../settings/forms/settings';
@@ -26,9 +25,9 @@ import { AdminSettingsStore } from '../store/settings';
     EmptyStateComponent,
     FormField,
     InputComponent,
-    LoadingSpinnerComponent,
     SignalFormComponent,
     SignalFormFieldComponent,
+    SkeletonComponent,
     TextareaComponent,
     TranslatePipe,
   ],
@@ -46,11 +45,41 @@ import { AdminSettingsStore } from '../store/settings';
       </div>
 
       @if (store.loading()) {
-        <div class="flex justify-center py-16">
-          <app-loading-spinner
-            size="lg"
-            cssClass="text-slate-400 dark:text-slate-500"
-          />
+        <div class="flex flex-col gap-6" role="status" aria-live="polite">
+          <span class="sr-only">{{ 'loading' | translate }}</span>
+          <app-card variant="bordered">
+            <app-skeleton cssClass="mb-4 h-5 w-32" />
+            <div class="flex flex-col gap-4">
+              @for (field of [1, 2, 3, 4]; track field) {
+                <div class="flex flex-col gap-2">
+                  <app-skeleton cssClass="h-3 w-24" />
+                  <app-skeleton cssClass="h-10 w-full" />
+                </div>
+              }
+            </div>
+          </app-card>
+          <app-card variant="bordered">
+            <app-skeleton cssClass="mb-4 h-5 w-32" />
+            <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+              @for (field of [1, 2]; track field) {
+                <div class="flex flex-col gap-2">
+                  <app-skeleton cssClass="h-3 w-24" />
+                  <app-skeleton cssClass="h-10 w-full" />
+                </div>
+              }
+            </div>
+          </app-card>
+          <app-card variant="bordered">
+            <app-skeleton cssClass="mb-4 h-5 w-32" />
+            <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+              @for (field of [1, 2, 3, 4]; track field) {
+                <div class="flex flex-col gap-2">
+                  <app-skeleton cssClass="h-3 w-24" />
+                  <app-skeleton cssClass="h-10 w-full" />
+                </div>
+              }
+            </div>
+          </app-card>
         </div>
       } @else if (store.error()) {
         <app-empty-state

@@ -8,21 +8,21 @@ import {
   OnInit,
   signal,
 } from '@angular/core';
-import { FormField, submit } from '@angular/forms/signals';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { FormField, submit } from '@angular/forms/signals';
 import { Router } from '@angular/router';
+import { UploadService } from '@core/services/upload';
 import { HugeiconsIconComponent } from '@hugeicons/angular';
 import Delete01Icon from '@hugeicons/core-free-icons/Delete01Icon';
 import Upload04Icon from '@hugeicons/core-free-icons/Upload04Icon';
-
-import { UploadService } from '@core/services/upload';
 import { ButtonComponent } from '@shared/components/button';
 import { CardComponent } from '@shared/components/card';
-import { SignalFormComponent } from '@shared/components/signal-form';
-import { SignalFormFieldComponent } from '@shared/components/signal-form-field';
 import { InputComponent } from '@shared/components/input';
 import { LoadingSpinnerComponent } from '@shared/components/loading-spinner';
 import { SelectComponent } from '@shared/components/select';
+import { SignalFormComponent } from '@shared/components/signal-form';
+import { SignalFormFieldComponent } from '@shared/components/signal-form-field';
+import { SkeletonComponent } from '@shared/components/skeleton';
 import { TextareaComponent } from '@shared/components/textarea';
 import { ToggleComponent } from '@shared/components/toggle';
 import type { SelectOption } from '@shared/models/select';
@@ -44,6 +44,7 @@ import { PortfolioFormStore } from '../store/portfolio-form';
     InputComponent,
     LoadingSpinnerComponent,
     SelectComponent,
+    SkeletonComponent,
     TextareaComponent,
     ToggleComponent,
     TranslatePipe,
@@ -61,11 +62,35 @@ import { PortfolioFormStore } from '../store/portfolio-form';
       </h1>
 
       @if (store.loading()) {
-        <div class="flex justify-center py-16">
-          <app-loading-spinner
-            size="lg"
-            cssClass="text-slate-400 dark:text-slate-500"
-          />
+        <div class="flex flex-col gap-6" role="status" aria-live="polite">
+          <span class="sr-only">{{ 'loading' | translate }}</span>
+          <app-card variant="bordered">
+            <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+              @for (field of [1, 2]; track field) {
+                <div class="flex flex-col gap-2">
+                  <app-skeleton cssClass="h-3 w-24" />
+                  <app-skeleton cssClass="h-10 w-full" />
+                </div>
+              }
+            </div>
+            <app-skeleton cssClass="mt-4 h-24 w-full" />
+            <div class="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
+              @for (field of [1, 2]; track field) {
+                <div class="flex flex-col gap-2">
+                  <app-skeleton cssClass="h-3 w-24" />
+                  <app-skeleton cssClass="h-10 w-full" />
+                </div>
+              }
+            </div>
+          </app-card>
+          <app-card variant="bordered">
+            <app-skeleton cssClass="mb-4 h-5 w-24" />
+            <div class="grid grid-cols-3 gap-3 sm:grid-cols-4">
+              @for (tile of [1, 2, 3, 4]; track tile) {
+                <app-skeleton cssClass="aspect-square w-full" />
+              }
+            </div>
+          </app-card>
         </div>
       } @else {
         <app-signal-form
