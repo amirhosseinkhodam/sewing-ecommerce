@@ -503,6 +503,8 @@ Only admin can change status. (Phase 8: SMS sent to customer on each transition.
 - [ ] Check lint, development build, and critical login/cart/checkout/admin flows before Phase 6
   - [x] Lint and builds green (`npm run lint` 0 errors; `npm run build` backend + production frontend)
   - [ ] Manual pass over the critical flows (login, cart, checkout, admin)
+    - [x] API-level end-to-end pass against the production image (2026-10-02, 56/56): admin catalog setup + image upload, public list/detail, register/login, cart, address, checkout (shipping snapshotted from settings, total = subtotal + shipping, cart cleared, stock decremented), receipt upload + attach, access control (401 anonymous, 403 customer→admin, 404 other user's order), payment confirm auto-advances to CONFIRMED, full status lifecycle + 400 on an illegal transition, customer cancel restoring stock, refresh token, profile update
+    - [ ] In-browser pass — UI states, RTL/Persian copy, and mobile layout; the stack with demo data is what needs clicking through
 
 ### Phase 6 — Admin Dashboard (2 days)
 - [x] Backend: Dashboard stats endpoint (`GET /api/admin/dashboard/stats?days=`), customer list (`GET /api/admin/customers`), and settings (`GET /api/settings` public, `GET/PATCH /api/admin/settings`)
@@ -528,8 +530,13 @@ Only admin can change status. (Phase 8: SMS sent to customer on each transition.
 - [x] Responsive audit (mobile/tablet/desktop) — headless pass over every public, customer, and admin route at 375/768/1280 (plus 320 for the navbar) in fa and en: no horizontal overflow; fixed the ng-select placeholder overlapping the value and the logged-in navbar overflowing on small phones (brand truncates, avatar dropdown moves into the mobile menu below `md`)
 - [x] Image lazy loading, code splitting — every list/thumbnail/receipt `<img>` has `loading="lazy"`, the gallery's main image (detail-page LCP) gets `fetchpriority="high"`; every route is `loadComponent` except the eager `/error` fallback
 - [ ] Build + deploy
+  - [x] Docker packaging — single image (NestJS serves the API, `/uploads`, and the production Angular build), `docker-compose.yml` (Postgres + app), `.env.production.example`; production guardrails: demo seed off and `SEED_ADMIN_PASSWORD` required under `NODE_ENV=production`, CORS closed unless `CORS_ORIGIN` is set, secrets never baked into the image
+  - [x] Verified locally: image build, `prisma migrate deploy` on start, admin-only seed, SPA deep links, immutable asset caching, JSON 404s for `/api` and `/uploads`, login + admin stats against the running stack
+  - [ ] Deploy to the server behind a TLS reverse proxy
 
-### Phase 8 — Paid Services (2 days)
+### Phase 8 — Paid Services (2 days) — **DEFERRED (owner's decision, 2026-10-02)**
+
+Skipped for now: the current code is being reviewed first, and card-to-card covers the MVP payment path. Pick this up after that review.
 - [ ] Backend: Zarinpal integration (request + verify)
 - [ ] Frontend: Zarinpal payment option in checkout
 - [ ] SMS notification service (Kavenegar)

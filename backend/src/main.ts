@@ -13,7 +13,10 @@ async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
 
   app.setGlobalPrefix('api');
-  app.enableCors();
+  // The frontend is served from this same origin in production (and proxied
+  // in dev), so CORS stays closed unless a separate origin is configured.
+  const corsOrigin = process.env.CORS_ORIGIN;
+  if (corsOrigin) app.enableCors({ origin: corsOrigin.split(',') });
   app.useGlobalPipes(new ValidationPipe({ whitelist: true, transform: true }));
   app.useGlobalFilters(new HttpExceptionFilter());
 

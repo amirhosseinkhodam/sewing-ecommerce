@@ -27,6 +27,19 @@ npm run start:backend  # API on localhost:3000, Swagger at /docs
 
 `npm run dev` proxies `/api` and `/uploads` from the Angular dev server to `localhost:3000`.
 
+## Production (Docker)
+
+One image serves the API, `/uploads`, and the built Angular app from a single port:
+
+```bash
+cp .env.production.example .env.production   # then fill in real secrets (never committed)
+docker compose --env-file .env.production up -d --build
+# first run only — creates the admin account:
+docker compose --env-file .env.production run --rm app npx prisma db seed
+```
+
+Pending migrations apply on every container start. The app binds to `127.0.0.1:3000`, so put a TLS-terminating reverse proxy (Caddy/Nginx) in front of it. Demo catalog data is skipped when `NODE_ENV=production` (force it with `SEED_DEMO=true`).
+
 ## Available Scripts
 
 | Command | Action |

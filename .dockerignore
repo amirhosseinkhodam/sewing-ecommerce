@@ -1,0 +1,28 @@
+node_modules
+dist
+.angular
+.git
+uploads
+backend/src/generated
+.env
+.env.*
+*.log
+.vscode
+.idea
+.agents
+.claude
+.github
+scripts
+# Stale local backup copy of the project — 1.1 GB, never part of a build.
+.backup_*
+# Char-device stubs some sandbox environments leave in the repo root; Docker
+# cannot read them into the build context.
+.bash_profile
+.bashrc
+.gapcode
+.gitconfig
+.mcp.json
+.profile
+.ripgreprc
+.zprofile
+.zshrc

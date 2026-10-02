@@ -41,6 +41,7 @@ lerna-debug.log*
 
 # dotenv environment variable files
 .env
+.env.production
 .env.development.local
 .env.test.local
 .env.production.local
@@ -81,3 +82,4 @@ dist-esbuild
 AGENTS.md
 CURRENT.md
 DECISIONS.md
+.claude/

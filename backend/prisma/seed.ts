@@ -15,6 +15,10 @@ const prisma = new PrismaClient({ adapter });
 
 const SETTINGS_ID = 'default';
 
+const isProduction = process.env.NODE_ENV === 'production';
+/** Demo data defaults on in development and off in production; SEED_DEMO overrides. */
+const seedDemo = (process.env.SEED_DEMO ?? String(!isProduction)) === 'true';
+
 async function main() {
   await prisma.shopSetting.upsert({
     where: { id: SETTINGS_ID },
@@ -39,6 +43,10 @@ async function main() {
 
   const adminEmail = process.env.SEED_ADMIN_EMAIL ?? 'admin@sewing.local';
   const adminPassword = process.env.SEED_ADMIN_PASSWORD ?? 'admin12345';
+  // Never let a production database get an admin with the well-known default.
+  if (isProduction && !process.env.SEED_ADMIN_PASSWORD) {
+    throw new Error('SEED_ADMIN_PASSWORD must be set when NODE_ENV=production');
+  }
 
   await prisma.user.upsert({
     where: { email: adminEmail },
@@ -54,6 +62,10 @@ async function main() {
   });
 
   console.log(`Admin user ready: ${adminEmail}`);
+
+  // Demo catalog, customers (shared known password), and orders are for local
+  // development only.
+  if (!seedDemo) return;
 
   const categories = [
     { name: 'مردانه', slug: 'men', sortOrder: 1 },

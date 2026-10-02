@@ -1,0 +1,47 @@
+# Production stack. Secrets live in .env.production (gitignored): compose both
+# injects it into the app container and interpolates it into this file, so every
+# compose command needs it explicitly:
+#   docker compose --env-file .env.production up -d --build
+# Seed the first admin account once:
+#   docker compose --env-file .env.production run --rm app npx prisma db seed
+services:
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-sewing}
+      POSTGRES_USER: ${POSTGRES_USER:-sewing}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD in .env.production}
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}']
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  app:
+    build: .
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    env_file: .env.production
+    environment:
+      DATABASE_URL: postgresql://${POSTGRES_USER:-sewing}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB:-sewing}
+      PORT: 3000
+    ports:
+      # Bound to localhost: put a TLS-terminating reverse proxy (Caddy/Nginx) in front.
+      - '127.0.0.1:${APP_PORT:-3000}:3000'
+    volumes:
+      - uploads:/app/uploads
+    healthcheck:
+      test: ['CMD', 'node', '-e', "fetch('http://localhost:3000/api/health').then(r => process.exit(r.ok ? 0 : 1)).catch(() => process.exit(1))"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+volumes:
+  db-data:
+  uploads:
