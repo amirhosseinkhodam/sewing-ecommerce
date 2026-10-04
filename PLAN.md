@@ -500,11 +500,12 @@ Only admin can change status. (Phase 8: SMS sent to customer on each transition.
 - [x] Migrate customer profile reads/writes to queries and mutations (`AuthStore` now holds only the session tokens plus login/register loading; `user`/`profileLoading` are computed from a `profile` query seeded by login, registration, and the profile PATCH, and the auth interceptor attaches the JWT to `/api/auth/me` and `/api/auth/profile`)
 - [x] Migrate remaining admin product/portfolio forms to Angular Signal Forms; retain validation and accessibility (Reactive Forms are now fully gone from the app; the unused `PasswordFormService` and `shared/validators` were deleted rather than ported)
 - [x] Adopt Spartan primitives for shared controls when appropriate while preserving `app-*` APIs and visual/RTL behavior (`app-button` → `BrnButton`, `app-toggle` → `BrnSwitch`/`BrnSwitchThumb`, `app-modal` + `ModalService` → `BrnDialogService`/`BrnDialogRef`, `app-input`/`app-textarea` → `BrnLabel`, `app-select` → ng-select `labelForId`; only the headless `@spartan-ng/brain` package is installed, so styled shells remain custom Tailwind)
-- [ ] Check lint, development build, and critical login/cart/checkout/admin flows before Phase 6
+- [x] Check lint, development build, and critical login/cart/checkout/admin flows before Phase 6
   - [x] Lint and builds green (`npm run lint` 0 errors; `npm run build` backend + production frontend)
-  - [ ] Manual pass over the critical flows (login, cart, checkout, admin)
+  - [x] Manual pass over the critical flows (login, cart, checkout, admin)
     - [x] API-level end-to-end pass against the production image (2026-10-02, 56/56): admin catalog setup + image upload, public list/detail, register/login, cart, address, checkout (shipping snapshotted from settings, total = subtotal + shipping, cart cleared, stock decremented), receipt upload + attach, access control (401 anonymous, 403 customer→admin, 404 other user's order), payment confirm auto-advances to CONFIRMED, full status lifecycle + 400 on an illegal transition, customer cancel restoring stock, refresh token, profile update
-    - [ ] In-browser pass — UI states, RTL/Persian copy, and mobile layout; the stack with demo data is what needs clicking through
+    - [x] In-browser pass (2026-10-04, Playwright against the running Docker stack + a throwaway `ng serve` to verify the fix) — guest browsing, login/register, product detail + size select + add-to-cart, cart qty, checkout stepper (address/shipping/payment/review), admin dashboard/products/categories/orders/order-detail/portfolio/messages/customers/settings, profile, addresses, order history, portfolio, about, contact, mobile (375px) and desktop (1280px) layouts in fa (RTL) and en (LTR); zero console errors across every screen, no horizontal overflow
+      - Found and fixed: the `phoneNumber` i18n key held a literal demo phone number ("021-12345678") instead of a label, so every place that uses it as a field/column label (Contact form, Contact info card, About info card, footer, admin Settings form, admin Customers table column header) rendered the literal string instead of "Phone Number"/"شماره تلفن". Fixed in both `frontend/src/app/i18n/en.json` and `fa.json`; verified against all six usages.
 
 ### Phase 6 — Admin Dashboard (2 days)
 - [x] Backend: Dashboard stats endpoint (`GET /api/admin/dashboard/stats?days=`), customer list (`GET /api/admin/customers`), and settings (`GET /api/settings` public, `GET/PATCH /api/admin/settings`)
@@ -512,7 +513,7 @@ Only admin can change status. (Phase 8: SMS sent to customer on each transition.
 - [x] Frontend: DashboardPage (stat cards, inline-SVG orders trend, status/payment breakdowns, recent orders)
 - [x] Frontend: CustomerListPage (search, role filter, pagination, aggregate order count/spend)
 - [x] Frontend: SettingsPage (shop name, business hours, bank card info, shipping rates) — the Phase 4/5 placeholder consts `orders/const/bank-card.ts` and `contact/const/shop-contact.ts` are deleted and `orders/const/shipping-options.ts` is now a factory over the settings row; order detail, checkout, Contact, and About read from the shared `settings` query
-- [ ] Manual pass over the new admin screens (dashboard, customers, settings) and the settings-driven checkout/order-detail/contact reads
+- [x] Manual pass over the new admin screens (dashboard, customers, settings) and the settings-driven checkout/order-detail/contact reads — covered in the same 2026-10-04 pass above; settings-driven shop phone/address/hours render correctly on Contact, About, checkout, and order detail
 - [x] Admin layout (sidebar + header) — done in Phase 2, extended in Phases 4–5
 - [x] ~~Admin: MessagesPage~~ — delivered in Phase 5
 
