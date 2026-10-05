@@ -38,7 +38,7 @@ docker compose --env-file .env.production up -d --build
 docker compose --env-file .env.production run --rm app npx prisma db seed
 ```
 
-Pending migrations apply on every container start. The app binds to `127.0.0.1:3000`, so put a TLS-terminating reverse proxy (Caddy/Nginx) in front of it. Demo catalog data is skipped when `NODE_ENV=production` (force it with `SEED_DEMO=true`).
+Pending migrations apply on every container start. The `caddy` service terminates TLS on ports 80/443 for `DOMAIN` (set in `.env.production`) and fetches and renews the Let's Encrypt certificate itself — point the domain's DNS at the server and open 80/443 before the first `up`. The app itself only binds to `127.0.0.1:3000`. Demo catalog data is skipped when `NODE_ENV=production` (force it with `SEED_DEMO=true`).
 
 ## Available Scripts
 

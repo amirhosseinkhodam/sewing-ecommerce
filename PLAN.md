@@ -534,7 +534,8 @@ Only admin can change status. (Phase 8: SMS sent to customer on each transition.
 - [ ] Build + deploy
   - [x] Docker packaging — single image (NestJS serves the API, `/uploads`, and the production Angular build), `docker-compose.yml` (Postgres + app), `.env.production.example`; production guardrails: demo seed off and `SEED_ADMIN_PASSWORD` required under `NODE_ENV=production`, CORS closed unless `CORS_ORIGIN` is set, secrets never baked into the image
   - [x] Verified locally: image build, `prisma migrate deploy` on start, admin-only seed, SPA deep links, immutable asset caching, JSON 404s for `/api` and `/uploads`, login + admin stats against the running stack
-  - [ ] Deploy to the server behind a TLS reverse proxy
+  - [x] TLS reverse proxy — `caddy` service in `docker-compose.yml` + root `Caddyfile`: automatic Let's Encrypt for `DOMAIN` (from `.env.production`), HTTP→HTTPS redirect, HSTS/nosniff/referrer headers, gzip/zstd, HTTP/2+3. Verified locally (2026-10-05, `DOMAIN=localhost`): SPA + deep links, `/api` health and JSON 404s, validation errors, headers, redirect
+  - [ ] Deploy to the server (owner runs it): DNS A record → server, open 80/443, fill `.env.production` (incl. `DOMAIN`), `up -d --build`, seed admin once
 
 ### Phase 8 — Paid Services (2 days) — **DEFERRED (owner's decision, 2026-10-02)**
 
