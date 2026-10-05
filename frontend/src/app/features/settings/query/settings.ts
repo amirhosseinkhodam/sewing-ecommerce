@@ -6,8 +6,8 @@ import { SettingsService } from '../services/settings';
 
 /**
  * The shop settings singleton. Imported by order detail (bank card), checkout
- * (shipping rates), and the Contact/About pages (contact details), so the
- * cache is shared rather than refetched per feature.
+ * (shipping rates), the Contact/About pages and the app-shell footer (contact
+ * details), so the cache is shared rather than refetched per feature.
  *
  * The row changes about as often as the shop's phone number does, so it is
  * kept fresh for a long time instead of being refetched on every navigation.

@@ -1,6 +1,7 @@
 import {
   ChangeDetectionStrategy,
   Component,
+  computed,
   DestroyRef,
   inject,
 } from '@angular/core';
@@ -11,6 +12,7 @@ import {
   RouterOutlet,
 } from '@angular/router';
 import { filter } from 'rxjs';
+import { injectShopSettingsQuery } from './features/settings/query/settings';
 import { FooterComponent } from './shared/components/footer';
 import { NavbarComponent } from './shared/components/navbar';
 import { NotificationComponent } from './shared/components/notification';
@@ -31,12 +33,18 @@ import { SeoService, type PageSeoModel } from './shared/services/seo';
       <main class="flex-1">
         <router-outlet />
       </main>
-      <app-footer />
+      <app-footer
+        [phone]="shop()?.shopPhone ?? ''"
+        [address]="shop()?.shopAddress ?? ''"
+      />
       <app-notification />
     </div>
   `,
 })
 export class AppComponent {
+  readonly #settingsQuery = injectShopSettingsQuery();
+  readonly shop = computed(() => this.#settingsQuery.data() ?? null);
+
   readonly #router = inject(Router);
   readonly #activatedRoute = inject(ActivatedRoute);
   readonly #seo = inject(SeoService);

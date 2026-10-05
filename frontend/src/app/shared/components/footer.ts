@@ -1,4 +1,4 @@
-import { Component, ChangeDetectionStrategy } from '@angular/core';
+import { Component, ChangeDetectionStrategy, input } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { HugeiconsIconComponent } from '@hugeicons/angular';
 import MapPinIcon from '@hugeicons/core-free-icons/MapPinIcon';
@@ -72,26 +72,30 @@ import { TranslatePipe } from '../pipes/translate';
               {{ 'contactUs' | translate }}
             </h4>
             <ul class="space-y-2">
-              <li class="flex items-center gap-2 text-sm text-slate-400">
-                <hugeicons-icon
-                  [icon]="icons.MapPinIcon"
-                  [size]="16"
-                  color="currentColor"
-                  [strokeWidth]="1.5"
-                  class="shrink-0"
-                />
-                {{ 'address' | translate }}
-              </li>
-              <li class="flex items-center gap-2 text-sm text-slate-400">
-                <hugeicons-icon
-                  [icon]="icons.TelephoneIcon"
-                  [size]="16"
-                  color="currentColor"
-                  [strokeWidth]="1.5"
-                  class="shrink-0"
-                />
-                {{ 'phoneNumber' | translate }}
-              </li>
+              @if (address()) {
+                <li class="flex items-center gap-2 text-sm text-slate-400">
+                  <hugeicons-icon
+                    [icon]="icons.MapPinIcon"
+                    [size]="16"
+                    color="currentColor"
+                    [strokeWidth]="1.5"
+                    class="shrink-0"
+                  />
+                  {{ address() }}
+                </li>
+              }
+              @if (phone()) {
+                <li class="flex items-center gap-2 text-sm text-slate-400">
+                  <hugeicons-icon
+                    [icon]="icons.TelephoneIcon"
+                    [size]="16"
+                    color="currentColor"
+                    [strokeWidth]="1.5"
+                    class="shrink-0"
+                  />
+                  <span dir="ltr">{{ phone() }}</span>
+                </li>
+              }
             </ul>
           </div>
         </div>
@@ -107,6 +111,9 @@ import { TranslatePipe } from '../pipes/translate';
   `,
 })
 export class FooterComponent {
+  readonly phone = input<string>('');
+  readonly address = input<string>('');
+
   readonly currentYear = new Date().getFullYear();
 
   readonly icons = { MapPinIcon, TelephoneIcon };
