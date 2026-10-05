@@ -521,6 +521,7 @@ Only admin can change status. (Phase 8: SMS sent to customer on each transition.
 - [x] SEO meta tags for all pages (Title, Description, OG tags) — `SeoService` (Title + Meta) driven by route `data`, admin routes carry `noindex`, `index.html` has static fallback tags
 - [ ] Complete i18n pass (all Persian text verified)
   - [x] Automated pass: en/fa key parity, no untranslated values, every template/feedback key resolves (added missing `quantity`/`remove`/`total`), hardcoded strings moved to keys (theme/language toggle aria-labels, home tagline, admin image-preview alt), RTL-flipped product-detail back arrow
+  - [x] Editorial pass over `fa.json` (2026-10-05): one spelling per term (`سفارش‌ها`, `جست‌وجو`, `نمونه‌کار`, `ثبت‌نام`, `آپلود` for every upload), natural phrasing for the `couldNot*` errors, `subtotal` no longer collides with "grand total" (`مبلغ کالاها`), `paymentRefunded` reads as a status (`مسترد شده`), checkout-context hints say "هنگام ثبت سفارش" instead of "در پرداخت", `invalidPhone` asks for a mobile number
   - [ ] Native-speaker read-through of `fa.json` wording
 - [x] Loading skeletons for all data-fetching pages — shared `app-skeleton`/`app-skeleton-table`/`app-skeleton-grid` primitives replace the bouncing-dot spinner across catalog/portfolio grids, all 5 admin tables, 4 detail pages, the dashboard, 3 admin forms, and cart/order-history/addresses/messages/checkout row lists
 - [x] Error boundaries: API failure -> inline error + retry button, 404 page, 500 page
