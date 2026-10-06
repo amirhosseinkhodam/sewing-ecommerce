@@ -36,7 +36,7 @@ enum ShippingMethod {
 }
 
 enum PaymentMethod {
-  ZARINPAL
+  ONLINE
   CARD_TO_CARD
 }
 
@@ -166,7 +166,6 @@ model Order {
   shippingAddressId String
   paymentMethod     PaymentMethod   @default(CARD_TO_CARD)
   paymentStatus     PaymentStatus   @default(PENDING)
-  zarinpalAuthority String?
   paymentReceipt    String?
   trackingCode      String?
   notes             String?
@@ -177,6 +176,14 @@ model Order {
   // snapshotted so a later rate change in ShopSetting never rewrites the
   // amount a customer was actually charged.
   shippingAmount Decimal @default(0)
+
+  // Online payment (`paymentMethod = ONLINE`). The authority is the gateway's
+  // id for the current payment attempt — a retry replaces it, and the callback
+  // finds the order by it. The ref id is the gateway's receipt number, set
+  // once verification succeeds. Provider-neutral on purpose: the gateway is
+  // chosen by PAYMENT_PROVIDER, not by the order.
+  paymentAuthority String? @unique
+  paymentRefId     String?
 
   // Shipping address is snapshotted the same way OrderItem snapshots product
   // data: deleting an address must never rewrite delivered order history.

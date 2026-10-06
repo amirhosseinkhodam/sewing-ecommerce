@@ -9,8 +9,9 @@ import type {
   OrderModel,
   PaginatedOrdersModel,
 } from '../../../shared/models/order';
-import { OrderStatus, Prisma } from '../generated/prisma/client';
+import { OrderStatus, PaymentMethod, Prisma } from '../generated/prisma/client';
 import { PrismaService } from '../common/prisma/prisma.service';
+import { PaymentService } from '../payment/payment.service';
 import { SettingsService } from '../settings/settings.service';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { OrderQueryDto } from './dto/order-query.dto';
@@ -49,13 +50,26 @@ type AdminOrderRow = Prisma.OrderGetPayload<{
 export class OrdersService {
   readonly #prisma: PrismaService;
   readonly #settings: SettingsService;
+  readonly #payment: PaymentService;
 
-  constructor(prisma: PrismaService, settings: SettingsService) {
+  constructor(
+    prisma: PrismaService,
+    settings: SettingsService,
+    payment: PaymentService,
+  ) {
     this.#prisma = prisma;
     this.#settings = settings;
+    this.#payment = payment;
   }
 
   async create(userId: string, dto: CreateOrderDto): Promise<OrderModel> {
+    if (
+      dto.paymentMethod === PaymentMethod.ONLINE &&
+      !this.#payment.onlineEnabled
+    ) {
+      throw new BadRequestException('Online payment is not available');
+    }
+
     const cart = await this.#prisma.cart.findUnique({
       where: { userId },
       include: {
@@ -411,6 +425,7 @@ export class OrdersService {
       paymentMethod: order.paymentMethod,
       paymentStatus: order.paymentStatus,
       paymentReceipt: order.paymentReceipt ?? undefined,
+      paymentRefId: order.paymentRefId ?? undefined,
       trackingCode: order.trackingCode ?? undefined,
       notes: order.notes ?? undefined,
       createdAt: order.createdAt.toISOString(),

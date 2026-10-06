@@ -17,6 +17,7 @@ import { ContactModule } from './contact/contact.module';
 import { CustomersModule } from './customers/customers.module';
 import { DashboardModule } from './dashboard/dashboard.module';
 import { OrdersModule } from './orders/orders.module';
+import { PaymentModule } from './payment/payment.module';
 import { PortfolioModule } from './portfolio/portfolio.module';
 import { ProductsModule } from './products/products.module';
 import { SettingsModule } from './settings/settings.module';
@@ -72,6 +73,7 @@ function staticRoots(): ServeStaticModuleOptions[] {
     CartModule,
     AddressesModule,
     OrdersModule,
+    PaymentModule.register(),
     PortfolioModule,
     ContactModule,
     SettingsModule,

@@ -1,5 +1,5 @@
 export const PAYMENT_METHODS = {
-  ZARINPAL: 'ZARINPAL',
+  ONLINE: 'ONLINE',
   CARD_TO_CARD: 'CARD_TO_CARD',
 } as const;
 

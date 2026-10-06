@@ -27,6 +27,8 @@ npm run start:backend  # API on localhost:3000, Swagger at /docs
 
 `npm run dev` proxies `/api` and `/uploads` from the Angular dev server to `localhost:3000`.
 
+Online payment is off unless `PAYMENT_PROVIDER` is set in `.env`. `PAYMENT_PROVIDER=fake` enables a free local gateway (a Pay / Fail page, no money moves). The backend refuses to start with it under `NODE_ENV=production`. Card-to-card is always available.
+
 ## Production (Docker)
 
 One image serves the API, `/uploads`, and the built Angular app from a single port:
@@ -79,6 +81,7 @@ shared/                   # Cross-half shared types (root, backend-importable)
 - **Phase 2 — Products + Categories**: done (public catalog + product detail with gallery/sizes, admin category/product management with image upload)
 - **Phase 3 — Cart + Checkout**: done (cart/address/order backend modules; CartPage, AddressManagementPage, multi-step CheckoutPage; navbar cart badge; add-to-cart with login-return flow)
 - **Phases 4–5**: done (orders, portfolio, contact)
-- **Frontend migration before Phase 6**: underway; see `PLAN.md` for the remaining checklist.
+- **Frontend migration + Phases 6–7**: done except deployment and a native-speaker `fa.json` review
+- **Phase 8 — Online payment + notifications**: in progress (provider-neutral gateway with a free fake provider first; see `PLAN.md`)
 
 Full roadmap, database schema, API endpoints, and implementation phases: see `PLAN.md`. How the system works (architecture, flows, auth, DB, decisions & why): see `PROJECT_KNOWLEDGE.md` — the canonical living knowledge guide, kept up to date automatically.

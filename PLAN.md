@@ -115,9 +115,9 @@ Order
 ├── shippingAddressId (FK -> Address)
 ├── shippingLabel / shippingProvince / shippingCity   (address snapshot)
 ├── shippingFullAddress / shippingPostalCode / shippingPhone
-├── paymentMethod: ZARINPAL | CARD_TO_CARD
+├── paymentMethod: ONLINE | CARD_TO_CARD
 ├── paymentStatus: PENDING | PAID | FAILED | REFUNDED
-├── zarinpalAuthority
+├── paymentAuthority (unique), paymentRefId
 ├── paymentReceipt (card-to-card receipt image path)
 ├── trackingCode
 ├── notes
@@ -296,9 +296,9 @@ frontend/src/app/
 - `DELETE /api/addresses/:id`
 
 **Payment**
-- `POST /api/payment/request`
-- `GET /api/payment/callback`
-- `POST /api/payment/verify`
+- `GET /api/payment/methods` — public; `ONLINE` only when `PAYMENT_PROVIDER` is set
+- `POST /api/payment/:orderId/start` — auth; opens (or retries) a gateway attempt, returns `{ redirectUrl }`
+- `GET /api/payment/callback` — unauthenticated browser redirect from the gateway; verifies server-side
 
 **Portfolio (public)**
 - `GET /api/portfolio` — paginated, active only; filters: `category` (slug), `search`
@@ -381,7 +381,7 @@ frontend/src/app/
 
 **Step 3: Payment**
 - Default: CARD_TO_CARD (کارت به کارت) — show admin bank card info + instructions: "Transfer amount to card XXXX-XXXX-XXXX-XXXX under name YYY, then upload receipt screenshot"
-- (Phase 8: ZARINPAL option added as alternative)
+- (Phase 8: ONLINE option, shown only when a payment gateway is configured)
 
 **Step 4: Review**
 - Show order summary: items, address, shipping, payment method, total
@@ -431,7 +431,7 @@ Only admin can change status. (Phase 8: SMS sent to customer on each transition.
 - On order placement -> `/orders/:id` shows bank card info and receipt upload form
 - User uploads receipt for admin review
 - Admin confirms or rejects from OrderListPage
-- (Phase 8: Zarinpal option added, with callback handling, retry flow, and auto-cancel after 24h)
+- Phase 8: online payment through the configured gateway (fake in dev, Zarinpal later), with callback verification, retry flow, and auto-cancel after 24h
 
 ---
 
@@ -537,13 +537,16 @@ Only admin can change status. (Phase 8: SMS sent to customer on each transition.
   - [x] TLS reverse proxy — `caddy` service in `docker-compose.yml` + root `Caddyfile`: automatic Let's Encrypt for `DOMAIN` (from `.env.production`), HTTP→HTTPS redirect, HSTS/nosniff/referrer headers, gzip/zstd, HTTP/2+3. Verified locally (2026-10-05, `DOMAIN=localhost`): SPA + deep links, `/api` health and JSON 404s, validation errors, headers, redirect
   - [ ] Deploy to the server (owner runs it): DNS A record → server, open 80/443, fill `.env.production` (incl. `DOMAIN`), `up -d --build`, seed admin once
 
-### Phase 8 — Paid Services (2 days) — **DEFERRED (owner's decision, 2026-10-02)**
+### Phase 8 — Online Payment + Notifications — **IN PROGRESS (2026-10-07)**
 
-Skipped for now: the current code is being reviewed first, and card-to-card covers the MVP payment path. Pick this up after that review.
-- [ ] Backend: Zarinpal integration (request + verify)
-- [ ] Frontend: Zarinpal payment option in checkout
-- [ ] SMS notification service (Kavenegar)
-- [ ] SMS on order status transitions
+No paid API accounts yet, so every integration is written against a provider-neutral interface with a free stand-in. Real providers drop in later by setting env vars, with no code changes. Card-to-card stays the always-on payment method.
+- [x] Backend: `PaymentGateway` interface + `FakePaymentGateway` (local Pay/Fail page, verify only succeeds after Pay was pressed), `PAYMENT_PROVIDER` env selects it (unset = card-to-card only; `fake` refused under `NODE_ENV=production`). `PaymentMethod.ZARINPAL` → `ONLINE`, `zarinpalAuthority` → provider-neutral `paymentAuthority` (unique) + `paymentRefId`. Endpoints: `GET /api/payment/methods`, `POST /api/payment/:orderId/start` (also the retry path), `GET /api/payment/callback` (verifies server-side, redirects to `/orders/:id?payment=SUCCESS|FAILED`; a paid PENDING order auto-advances to CONFIRMED)
+- [ ] Frontend: "Online payment" option in checkout (only when `/payment/methods` offers it), redirect to the gateway after placing the order, result banner + "Pay again" on order detail
+- [ ] Backend: `ZarinpalGateway` (REST v4 request + verify), `ZARINPAL_MERCHANT_ID` + `ZARINPAL_SANDBOX=true` — verified against the free sandbox
+- [ ] Auto-cancel unpaid online orders after 24h (restore stock)
+- [ ] Backend: `SmsProvider` interface + `LogSmsProvider` (writes to the log; free), `SMS_PROVIDER` env selects it
+- [ ] SMS on order status transitions (through the interface)
+- [ ] Later, with paid accounts: `KavenegarSmsProvider`; Zarinpal production merchant ID
 
 **Total estimate: ~26 working days**
 

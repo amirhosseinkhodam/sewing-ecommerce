@@ -37,6 +37,8 @@ export interface OrderModel {
   readonly paymentMethod: PaymentMethod;
   readonly paymentStatus: PaymentStatus;
   readonly paymentReceipt?: string;
+  /** Gateway receipt number, set once an online payment is verified. */
+  readonly paymentRefId?: string;
   readonly trackingCode?: string;
   readonly notes?: string;
   readonly createdAt: string;
