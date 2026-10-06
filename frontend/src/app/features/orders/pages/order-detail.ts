@@ -8,6 +8,10 @@ import {
   signal,
 } from '@angular/core';
 import { Router } from '@angular/router';
+import { ORDER_STATUSES } from '@domain/const/order-statuses';
+import { PAYMENT_METHODS } from '@domain/const/payment-methods';
+import { PAYMENT_RESULTS } from '@domain/const/payment-results';
+import { PAYMENT_STATUSES } from '@domain/const/payment-statuses';
 import { HugeiconsIconComponent } from '@hugeicons/angular';
 import Image01Icon from '@hugeicons/core-free-icons/Image01Icon';
 
@@ -90,6 +94,59 @@ import { OrderStore } from '../store/order';
             <app-order-status-badge [paymentStatus]="order.paymentStatus" />
           </div>
         </div>
+
+        <!-- Where the gateway sent the customer back to. The banner follows
+             the order's real payment status, not just the query string, so a
+             hand-edited URL can't claim a payment that didn't happen. -->
+        @if (paymentBanner(); as banner) {
+          <p
+            role="status"
+            class="mb-6 rounded-card border p-4 text-sm font-medium"
+            [class]="
+              banner === 'paymentSuccessBanner'
+                ? 'border-green-200 dark:border-green-900 bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-400'
+                : 'border-red-200 dark:border-red-900 bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-400'
+            "
+          >
+            {{ banner | translate }}
+          </p>
+        }
+
+        <!-- Online payment: pay (or pay again) until it is confirmed. -->
+        @if (showOnlinePanel()) {
+          <app-card variant="bordered" cssClass="mb-6">
+            <h2 class="font-bold text-slate-900 dark:text-slate-100 mb-1">
+              {{ 'onlinePayment' | translate }}
+            </h2>
+            <p class="text-sm text-slate-500 dark:text-slate-400 mb-4">
+              {{ 'onlinePaymentInstructions' | translate }}
+            </p>
+            <div class="flex flex-wrap items-center justify-between gap-3">
+              <span class="font-bold text-slate-900 dark:text-slate-100">
+                {{ toNumber(order.totalAmount) | localizedNumber }}
+                {{ 'currencyToman' | translate }}
+              </span>
+              <app-button
+                variant="primary"
+                [loading]="store.startingPayment()"
+                (buttonClick)="onPay(order.id)"
+              >
+                {{
+                  order.paymentStatus === failedStatus
+                    ? ('payAgain' | translate)
+                    : ('payNow' | translate)
+                }}
+              </app-button>
+            </div>
+          </app-card>
+        }
+
+        @if (order.paymentRefId; as refId) {
+          <p class="mb-6 text-sm text-slate-600 dark:text-slate-300">
+            {{ 'paymentRefId' | translate }}:
+            <span class="font-mono" dir="ltr">{{ refId }}</span>
+          </p>
+        }
 
         <!-- Card-to-card instructions, shown until the payment is confirmed. -->
         @if (showPaymentPanel()) {
@@ -328,6 +385,10 @@ import { OrderStore } from '../store/order';
 export class OrderDetailComponent implements OnInit {
   /** Bound from the route via `withComponentInputBinding`. */
   readonly id = input.required<string>();
+  /** `?payment=SUCCESS|FAILED`, appended by the backend after the gateway. */
+  readonly payment = input<string>();
+
+  readonly failedStatus = PAYMENT_STATUSES.FAILED;
 
   readonly store = inject(OrderStore);
 
@@ -353,10 +414,31 @@ export class OrderDetailComponent implements OnInit {
     const order = this.store.order();
     if (!order) return false;
     return (
-      order.paymentMethod === 'CARD_TO_CARD' &&
-      order.paymentStatus !== 'PAID' &&
-      order.status !== 'CANCELLED'
+      order.paymentMethod === PAYMENT_METHODS.CARD_TO_CARD &&
+      order.paymentStatus !== PAYMENT_STATUSES.PAID &&
+      order.status !== ORDER_STATUSES.CANCELLED
     );
+  });
+
+  readonly showOnlinePanel = computed(() => {
+    const order = this.store.order();
+    if (!order) return false;
+    return (
+      order.paymentMethod === PAYMENT_METHODS.ONLINE &&
+      order.paymentStatus !== PAYMENT_STATUSES.PAID &&
+      order.status !== ORDER_STATUSES.CANCELLED
+    );
+  });
+
+  /** Translation key of the result banner, or null when there is nothing to say. */
+  readonly paymentBanner = computed(() => {
+    const order = this.store.order();
+    const result = this.payment();
+    if (!order || order.paymentMethod !== PAYMENT_METHODS.ONLINE) return null;
+    if (order.paymentStatus === PAYMENT_STATUSES.PAID) {
+      return result === PAYMENT_RESULTS.SUCCESS ? 'paymentSuccessBanner' : null;
+    }
+    return result === PAYMENT_RESULTS.FAILED ? 'paymentFailedBanner' : null;
   });
 
   readonly canCancel = computed(() => {
@@ -415,6 +497,10 @@ export class OrderDetailComponent implements OnInit {
         );
       },
     });
+  }
+
+  onPay(id: string) {
+    this.store.startPayment(id);
   }
 
   onCancel(id: string) {

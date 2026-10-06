@@ -3,12 +3,16 @@ import {
   computed,
   effect,
   inject,
+  linkedSignal,
   signal,
   ChangeDetectionStrategy,
 } from '@angular/core';
 import { Router } from '@angular/router';
 import type { AddressModel, AddressPayloadModel } from '@domain/models/address';
-import { PAYMENT_METHODS } from '@domain/const/payment-methods';
+import {
+  PAYMENT_METHODS,
+  type PaymentMethod,
+} from '@domain/const/payment-methods';
 import type { ShippingMethod } from '@domain/const/shipping-methods';
 import { ButtonComponent } from '@shared/components/button';
 import { CardComponent } from '@shared/components/card';
@@ -18,6 +22,7 @@ import { TranslatePipe } from '@shared/pipes/translate';
 import { AddressFormComponent } from '../../addresses/components/address-form';
 import { CartStore } from '../../cart/store/cart';
 import { injectShopSettingsQuery } from '../../settings/query/settings';
+import { PAYMENT_METHOD_KEYS } from '../const/payment-options';
 import { shippingOptions as buildShippingOptions } from '../const/shipping-options';
 import { CheckoutStore } from '../store/checkout';
 
@@ -222,15 +227,33 @@ import { CheckoutStore } from '../store/checkout';
                   <h2 class="font-bold text-slate-900 dark:text-slate-100 mb-4">
                     {{ 'paymentMethod' | translate }}
                   </h2>
-                  <div
-                    class="rounded-card border border-slate-900 dark:border-white bg-slate-50 dark:bg-slate-700/50 p-4"
-                  >
-                    <p class="font-medium text-slate-900 dark:text-slate-100">
-                      {{ 'cardToCard' | translate }}
-                    </p>
-                    <p class="text-sm text-slate-500 dark:text-slate-400 mt-1">
-                      {{ 'cardToCardInstructions' | translate }}
-                    </p>
+                  <div class="flex flex-col gap-3">
+                    @for (
+                      method of checkoutStore.paymentMethods();
+                      track method
+                    ) {
+                      <button
+                        type="button"
+                        class="text-start rounded-card border p-4 transition-colors"
+                        [class]="
+                          selectedPayment() === method
+                            ? 'border-slate-900 dark:border-white bg-slate-50 dark:bg-slate-700/50'
+                            : 'border-slate-200 dark:border-slate-700 hover:border-slate-400 dark:hover:border-slate-500'
+                        "
+                        (click)="selectedPayment.set(method)"
+                      >
+                        <p
+                          class="font-medium text-slate-900 dark:text-slate-100"
+                        >
+                          {{ paymentKeys[method].label | translate }}
+                        </p>
+                        <p
+                          class="text-sm text-slate-500 dark:text-slate-400 mt-1"
+                        >
+                          {{ paymentKeys[method].hint | translate }}
+                        </p>
+                      </button>
+                    }
                   </div>
                 </app-card>
               }
@@ -294,7 +317,7 @@ import { CheckoutStore } from '../store/checkout';
                         {{ 'paymentMethod' | translate }}
                       </h3>
                       <p class="text-sm text-slate-700 dark:text-slate-300">
-                        {{ 'cardToCard' | translate }}
+                        {{ paymentKeys[selectedPayment()].label | translate }}
                       </p>
                     </div>
                   </div>
@@ -377,6 +400,20 @@ export class CheckoutComponent {
   readonly selectedAddressId = signal<string | null>(null);
   readonly selectedShipping = signal<ShippingMethod | null>(null);
   readonly formOpen = signal(false);
+
+  readonly paymentKeys = PAYMENT_METHOD_KEYS;
+  /**
+   * Card-to-card until the customer picks otherwise. If the offered methods
+   * change and the picked one is gone, falls back to card-to-card rather than
+   * submit a method the server will reject.
+   */
+  readonly selectedPayment = linkedSignal<PaymentMethod[], PaymentMethod>({
+    source: () => this.checkoutStore.paymentMethods(),
+    computation: (methods, previous) =>
+      previous && methods.includes(previous.value)
+        ? previous.value
+        : PAYMENT_METHODS.CARD_TO_CARD,
+  });
 
   readonly stepLabels = [
     'shippingAddress',
@@ -472,7 +509,7 @@ export class CheckoutComponent {
     this.checkoutStore.placeOrder({
       shippingMethod: method,
       shippingAddressId: addressId,
-      paymentMethod: PAYMENT_METHODS.CARD_TO_CARD,
+      paymentMethod: this.selectedPayment(),
     });
   }
 

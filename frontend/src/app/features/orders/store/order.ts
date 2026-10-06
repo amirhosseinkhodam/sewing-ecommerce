@@ -6,6 +6,7 @@ import {
   injectUploadReceiptMutation,
   type UploadReceiptModel,
 } from '../mutation/orders';
+import { injectStartPaymentMutation } from '../mutation/payment';
 import { injectOrderQuery, injectOrdersQuery } from '../query/orders';
 
 @Injectable()
@@ -40,8 +41,16 @@ export class OrderStore {
 
   readonly #receiptMutation = injectUploadReceiptMutation();
   readonly #cancelMutation = injectCancelOrderMutation();
+  readonly #startPaymentMutation = injectStartPaymentMutation();
   readonly saving = computed(
     () => this.#receiptMutation.isPending() || this.#cancelMutation.isPending(),
+  );
+  // Stays true after success too: the browser is leaving for the gateway, so
+  // the button shouldn't re-enable and invite a second attempt.
+  readonly startingPayment = computed(
+    () =>
+      this.#startPaymentMutation.isPending() ||
+      this.#startPaymentMutation.isSuccess(),
   );
 
   loadOrder(id: string): void {
@@ -63,6 +72,10 @@ export class OrderStore {
 
   cancelOrder(id: string): void {
     this.#cancelMutation.mutate(id);
+  }
+
+  startPayment(id: string): void {
+    this.#startPaymentMutation.mutate(id);
   }
 
   reload(): void {

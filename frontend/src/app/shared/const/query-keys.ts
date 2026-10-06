@@ -16,6 +16,7 @@ export const QUERY_KEYS = {
   orders: 'orders',
   order: 'order',
   settings: 'settings',
+  paymentMethods: 'payment-methods',
   adminCategories: 'admin-categories',
   adminProducts: 'admin-products',
   adminProduct: 'admin-product',

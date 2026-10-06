@@ -12,6 +12,7 @@ import { HugeiconsIconComponent } from '@hugeicons/angular';
 import Image01Icon from '@hugeicons/core-free-icons/Image01Icon';
 
 import type { OrderStatus } from '@domain/const/order-statuses';
+import { PAYMENT_METHODS } from '@domain/const/payment-methods';
 import { ButtonComponent } from '@shared/components/button';
 import { CardComponent } from '@shared/components/card';
 import { InputComponent } from '@shared/components/input';
@@ -203,53 +204,73 @@ const NEXT_STATUSES: Readonly<Record<OrderStatus, readonly OrderStatus[]>> = {
               }
             </app-card>
 
-            <!-- Receipt review: the admin's evidence for confirming payment. -->
-            <app-card variant="bordered">
-              <h2 class="font-bold text-slate-900 dark:text-slate-100 mb-4">
-                {{ 'paymentReceipt' | translate }}
-              </h2>
-              @if (order.paymentReceipt; as receipt) {
-                <img
-                  loading="lazy"
-                  [src]="receipt"
-                  [alt]="'paymentReceipt' | translate"
-                  class="max-h-96 rounded-lg border border-slate-200 dark:border-slate-700 object-contain"
-                />
-                @if (order.paymentStatus !== 'PAID') {
-                  <div class="flex flex-wrap gap-3 mt-4">
+            @if (order.paymentMethod === onlineMethod) {
+              <!-- Online orders are confirmed by the gateway, so there is no
+                 receipt to review; the admin sees the gateway's reference. -->
+              <app-card variant="bordered">
+                <h2 class="font-bold text-slate-900 dark:text-slate-100 mb-4">
+                  {{ 'onlinePayment' | translate }}
+                </h2>
+                @if (order.paymentRefId; as refId) {
+                  <p class="text-sm text-slate-600 dark:text-slate-300">
+                    {{ 'paymentRefId' | translate }}:
+                    <span class="font-mono" dir="ltr">{{ refId }}</span>
+                  </p>
+                } @else {
+                  <p class="text-sm text-slate-500 dark:text-slate-400">
+                    {{ 'awaitingOnlinePayment' | translate }}
+                  </p>
+                }
+              </app-card>
+            } @else {
+              <!-- Receipt review: the admin's evidence for confirming payment. -->
+              <app-card variant="bordered">
+                <h2 class="font-bold text-slate-900 dark:text-slate-100 mb-4">
+                  {{ 'paymentReceipt' | translate }}
+                </h2>
+                @if (order.paymentReceipt; as receipt) {
+                  <img
+                    loading="lazy"
+                    [src]="receipt"
+                    [alt]="'paymentReceipt' | translate"
+                    class="max-h-96 rounded-lg border border-slate-200 dark:border-slate-700 object-contain"
+                  />
+                  @if (order.paymentStatus !== 'PAID') {
+                    <div class="flex flex-wrap gap-3 mt-4">
+                      <app-button
+                        variant="primary"
+                        [loading]="store.saving()"
+                        (buttonClick)="onConfirmPayment(order.id)"
+                      >
+                        {{ 'confirmPayment' | translate }}
+                      </app-button>
+                      <app-button
+                        variant="secondary"
+                        cssClass="!text-red-600 dark:!text-red-400"
+                        [loading]="store.saving()"
+                        (buttonClick)="onRejectPayment(order.id)"
+                      >
+                        {{ 'rejectPayment' | translate }}
+                      </app-button>
+                    </div>
+                  }
+                } @else {
+                  <p class="text-sm text-slate-500 dark:text-slate-400">
+                    {{ 'noReceiptUploaded' | translate }}
+                  </p>
+                  @if (order.paymentStatus !== 'PAID') {
                     <app-button
-                      variant="primary"
+                      variant="secondary"
+                      cssClass="mt-4"
                       [loading]="store.saving()"
                       (buttonClick)="onConfirmPayment(order.id)"
                     >
-                      {{ 'confirmPayment' | translate }}
+                      {{ 'markAsPaid' | translate }}
                     </app-button>
-                    <app-button
-                      variant="secondary"
-                      cssClass="!text-red-600 dark:!text-red-400"
-                      [loading]="store.saving()"
-                      (buttonClick)="onRejectPayment(order.id)"
-                    >
-                      {{ 'rejectPayment' | translate }}
-                    </app-button>
-                  </div>
+                  }
                 }
-              } @else {
-                <p class="text-sm text-slate-500 dark:text-slate-400">
-                  {{ 'noReceiptUploaded' | translate }}
-                </p>
-                @if (order.paymentStatus !== 'PAID') {
-                  <app-button
-                    variant="secondary"
-                    cssClass="mt-4"
-                    [loading]="store.saving()"
-                    (buttonClick)="onConfirmPayment(order.id)"
-                  >
-                    {{ 'markAsPaid' | translate }}
-                  </app-button>
-                }
-              }
-            </app-card>
+              </app-card>
+            }
           </div>
 
           <div class="flex flex-col gap-6">
@@ -341,6 +362,7 @@ export class AdminOrderDetailComponent implements OnInit {
   readonly store = inject(AdminOrderStore);
 
   readonly icons = { Image01Icon };
+  readonly onlineMethod = PAYMENT_METHODS.ONLINE;
 
   readonly selectedStatus = signal<OrderStatus | null>(null);
 
