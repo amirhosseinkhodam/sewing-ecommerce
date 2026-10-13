@@ -84,4 +84,4 @@ shared/                   # Cross-half shared types (root, backend-importable)
 - **Frontend migration + Phases 6–7**: done except deployment and a native-speaker `fa.json` review
 - **Phase 8 — Online payment + notifications**: in progress (provider-neutral gateway with a free fake provider first; see `PLAN.md`)
 
-Full roadmap, database schema, API endpoints, and implementation phases: see `PLAN.md`. How the system works (architecture, flows, auth, DB, decisions & why): see `PROJECT_KNOWLEDGE.md` — the canonical living knowledge guide, kept up to date automatically.
+Full roadmap, database schema, API endpoints, and implementation phases: see `PLAN.md`. Swagger at `/docs` is the generated API reference.
