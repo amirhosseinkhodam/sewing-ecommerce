@@ -28,6 +28,8 @@
   "couldNotSave": "Could not save.",
   "couldNotDelete": "Could not delete.",
   "toggleDarkMode": "Toggle dark mode",
+  "showPassword": "Show password",
+  "hidePassword": "Hide password",
   "switchLanguage": "Switch language ({{language}})",
   "openMenu": "Open menu",
   "closeMenu": "Close menu",

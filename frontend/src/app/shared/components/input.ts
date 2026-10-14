@@ -1,21 +1,27 @@
 import {
+  ChangeDetectionStrategy,
   Component,
+  computed,
+  ElementRef,
+  forwardRef,
   input,
   model,
   output,
-  forwardRef,
+  signal,
   ViewChild,
-  ElementRef,
-  ChangeDetectionStrategy,
 } from '@angular/core';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 import type { FormValueControl } from '@angular/forms/signals';
+import { HugeiconsIconComponent } from '@hugeicons/angular';
+import ViewIcon from '@hugeicons/core-free-icons/ViewIcon';
+import ViewOffSlashIcon from '@hugeicons/core-free-icons/ViewOffSlashIcon';
 import { BrnLabel } from '@spartan-ng/brain/label';
+import { TranslatePipe } from '../pipes/translate';
 import { uniqueId } from '../utils/unique-id';
 
 @Component({
   selector: 'app-input',
-  imports: [BrnLabel],
+  imports: [BrnLabel, HugeiconsIconComponent, TranslatePipe],
   template: `
     @if (label()) {
       <label
@@ -26,23 +32,44 @@ import { uniqueId } from '../utils/unique-id';
         {{ label() }}
       </label>
     }
-    <input
-      #inputElement
-      [id]="inputId"
-      [type]="type()"
-      [placeholder]="placeholder()"
-      [disabled]="disabled()"
-      [class]="computedClasses()"
-      [min]="min()"
-      [max]="max()"
-      [step]="step()"
-      [autocomplete]="autocomplete()"
-      [value]="value()"
-      (input)="onInput($event)"
-      (blur)="onBlur()"
-      (focus)="onFocus()"
-      (keydown)="keydown.emit($event)"
-    />
+    <div class="relative">
+      <input
+        #inputElement
+        [id]="inputId"
+        [type]="inputType()"
+        [placeholder]="placeholder()"
+        [disabled]="disabled()"
+        [class]="computedClasses()"
+        [min]="min()"
+        [max]="max()"
+        [step]="step()"
+        [autocomplete]="autocomplete()"
+        [value]="value()"
+        (input)="onInput($event)"
+        (blur)="onBlur()"
+        (focus)="onFocus()"
+        (keydown)="keydown.emit($event)"
+      />
+      @if (isPassword()) {
+        <button
+          type="button"
+          class="absolute inset-y-0 end-0 flex items-center px-3 bg-transparent border-0 cursor-pointer text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200 focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-blue-500 disabled:cursor-not-allowed disabled:opacity-50"
+          [disabled]="disabled()"
+          [attr.aria-label]="
+            (showPassword() ? 'hidePassword' : 'showPassword') | translate
+          "
+          [attr.aria-pressed]="showPassword()"
+          (click)="togglePassword()"
+        >
+          <hugeicons-icon
+            [icon]="showPassword() ? icons.ViewOffSlashIcon : icons.ViewIcon"
+            [size]="20"
+            color="currentColor"
+            [strokeWidth]="1.5"
+          />
+        </button>
+      }
+    </div>
   `,
   changeDetection: ChangeDetectionStrategy.Eager,
   providers: [
@@ -75,6 +102,13 @@ export class InputComponent
   readonly error = input<boolean>(false);
   readonly label = input<string>();
 
+  readonly icons = { ViewIcon, ViewOffSlashIcon };
+  readonly showPassword = signal(false);
+  readonly isPassword = computed(() => this.type() === 'password');
+  readonly inputType = computed(() =>
+    this.isPassword() && this.showPassword() ? 'text' : this.type(),
+  );
+
   readonly input = output<string>({ alias: 'inputChange' });
   readonly blur = output<void>({ alias: 'inputBlur' });
   readonly focusChange = output<void>({ alias: 'inputFocus' });
@@ -100,6 +134,10 @@ export class InputComponent
 
   onFocus() {
     this.focusChange.emit();
+  }
+
+  togglePassword() {
+    this.showPassword.update((shown) => !shown);
   }
 
   writeValue(value: string): void {
@@ -139,8 +177,15 @@ export class InputComponent
     };
 
     const errorClass = this.error() ? 'ring-red-500 border-red-500' : '';
+    const passwordClass = this.isPassword() ? 'pe-11' : '';
 
-    return [base, variants[this.variant()], errorClass, this.cssClass()]
+    return [
+      base,
+      variants[this.variant()],
+      errorClass,
+      passwordClass,
+      this.cssClass(),
+    ]
       .filter(Boolean)
       .join(' ');
   };

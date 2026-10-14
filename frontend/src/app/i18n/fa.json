@@ -28,6 +28,8 @@
   "couldNotSave": "ذخیره انجام نشد.",
   "couldNotDelete": "حذف انجام نشد.",
   "toggleDarkMode": "تغییر حالت تاریک",
+  "showPassword": "نمایش رمز عبور",
+  "hidePassword": "پنهان کردن رمز عبور",
   "switchLanguage": "تغییر زبان ({{language}})",
   "openMenu": "باز کردن منو",
   "closeMenu": "بستن منو",
