@@ -5,6 +5,7 @@ import {
   inject,
   OnInit,
   signal,
+  untracked,
   ChangeDetectionStrategy,
 } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -194,27 +195,30 @@ export class ProductDetailComponent implements OnInit {
     effect(() => {
       const product = this.store.product();
       if (!product) return;
-      const query = this.#route.snapshot.queryParamMap;
-      if (query.get('autoAdd') !== '1' || !this.#auth.isLoggedIn()) return;
+      untracked(() => {
+        const query = this.#route.snapshot.queryParamMap;
+        if (query.get('autoAdd') !== '1' || !this.#auth.isLoggedIn()) return;
 
-      const variantId = query.get('variantId');
-      const variant = product.variants.find((v) => v.id === variantId);
-      if (variant) this.selectedVariant.set(variant);
+        const variant = product.variants.find(
+          (v) => v.id === query.get('variantId'),
+        );
+        if (!variant) return;
 
-      if (product.variants.length === 0 || !this.selectedVariant()) return;
-      this.#cartStore.addItem({
-        productId: product.id,
-        variantId: this.selectedVariant()!.id,
-        quantity: 1,
-      });
-      this.#notification.show(
-        'success',
-        this.#languageService.translate('addedToCart'),
-      );
-      void this.#router.navigate([], {
-        relativeTo: this.#route,
-        queryParams: {},
-        replaceUrl: true,
+        this.selectedVariant.set(variant);
+        this.#cartStore.addItem({
+          productId: product.id,
+          variantId: variant.id,
+          quantity: 1,
+        });
+        this.#notification.show(
+          'success',
+          this.#languageService.translate('addedToCart'),
+        );
+        void this.#router.navigate([], {
+          relativeTo: this.#route,
+          queryParams: {},
+          replaceUrl: true,
+        });
       });
     });
   }
@@ -258,11 +262,16 @@ export class ProductDetailComponent implements OnInit {
         this.#languageService.translate('loginToAddToCart'),
       );
       const variant = this.selectedVariant();
+      const target = this.#router.parseUrl(this.#router.url);
+      if (variant) {
+        target.queryParams = {
+          ...target.queryParams,
+          variantId: variant.id,
+          autoAdd: '1',
+        };
+      }
       void this.#router.navigate(['/login'], {
-        queryParams: {
-          returnUrl: this.#router.url,
-          ...(variant ? { variantId: variant.id, autoAdd: '1' } : {}),
-        },
+        queryParams: { returnUrl: target.toString() },
       });
       return;
     }

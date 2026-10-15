@@ -9,6 +9,7 @@ import { SignalFormComponent } from '@shared/components/signal-form';
 import { SignalFormFieldComponent } from '@shared/components/signal-form-field';
 import { LoginFormService } from '../forms/login';
 import { AuthStore } from '../store/auth';
+import { safeReturnUrl } from '../utils/return-url';
 
 @Component({
   selector: 'app-login',
@@ -73,6 +74,7 @@ import { AuthStore } from '../store/auth';
             {{ 'dontHaveAccount' | translate }}
             <a
               routerLink="/register"
+              [queryParams]="returnUrl ? { returnUrl } : null"
               class="text-slate-900 dark:text-white font-medium hover:underline"
             >
               {{ 'register' | translate }}
@@ -89,12 +91,15 @@ export class LoginComponent {
 
   readonly #route = inject(ActivatedRoute);
 
+  readonly returnUrl = safeReturnUrl(
+    this.#route.snapshot.queryParamMap.get('returnUrl'),
+  );
+
   onSubmit(): void {
     void submit(this.loginForm.form, async () => {
       this.store.login({
         payload: this.loginForm.model(),
-        returnUrl:
-          this.#route.snapshot.queryParamMap.get('returnUrl') ?? undefined,
+        returnUrl: this.returnUrl,
       });
     });
   }

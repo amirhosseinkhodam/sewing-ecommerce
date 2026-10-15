@@ -1,5 +1,5 @@
 import { Component, inject, ChangeDetectionStrategy } from '@angular/core';
-import { RouterLink } from '@angular/router';
+import { ActivatedRoute, RouterLink } from '@angular/router';
 import { FormField, submit } from '@angular/forms/signals';
 import { TranslatePipe } from '@shared/pipes/translate';
 import { CardComponent } from '@shared/components/card';
@@ -9,6 +9,7 @@ import { SignalFormComponent } from '@shared/components/signal-form';
 import { SignalFormFieldComponent } from '@shared/components/signal-form-field';
 import { RegisterFormService } from '../forms/register';
 import { AuthStore } from '../store/auth';
+import { safeReturnUrl } from '../utils/return-url';
 
 @Component({
   selector: 'app-register',
@@ -124,6 +125,7 @@ import { AuthStore } from '../store/auth';
             {{ 'alreadyHaveAccount' | translate }}
             <a
               routerLink="/login"
+              [queryParams]="returnUrl ? { returnUrl } : null"
               class="text-slate-900 dark:text-white font-medium hover:underline"
             >
               {{ 'login' | translate }}
@@ -138,11 +140,17 @@ export class RegisterComponent {
   readonly registerForm = inject(RegisterFormService);
   readonly store = inject(AuthStore);
 
+  readonly #route = inject(ActivatedRoute);
+
+  readonly returnUrl = safeReturnUrl(
+    this.#route.snapshot.queryParamMap.get('returnUrl'),
+  );
+
   onSubmit(): void {
     void submit(this.registerForm.form, async () => {
       const { confirmPassword: _confirmPassword, ...payload } =
         this.registerForm.model();
-      this.store.register(payload);
+      this.store.register({ payload, returnUrl: this.returnUrl });
     });
   }
 }

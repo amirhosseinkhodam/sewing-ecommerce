@@ -30,3 +30,8 @@ export interface LoginRequestModel {
   readonly payload: AuthPayloadModel;
   readonly returnUrl?: string;
 }
+
+export interface RegisterRequestModel {
+  readonly payload: RegisterPayloadModel;
+  readonly returnUrl?: string;
+}

@@ -16,7 +16,8 @@ import { QUERY_KEYS } from '@shared/const/query-keys';
 import { injectMutationFeedback } from '@shared/utils/mutation-feedback';
 import { USER_ROLES } from '@domain/const/user-roles';
 import type { UserModel } from '@domain/models/user';
-import { LoginRequestModel, RegisterPayloadModel } from '../models/auth';
+import { LoginRequestModel, RegisterRequestModel } from '../models/auth';
+import { safeReturnUrl } from '../utils/return-url';
 import { AuthService } from '../services/auth';
 import { injectProfileQuery } from '../query/profile';
 
@@ -90,7 +91,7 @@ export const AuthStore = signalStore(
                 tapResponse({
                   next: (response) => {
                     startSession(response);
-                    void router.navigateByUrl(returnUrl ?? '/');
+                    void router.navigateByUrl(safeReturnUrl(returnUrl) ?? '/');
                   },
                   error: (err: unknown) => {
                     patchState(store, { loading: false });
@@ -101,15 +102,15 @@ export const AuthStore = signalStore(
             ),
           ),
         ),
-        register: rxMethod<RegisterPayloadModel>(
+        register: rxMethod<RegisterRequestModel>(
           pipe(
             tap(() => patchState(store, { loading: true })),
-            switchMap((payload: RegisterPayloadModel) =>
+            switchMap(({ payload, returnUrl }: RegisterRequestModel) =>
               authService.register(payload).pipe(
                 tapResponse({
                   next: (response) => {
                     startSession(response);
-                    void router.navigateByUrl('/');
+                    void router.navigateByUrl(safeReturnUrl(returnUrl) ?? '/');
                   },
                   error: (err: unknown) => {
                     patchState(store, { loading: false });
