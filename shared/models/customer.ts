@@ -8,7 +8,6 @@ export interface CustomerModel {
   readonly id: string;
   readonly firstName: string;
   readonly lastName: string;
-  readonly email: string;
   readonly phone: string;
   readonly role: UserRole;
   readonly orderCount: number;

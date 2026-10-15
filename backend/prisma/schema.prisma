@@ -44,7 +44,6 @@ model User {
   id        String   @id @default(uuid())
   firstName String
   lastName  String
-  email     String   @unique
   phone     String   @unique
   password  String
   role      Role     @default(CUSTOMER)
@@ -224,8 +223,7 @@ model OrderItem {
 model ContactMessage {
   id        String   @id @default(uuid())
   name      String
-  email     String
-  phone     String?
+  phone     String
   message   String
   isRead    Boolean  @default(false)
   createdAt DateTime @default(now())
@@ -241,7 +239,6 @@ model ShopSetting {
   bankCardNumber String
   bankCardHolder String
   shopPhone      String
-  shopEmail      String
   shopAddress    String
   businessHours  String
   postPrice      Decimal

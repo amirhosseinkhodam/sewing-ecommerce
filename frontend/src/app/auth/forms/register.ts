@@ -1,5 +1,5 @@
 import { Injectable, signal } from '@angular/core';
-import { email, form, required, validate } from '@angular/forms/signals';
+import { form, required, validate } from '@angular/forms/signals';
 import { passwordErrors } from './password-errors';
 
 @Injectable({ providedIn: 'root' })
@@ -7,7 +7,6 @@ export class RegisterFormService {
   readonly model = signal({
     firstName: '',
     lastName: '',
-    email: '',
     phone: '',
     password: '',
     confirmPassword: '',
@@ -25,8 +24,6 @@ export class RegisterFormService {
         return undefined;
       });
     }
-    required(path.email, { message: 'validation.required' });
-    email(path.email, { message: 'validation.email' });
     required(path.phone, { message: 'validation.required' });
     validate(path.phone, ({ value }) =>
       value() && !/^09\d{9}$/.test(value())

@@ -4,7 +4,7 @@ import { Role } from '../../generated/prisma/client';
 
 export interface AuthUser {
   readonly id: string;
-  readonly email: string;
+  readonly phone: string;
   readonly role: Role;
 }
 

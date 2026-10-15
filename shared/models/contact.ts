@@ -1,8 +1,7 @@
 export interface ContactMessageModel {
   readonly id: string;
   readonly name: string;
-  readonly email: string;
-  readonly phone: string | null;
+  readonly phone: string;
   readonly message: string;
   readonly isRead: boolean;
   readonly createdAt: string;
@@ -10,8 +9,7 @@ export interface ContactMessageModel {
 
 export interface ContactPayloadModel {
   readonly name: string;
-  readonly email: string;
-  readonly phone?: string;
+  readonly phone: string;
   readonly message: string;
 }
 

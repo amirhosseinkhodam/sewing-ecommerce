@@ -29,7 +29,6 @@ async function main() {
       bankCardNumber: '6037-9911-2233-4455',
       bankCardHolder: 'فروشگاه خیاطی',
       shopPhone: '021-12345678',
-      shopEmail: 'info@sewing.local',
       shopAddress: 'تهران، خیابان ولیعصر، پلاک ۱۲۳',
       businessHours: 'شنبه تا پنجشنبه، ۹ صبح تا ۸ شب',
       postPrice: 60000,
@@ -41,7 +40,7 @@ async function main() {
   // eslint-disable-next-line no-console
   console.log('Shop settings seeded.');
 
-  const adminEmail = process.env.SEED_ADMIN_EMAIL ?? 'admin@sewing.local';
+  const adminPhone = process.env.SEED_ADMIN_PHONE ?? '09120000000';
   const adminPassword = process.env.SEED_ADMIN_PASSWORD ?? 'admin12345';
   // Never let a production database get an admin with the well-known default.
   if (isProduction && !process.env.SEED_ADMIN_PASSWORD) {
@@ -49,19 +48,18 @@ async function main() {
   }
 
   await prisma.user.upsert({
-    where: { email: adminEmail },
+    where: { phone: adminPhone },
     update: {},
     create: {
       firstName: 'Admin',
       lastName: 'Sewing',
-      email: adminEmail,
-      phone: '09120000000',
+      phone: adminPhone,
       password: await bcrypt.hash(adminPassword, 10),
       role: Role.ADMIN,
     },
   });
 
-  console.log(`Admin user ready: ${adminEmail}`);
+  console.log(`Admin user ready: ${adminPhone}`);
 
   // Demo catalog, customers (shared known password), and orders are for local
   // development only.
@@ -188,7 +186,7 @@ async function main() {
  * order history behind them, so a small set of demo customers and orders is
  * seeded. Orders are spread across the last few weeks and across the whole
  * status/payment lifecycle so the trend chart and the status breakdowns all
- * have something to show. Everything is keyed on a stable email, so re-running
+ * have something to show. Everything is keyed on a stable phone number, so re-running
  * the seed is idempotent.
  */
 async function seedDemoOrders() {
@@ -207,19 +205,16 @@ async function seedDemoOrders() {
     {
       firstName: 'مریم',
       lastName: 'کریمی',
-      email: 'maryam@sewing.local',
       phone: '09121110001',
     },
     {
       firstName: 'علی',
       lastName: 'رضایی',
-      email: 'ali@sewing.local',
       phone: '09121110002',
     },
     {
       firstName: 'زهرا',
       lastName: 'موسوی',
-      email: 'zahra@sewing.local',
       phone: '09121110003',
     },
   ];
@@ -227,7 +222,7 @@ async function seedDemoOrders() {
   const users = [];
   for (const customer of demoCustomers) {
     const user = await prisma.user.upsert({
-      where: { email: customer.email },
+      where: { phone: customer.phone },
       update: {},
       create: { ...customer, password, role: Role.CUSTOMER },
     });
@@ -253,14 +248,54 @@ async function seedDemoOrders() {
   // (daysAgo, status, paymentStatus, shippingMethod) — a spread that exercises
   // every branch of the status lifecycle and both payment outcomes.
   const orderPlan = [
-    { daysAgo: 27, status: OrderStatus.DELIVERED, paymentStatus: PaymentStatus.PAID, shippingMethod: ShippingMethod.POST },
-    { daysAgo: 21, status: OrderStatus.DELIVERED, paymentStatus: PaymentStatus.PAID, shippingMethod: ShippingMethod.COURIER },
-    { daysAgo: 15, status: OrderStatus.CANCELLED, paymentStatus: PaymentStatus.FAILED, shippingMethod: ShippingMethod.POST },
-    { daysAgo: 11, status: OrderStatus.SHIPPED, paymentStatus: PaymentStatus.PAID, shippingMethod: ShippingMethod.COURIER },
-    { daysAgo: 8, status: OrderStatus.PROCESSING, paymentStatus: PaymentStatus.PAID, shippingMethod: ShippingMethod.POST },
-    { daysAgo: 5, status: OrderStatus.CONFIRMED, paymentStatus: PaymentStatus.PAID, shippingMethod: ShippingMethod.COURIER },
-    { daysAgo: 3, status: OrderStatus.PENDING, paymentStatus: PaymentStatus.PENDING, shippingMethod: ShippingMethod.POST },
-    { daysAgo: 1, status: OrderStatus.PENDING, paymentStatus: PaymentStatus.PENDING, shippingMethod: ShippingMethod.COURIER },
+    {
+      daysAgo: 27,
+      status: OrderStatus.DELIVERED,
+      paymentStatus: PaymentStatus.PAID,
+      shippingMethod: ShippingMethod.POST,
+    },
+    {
+      daysAgo: 21,
+      status: OrderStatus.DELIVERED,
+      paymentStatus: PaymentStatus.PAID,
+      shippingMethod: ShippingMethod.COURIER,
+    },
+    {
+      daysAgo: 15,
+      status: OrderStatus.CANCELLED,
+      paymentStatus: PaymentStatus.FAILED,
+      shippingMethod: ShippingMethod.POST,
+    },
+    {
+      daysAgo: 11,
+      status: OrderStatus.SHIPPED,
+      paymentStatus: PaymentStatus.PAID,
+      shippingMethod: ShippingMethod.COURIER,
+    },
+    {
+      daysAgo: 8,
+      status: OrderStatus.PROCESSING,
+      paymentStatus: PaymentStatus.PAID,
+      shippingMethod: ShippingMethod.POST,
+    },
+    {
+      daysAgo: 5,
+      status: OrderStatus.CONFIRMED,
+      paymentStatus: PaymentStatus.PAID,
+      shippingMethod: ShippingMethod.COURIER,
+    },
+    {
+      daysAgo: 3,
+      status: OrderStatus.PENDING,
+      paymentStatus: PaymentStatus.PENDING,
+      shippingMethod: ShippingMethod.POST,
+    },
+    {
+      daysAgo: 1,
+      status: OrderStatus.PENDING,
+      paymentStatus: PaymentStatus.PENDING,
+      shippingMethod: ShippingMethod.COURIER,
+    },
   ];
 
   let seededOrders = 0;

@@ -90,7 +90,7 @@ export class InputComponent
   /** Associates the label with the control for screen readers and click-to-focus. */
   readonly inputId = uniqueId('app-input');
   readonly type = input<
-    'text' | 'email' | 'password' | 'number' | 'textarea' | 'search' | 'tel'
+    'text' | 'password' | 'number' | 'textarea' | 'search' | 'tel'
   >('text');
   readonly placeholder = input<string>();
   readonly disabled = input<boolean>(false);

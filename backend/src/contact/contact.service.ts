@@ -20,7 +20,6 @@ export class ContactService {
     await this.#prisma.contactMessage.create({
       data: {
         name: dto.name,
-        email: dto.email,
         phone: dto.phone,
         message: dto.message,
       },

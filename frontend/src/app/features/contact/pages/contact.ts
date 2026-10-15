@@ -8,7 +8,6 @@ import { FormField, submit } from '@angular/forms/signals';
 import { HugeiconsIconComponent } from '@hugeicons/angular';
 import Clock01Icon from '@hugeicons/core-free-icons/Clock01Icon';
 import Location01Icon from '@hugeicons/core-free-icons/Location01Icon';
-import Mail01Icon from '@hugeicons/core-free-icons/Mail01Icon';
 import SmartPhone01Icon from '@hugeicons/core-free-icons/SmartPhone01Icon';
 
 import { ButtonComponent } from '@shared/components/button';
@@ -62,23 +61,13 @@ import { injectSubmitContactMutation } from '../mutation/contact';
               </div>
               <div>
                 <app-input
-                  [formField]="contactForm.form.email"
-                  type="email"
-                  [label]="'email' | translate"
-                  [placeholder]="'email' | translate"
+                  [formField]="contactForm.form.phone"
+                  type="tel"
+                  [label]="'phoneNumber' | translate"
+                  [placeholder]="'phoneNumber' | translate"
                 />
-                <app-signal-form-field [field]="contactForm.form.email" />
+                <app-signal-form-field [field]="contactForm.form.phone" />
               </div>
-            </div>
-
-            <div>
-              <app-input
-                [formField]="contactForm.form.phone"
-                type="tel"
-                [label]="'phoneNumber' | translate"
-                [placeholder]="'optional' | translate"
-              />
-              <app-signal-form-field [field]="contactForm.form.phone" />
             </div>
 
             <div>
@@ -152,27 +141,6 @@ import { injectSubmitContactMutation } from '../mutation/contact';
 
             <div class="flex items-start gap-3">
               <hugeicons-icon
-                [icon]="icons.Mail01Icon"
-                [size]="18"
-                color="currentColor"
-                [strokeWidth]="1.5"
-                class="text-slate-400 dark:text-slate-500 mt-0.5 shrink-0"
-              />
-              <div>
-                <p class="text-xs text-slate-500 dark:text-slate-400">
-                  {{ 'email' | translate }}
-                </p>
-                <p
-                  class="text-sm text-slate-900 dark:text-slate-100 mt-0.5"
-                  dir="ltr"
-                >
-                  {{ shop()?.shopEmail }}
-                </p>
-              </div>
-            </div>
-
-            <div class="flex items-start gap-3">
-              <hugeicons-icon
                 [icon]="icons.Clock01Icon"
                 [size]="18"
                 color="currentColor"
@@ -199,7 +167,6 @@ export class ContactComponent {
 
   readonly icons = {
     Location01Icon,
-    Mail01Icon,
     SmartPhone01Icon,
     Clock01Icon,
   };

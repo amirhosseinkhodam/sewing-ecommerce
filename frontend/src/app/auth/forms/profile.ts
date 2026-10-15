@@ -1,5 +1,5 @@
 import { Injectable, signal } from '@angular/core';
-import { email, form, required, validate } from '@angular/forms/signals';
+import { form, required, validate } from '@angular/forms/signals';
 import type { UserModel } from '@domain/models/user';
 
 @Injectable({ providedIn: 'root' })
@@ -7,7 +7,6 @@ export class ProfileFormService {
   readonly model = signal({
     firstName: '',
     lastName: '',
-    email: '',
     phone: '',
   });
   readonly form = form(this.model, (path) => {
@@ -23,8 +22,6 @@ export class ProfileFormService {
         return undefined;
       });
     }
-    required(path.email, { message: 'validation.required' });
-    email(path.email, { message: 'validation.email' });
     required(path.phone, { message: 'validation.required' });
     validate(path.phone, ({ value }) =>
       value() && !/^09\d{9}$/.test(value())
@@ -37,7 +34,6 @@ export class ProfileFormService {
     this.model.set({
       firstName: user.firstName,
       lastName: user.lastName,
-      email: user.email,
       phone: user.phone,
     });
   }

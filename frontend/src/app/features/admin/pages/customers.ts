@@ -83,9 +83,6 @@ const ROLE_FILTER_ALL = 'all';
                     {{ 'name' | translate }}
                   </th>
                   <th class="px-4 py-3 text-start font-medium">
-                    {{ 'email' | translate }}
-                  </th>
-                  <th class="px-4 py-3 text-start font-medium">
                     {{ 'phoneNumber' | translate }}
                   </th>
                   <th class="px-4 py-3 text-start font-medium">
@@ -111,12 +108,6 @@ const ROLE_FILTER_ALL = 'all';
                       class="px-4 py-3 font-medium text-slate-900 dark:text-slate-100"
                     >
                       {{ customer.firstName }} {{ customer.lastName }}
-                    </td>
-                    <td
-                      class="px-4 py-3 text-slate-500 dark:text-slate-400"
-                      dir="ltr"
-                    >
-                      {{ customer.email }}
                     </td>
                     <td
                       class="px-4 py-3 text-slate-500 dark:text-slate-400"

@@ -1,6 +1,5 @@
 import { Transform, Type } from 'class-transformer';
 import {
-  IsEmail,
   IsInt,
   IsNumber,
   IsString,
@@ -39,12 +38,6 @@ export class UpdateSettingsDto {
   @MinLength(1)
   @MaxLength(40)
   readonly shopPhone!: string;
-
-  @Transform(({ value }: { value: unknown }) =>
-    typeof value === 'string' ? value.trim().toLowerCase() : value,
-  )
-  @IsEmail()
-  readonly shopEmail!: string;
 
   @IsString()
   @MinLength(1)

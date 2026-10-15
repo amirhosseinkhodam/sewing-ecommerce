@@ -98,7 +98,7 @@ Future features (`categories`, `products`, `cart`, `orders`, ...) follow the **e
 - `app.setGlobalPrefix('api')` — all routes are under `/api`.
 - `app.enableCors()` — allows cross-origin requests (dev convenience; the dev proxy makes this mostly moot).
 - `app.useGlobalPipes(new ValidationPipe({ whitelist: true, transform: true }))` — two important behaviors:
-  - **`whitelist: true`** strips any property from the request body that isn't declared in a DTO. If a client sends `{ email, password, isAdmin: true }`, `isAdmin` is silently dropped — a cheap security guard against mass-assignment.
+  - **`whitelist: true`** strips any property from the request body that isn't declared in a DTO. If a client sends `{ phone, password, isAdmin: true }`, `isAdmin` is silently dropped — a cheap security guard against mass-assignment.
   - **`transform: true`** converts plain JSON into typed DTO class instances, and coerces primitives (e.g. string `"5"` → number `5` for `@Param` / `@Query`).
 - `app.useGlobalFilters(new HttpExceptionFilter())` — every thrown error is converted to the standardized `{ statusCode, message }` shape (see [A7](#a7-error-contract)).
 - Swagger is generated automatically from the controllers/DTOs and mounted at **`/docs`** — you can explore and test every endpoint there.
@@ -166,8 +166,8 @@ Note the private field pattern (`readonly #auth`) — NestJS DI happens through 
 
 `auth.service.ts` is where the interesting logic lives:
 
-- **`register`**: checks for an existing email *or* phone (`findFirst` with an `OR`), throws `ConflictException` (→ HTTP 409) if taken, hashes the password with **bcrypt** (10 rounds — never store plaintext, never return it), creates the user, and returns tokens + user.
-- **`login`**: looks up by email, compares bcrypt hashes, throws `UnauthorizedException` (→ 401) on failure.
+- **`register`**: checks for an existing phone, throws `ConflictException` (→ HTTP 409) if taken, hashes the password with **bcrypt** (10 rounds — never store plaintext, never return it), creates the user, and returns tokens + user.
+- **`login`**: looks up by phone, compares bcrypt hashes, throws `UnauthorizedException` (→ 401) on failure.
 - **`refresh`**: verifies the *refresh* token with a **separate secret** (`JWT_REFRESH_SECRET`), reloads the user, issues a fresh token pair.
 - **`#signTokens`**: issues an **access token (15 min)** and a **refresh token (7 days)**, signed with *different* secrets and expiries so a leaked access token can't mint new tokens. It's `async` with `Promise.all`.
 - **Prisma `omit`**: every query that returns a user uses `omit: { password, createdAt, updatedAt }` (shared `USER_OMIT` const) so `password` never leaves the service. `login` fetches the password for the bcrypt check, then strips it via destructuring before returning. The response shape is the shared `UserModel` (from `shared/models/user.ts`) — this is why your frontend never sees a `password` field.
@@ -178,7 +178,7 @@ Passport's JWT strategy reads the `Authorization: Bearer <token>` header, verifi
 
 ```ts
 validate(payload: JwtPayload): AuthUser {
-  return { id: payload.sub, email: payload.email, role: payload.role };
+  return { id: payload.sub, phone: payload.phone, role: payload.role };
 }
 ```
 
@@ -212,7 +212,7 @@ The global `ValidationPipe` runs these rules, and on failure returns a 400 with 
 - Same pattern for `categories` (public list vs admin CRUD).
 - `dto/create-product.dto.ts` — `@ValidateNested` + `@Type(() => CreateVariantDto)` for the `variants` array, so Prisma receives typed variant data.
 - `products.service.ts` — every read includes `category` and ordered `variants` via Prisma `include`; writes upsert variants (`upsert` by `id`) so editing replaces variant stock/sizes cleanly; deletion cascades via the Prisma schema.
-- **Deleting a category that still has products → 409** (`ConflictException`, checked with `product.count()` first) — mirrors the duplicate-email 409 pattern.
+- **Deleting a category that still has products → 409** (`ConflictException`, checked with `product.count()` first) — mirrors the duplicate-phone 409 pattern.
 - `common/utils/slugify.ts` — generates a URL-safe slug from the name. It **transliterates Persian → Latin** (`جلیقه چرم` → `jlyghh-chrm`) so Persian product names get readable (non-empty) slugs, with a `randomUUID()` fallback for names that produce nothing.
 
 **List filtering** (`GET /api/products`) reads `search`, `category` (slug), `minPrice`, `maxPrice`, `sort` (`newest | priceAsc | priceDesc`), `page`, `pageSize` from the query string and returns `{ items, total, page, pageSize, totalPages }`.
@@ -232,7 +232,7 @@ The returned relative paths (`/uploads/...`) are what you store on the model and
 `common/filters/http-exception.filter.ts` catches **everything** and responds with exactly:
 
 ```json
-{ "statusCode": 400, "message": "email must be an email" }
+{ "statusCode": 400, "message": "phone must be a valid phone number" }
 ```
 
 - `message` is a single string — even class-validator arrays are joined with `", "`.
@@ -242,7 +242,7 @@ The returned relative paths (`/uploads/...`) are what you store on the model and
 | Situation | Status |
 |---|---|
 | Validation failed (DTO) | 400 |
-| Duplicate email/phone | 409 (ConflictException) |
+| Duplicate phone | 409 (ConflictException) |
 | Wrong credentials / expired token | 401 (UnauthorizedException) |
 | Not authenticated | 401 |
 | Authenticated but not admin on an `@Roles('ADMIN')` route | 403 |
@@ -462,7 +462,7 @@ LoginComponent
 
 ```ts
 export interface AuthPayloadModel {   // = LoginDto
-  readonly email: string;
+  readonly phone: string;
   readonly password: string;
 }
 export interface AuthResponseModel {  // = login() return value
@@ -474,7 +474,7 @@ export interface AuthResponseModel {  // = login() return value
 
 **Services** (`services/auth.ts`) mirror your controller routes 1:1: `login`, `register`, `refresh`, `me`, `updateProfile`.
 
-**Field names matter**: `getRawValue()` sends exactly the model properties — `email`, `password`, `firstName`, `lastName`, `phone`, `refreshToken`. If you rename a backend DTO field, you must rename it here too.
+**Field names matter**: `getRawValue()` sends exactly the model properties — `phone`, `password`, `firstName`, `lastName`, `refreshToken`. If you rename a backend DTO field, you must rename it here too.
 
 ## B7. Forms
 
@@ -485,7 +485,7 @@ Forms are the biggest mental shift. Look at `forms/login.ts`:
 export class LoginFormService {
   readonly #fb = inject(FormBuilder);
   readonly #form = this.#fb.nonNullable.group({
-    email: ['', [Validators.required, Validators.email]],
+    phone: ['', [Validators.required]],
     password: ['', [Validators.required, strongPasswordValidator()]],
   });
   get form() { return this.#form; }
@@ -555,10 +555,10 @@ Current live endpoints (Swagger at `/docs`). Shapes match DTO ⇄ model.
 
 | Method | Path | Auth | Request body (DTO) | Response |
 |---|---|---|---|---|
-| POST | `/api/auth/register` | — | `RegisterDto` `{firstName, lastName, email, password, phone}` | `{accessToken, refreshToken, user}` |
-| POST | `/api/auth/login` | — | `LoginDto` `{email, password}` | `{accessToken, refreshToken, user}` |
+| POST | `/api/auth/register` | — | `RegisterDto` `{firstName, lastName, password, phone}` | `{accessToken, refreshToken, user}` |
+| POST | `/api/auth/login` | — | `LoginDto` `{phone, password}` | `{accessToken, refreshToken, user}` |
 | POST | `/api/auth/refresh` | — | `RefreshDto` `{refreshToken}` | `{accessToken, refreshToken, user}` |
-| GET | `/api/auth/me` | Bearer | — | `UserModel` `{id, firstName, lastName, email, phone, role}` |
+| GET | `/api/auth/me` | Bearer | — | `UserModel` `{id, firstName, lastName, phone, role}` |
 | PATCH | `/api/auth/profile` | Bearer | `UpdateProfileDto` (all optional) | `UserModel` |
 
 `role` ∈ `'CUSTOMER' | 'ADMIN'` (Prisma `Role` enum, sent uppercase).

@@ -30,7 +30,6 @@ export class CustomersService {
       where.OR = [
         { firstName: { contains: query.search, mode: 'insensitive' } },
         { lastName: { contains: query.search, mode: 'insensitive' } },
-        { email: { contains: query.search, mode: 'insensitive' } },
         { phone: { contains: query.search } },
       ];
     }
@@ -54,7 +53,6 @@ export class CustomersService {
         id: user.id,
         firstName: user.firstName,
         lastName: user.lastName,
-        email: user.email,
         phone: user.phone,
         role: user.role,
         orderCount: aggregates.get(user.id)?._count._all ?? 0,

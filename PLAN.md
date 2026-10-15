@@ -40,7 +40,7 @@ Database (PostgreSQL)
 ```
 User
 ├── id (uuid, PK)
-├── firstName / lastName / email / phone
+├── firstName / lastName / phone
 ├── password (bcrypt)
 ├── role: CUSTOMER | ADMIN
 ├── createdAt / updatedAt
@@ -132,7 +132,7 @@ OrderItem (snapshot)
 
 ContactMessage
 ├── id (uuid, PK)
-├── name / email / phone
+├── name / phone
 ├── message
 ├── isRead
 ├── createdAt / updatedAt
@@ -141,7 +141,7 @@ ShopSetting (single row, id = 'default')
 ├── id (PK, defaults to 'default' so the row is a singleton)
 ├── shopName / businessHours
 ├── bankCardNumber / bankCardHolder
-├── shopPhone / shopEmail / shopAddress
+├── shopPhone / shopAddress
 ├── postPrice: DECIMAL / postEtaDays: INT
 ├── courierPrice: DECIMAL / courierEtaDays: INT
 ├── createdAt / updatedAt
@@ -318,7 +318,7 @@ frontend/src/app/
 - `PATCH /api/admin/orders/:id/payment` — confirm/reject card-to-card payment
 - `GET /POST /api/admin/portfolio` — list includes inactive items
 - `GET /PATCH/DELETE /api/admin/portfolio/:id`
-- `GET /api/admin/customers` — paginated; filters: `search` (name/email/phone), `role`; rows carry `orderCount` and `totalSpent` (cancelled orders excluded)
+- `GET /api/admin/customers` — paginated; filters: `search` (name/phone), `role`; rows carry `orderCount` and `totalSpent` (cancelled orders excluded)
 - `GET /api/admin/messages` — paginated; filter: `isRead`; response carries `unreadCount`
 - `PATCH /api/admin/messages/:id/read`
 - `DELETE /api/admin/messages/:id`
@@ -348,7 +348,7 @@ frontend/src/app/
 
 ### Contact
 
-- `/contact` → `POST /api/contact` submits name/email/phone/message; stored as a `ContactMessage` the admin reads in the admin panel (mark read / delete).
+- `/contact` → `POST /api/contact` submits name/phone/message; stored as a `ContactMessage` the admin reads in the admin panel (mark read / delete).
 
 ### Guest browsing -> Add to cart -> Checkout
 
@@ -594,7 +594,7 @@ Checkout: `checkout, shippingAddress, selectAddress, addAddress, shippingMethod,
 
 Order: `order(s), orderDetail, orderNumber, orderDate, orderStatus, orderHistory, status(Pending|Confirmed|Processing|Shipped|Delivered|Cancelled), paymentStatus, payment(Pending|Paid|Failed|Refunded), trackingCode, retryPayment, paymentFailed, paymentCancelled`
 
-Auth: `email, password, confirmPassword, firstName, lastName, phone, register, login, forgotPassword, loginRequired, loginToAddToCart, alreadyHaveAccount, dontHaveAccount`
+Auth: `phone, password, confirmPassword, firstName, lastName, phone, register, login, forgotPassword, loginRequired, loginToAddToCart, alreadyHaveAccount, dontHaveAccount`
 
 Admin: `dashboard, totalOrders, totalRevenue, totalCustomers, totalProducts, recentOrders, manageProducts, manageOrders, manageCategories, managePortfolio, manageCustomers, messages, shopName, businessHours, bankCardSettings, shippingSettings`
 

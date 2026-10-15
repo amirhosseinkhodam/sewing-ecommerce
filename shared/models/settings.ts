@@ -16,7 +16,6 @@ export interface ShopSettingsModel {
   readonly bankCardNumber: string;
   readonly bankCardHolder: string;
   readonly shopPhone: string;
-  readonly shopEmail: string;
   readonly shopAddress: string;
   readonly businessHours: string;
   /** Keyed by shipping method so the checkout can render the step generically. */
@@ -34,7 +33,6 @@ export interface UpdateShopSettingsPayloadModel {
   readonly bankCardNumber: string;
   readonly bankCardHolder: string;
   readonly shopPhone: string;
-  readonly shopEmail: string;
   readonly shopAddress: string;
   readonly businessHours: string;
   readonly postPrice: string;

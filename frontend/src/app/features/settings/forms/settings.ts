@@ -1,5 +1,5 @@
 import { Injectable, signal } from '@angular/core';
-import { email, form, required, validate } from '@angular/forms/signals';
+import { form, required, validate } from '@angular/forms/signals';
 import type {
   ShopSettingsModel,
   UpdateShopSettingsPayloadModel,
@@ -30,7 +30,6 @@ export class SettingsFormService {
     bankCardNumber: '',
     bankCardHolder: '',
     shopPhone: '',
-    shopEmail: '',
     shopAddress: '',
     businessHours: '',
     postPrice: '0',
@@ -44,8 +43,6 @@ export class SettingsFormService {
     required(path.bankCardNumber, { message: 'validation.required' });
     required(path.bankCardHolder, { message: 'validation.required' });
     required(path.shopPhone, { message: 'validation.required' });
-    required(path.shopEmail, { message: 'validation.required' });
-    email(path.shopEmail, { message: 'validation.email' });
     required(path.shopAddress, { message: 'validation.required' });
     required(path.businessHours, { message: 'validation.required' });
     for (const field of [
@@ -68,7 +65,6 @@ export class SettingsFormService {
       bankCardNumber: settings.bankCardNumber,
       bankCardHolder: settings.bankCardHolder,
       shopPhone: settings.shopPhone,
-      shopEmail: settings.shopEmail,
       shopAddress: settings.shopAddress,
       businessHours: settings.businessHours,
       postPrice: post.price,
@@ -85,7 +81,6 @@ export class SettingsFormService {
       bankCardNumber: value.bankCardNumber.trim(),
       bankCardHolder: value.bankCardHolder.trim(),
       shopPhone: value.shopPhone.trim(),
-      shopEmail: value.shopEmail.trim(),
       shopAddress: value.shopAddress.trim(),
       businessHours: value.businessHours.trim(),
       postPrice: value.postPrice,

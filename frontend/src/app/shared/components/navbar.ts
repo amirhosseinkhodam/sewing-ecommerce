@@ -129,7 +129,7 @@ import { CartStore } from '../../features/cart/store/cart';
                         <p
                           class="text-xs text-slate-500 dark:text-slate-400 truncate"
                         >
-                          {{ user.email }}
+                          {{ user.phone }}
                         </p>
                       </div>
                     }

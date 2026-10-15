@@ -67,17 +67,6 @@ import { safeReturnUrl } from '../utils/return-url';
 
             <div>
               <app-input
-                [formField]="registerForm.form.email"
-                type="email"
-                [label]="'email' | translate"
-                [placeholder]="'email' | translate"
-                autocomplete="email"
-              />
-              <app-signal-form-field [field]="registerForm.form.email" />
-            </div>
-
-            <div>
-              <app-input
                 [formField]="registerForm.form.phone"
                 type="tel"
                 [label]="'phone' | translate"

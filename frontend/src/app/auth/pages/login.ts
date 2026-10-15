@@ -40,13 +40,13 @@ import { safeReturnUrl } from '../utils/return-url';
           >
             <div>
               <app-input
-                [formField]="loginForm.form.email"
-                type="email"
-                [label]="'email' | translate"
-                [placeholder]="'email' | translate"
-                autocomplete="email"
+                [formField]="loginForm.form.phone"
+                type="tel"
+                [label]="'phone' | translate"
+                [placeholder]="'phone' | translate"
+                autocomplete="tel"
               />
-              <app-signal-form-field [field]="loginForm.form.email" />
+              <app-signal-form-field [field]="loginForm.form.phone" />
             </div>
 
             <div>

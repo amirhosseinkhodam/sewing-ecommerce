@@ -1,10 +1,4 @@
-import {
-  IsEmail,
-  IsNotEmpty,
-  IsOptional,
-  IsString,
-  MaxLength,
-} from 'class-validator';
+import { IsNotEmpty, IsString, Matches, MaxLength } from 'class-validator';
 
 export class CreateContactDto {
   @IsString()
@@ -12,13 +6,11 @@ export class CreateContactDto {
   @MaxLength(120)
   readonly name: string;
 
-  @IsEmail()
-  readonly email: string;
-
-  @IsOptional()
   @IsString()
-  @MaxLength(20)
-  readonly phone?: string;
+  @Matches(/^09\d{9}$/, {
+    message: 'phone must be a valid Iranian mobile number',
+  })
+  readonly phone: string;
 
   @IsString()
   @IsNotEmpty()

@@ -1,25 +1,17 @@
 import { Injectable, signal } from '@angular/core';
-import {
-  email,
-  form,
-  minLength,
-  required,
-  validate,
-} from '@angular/forms/signals';
+import { form, minLength, required, validate } from '@angular/forms/signals';
 import type { ContactPayloadModel } from '@domain/models/contact';
 
 @Injectable({ providedIn: 'root' })
 export class ContactFormService {
   readonly model = signal({
     name: '',
-    email: '',
     phone: '',
     message: '',
   });
   readonly form = form(this.model, (path) => {
     required(path.name, { message: 'validation.required' });
-    required(path.email, { message: 'validation.required' });
-    email(path.email, { message: 'validation.email' });
+    required(path.phone, { message: 'validation.required' });
     validate(path.phone, ({ value }) =>
       value() && !/^09\d{9}$/.test(value())
         ? { kind: 'invalidPhone', message: 'validation.invalidPhone' }
@@ -37,8 +29,7 @@ export class ContactFormService {
     const value = this.model();
     return {
       name: value.name.trim(),
-      email: value.email.trim(),
-      phone: value.phone.trim() || undefined,
+      phone: value.phone.trim(),
       message: value.message.trim(),
     };
   }

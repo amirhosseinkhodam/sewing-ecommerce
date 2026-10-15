@@ -117,16 +117,6 @@ import { AdminSettingsStore } from '../store/settings';
                     [field]="settingsForm.form.shopPhone"
                   />
                 </div>
-                <div>
-                  <app-input
-                    type="email"
-                    [formField]="settingsForm.form.shopEmail"
-                    [label]="'email' | translate"
-                  />
-                  <app-signal-form-field
-                    [field]="settingsForm.form.shopEmail"
-                  />
-                </div>
               </div>
               <div>
                 <app-textarea

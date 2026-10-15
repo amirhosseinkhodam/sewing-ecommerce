@@ -1,14 +1,13 @@
 import type { UserModel } from '@domain/models/user';
 
 export interface AuthPayloadModel {
-  readonly email: string;
+  readonly phone: string;
   readonly password: string;
 }
 
 export interface RegisterPayloadModel {
   readonly firstName: string;
   readonly lastName: string;
-  readonly email: string;
   readonly password: string;
   readonly phone: string;
 }
@@ -16,7 +15,6 @@ export interface RegisterPayloadModel {
 export interface UpdateProfilePayloadModel {
   readonly firstName: string;
   readonly lastName: string;
-  readonly email: string;
   readonly phone: string;
 }
 

@@ -49,7 +49,6 @@ export class SettingsService {
       bankCardNumber: settings.bankCardNumber,
       bankCardHolder: settings.bankCardHolder,
       shopPhone: settings.shopPhone,
-      shopEmail: settings.shopEmail,
       shopAddress: settings.shopAddress,
       businessHours: settings.businessHours,
       shippingRates: {

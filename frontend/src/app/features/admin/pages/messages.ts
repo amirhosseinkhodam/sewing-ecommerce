@@ -118,10 +118,7 @@ const READ_FILTERS = {
                     class="text-sm text-slate-500 dark:text-slate-400 mt-1"
                     dir="ltr"
                   >
-                    {{ message.email }}
-                    @if (message.phone; as phone) {
-                      · {{ phone }}
-                    }
+                    {{ message.phone }}
                   </p>
                   <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">
                     {{ message.createdAt | localizedDate }}

@@ -47,7 +47,7 @@ import { AuthStore } from '../store/auth';
                   {{ user.firstName }} {{ user.lastName }}
                 </h1>
                 <p class="text-sm text-slate-500 dark:text-slate-400">
-                  {{ user.email }}
+                  {{ user.phone }}
                 </p>
               </div>
             </div>
@@ -81,16 +81,6 @@ import { AuthStore } from '../store/auth';
                       [field]="profileForm.form.lastName"
                       [requiredLength]="2"
                     />
-                  </div>
-                  <div>
-                    <app-input
-                      [formField]="profileForm.form.email"
-                      type="email"
-                      [label]="'email' | translate"
-                      [placeholder]="'email' | translate"
-                      autocomplete="email"
-                    />
-                    <app-signal-form-field [field]="profileForm.form.email" />
                   </div>
                   <div>
                     <app-input
@@ -137,16 +127,6 @@ import { AuthStore } from '../store/auth';
                     class="text-sm font-medium text-slate-900 dark:text-slate-100"
                   >
                     {{ user.lastName }}
-                  </p>
-                </div>
-                <div class="p-4 bg-slate-50 dark:bg-slate-800 rounded-lg">
-                  <p class="text-xs text-slate-500 dark:text-slate-400">
-                    {{ 'email' | translate }}
-                  </p>
-                  <p
-                    class="text-sm font-medium text-slate-900 dark:text-slate-100"
-                  >
-                    {{ user.email }}
                   </p>
                 </div>
                 <div class="p-4 bg-slate-50 dark:bg-slate-800 rounded-lg">
