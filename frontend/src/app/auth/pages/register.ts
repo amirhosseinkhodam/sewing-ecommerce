@@ -79,7 +79,7 @@ import { safeReturnUrl } from '../utils/return-url';
             <div>
               <app-input
                 [formField]="registerForm.form.phone"
-                type="text"
+                type="tel"
                 [label]="'phone' | translate"
                 [placeholder]="'phone' | translate"
                 autocomplete="tel"

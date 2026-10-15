@@ -18,6 +18,7 @@ import ViewOffSlashIcon from '@hugeicons/core-free-icons/ViewOffSlashIcon';
 import { BrnLabel } from '@spartan-ng/brain/label';
 import { TranslatePipe } from '../pipes/translate';
 import { uniqueId } from '../utils/unique-id';
+import { normalizeDigits } from '../utils/normalize-digits';
 
 @Component({
   selector: 'app-input',
@@ -37,6 +38,7 @@ import { uniqueId } from '../utils/unique-id';
         #inputElement
         [id]="inputId"
         [type]="inputType()"
+        [attr.inputmode]="inputMode()"
         [placeholder]="placeholder()"
         [disabled]="disabled()"
         [class]="computedClasses()"
@@ -106,8 +108,24 @@ export class InputComponent
   readonly showPassword = signal(false);
   readonly isPassword = computed(() => this.type() === 'password');
   readonly inputType = computed(() =>
-    this.isPassword() && this.showPassword() ? 'text' : this.type(),
+    this.type() === 'number'
+      ? 'text'
+      : this.isPassword() && this.showPassword()
+        ? 'text'
+        : this.type(),
   );
+  /**
+   * Native `type="number"` rejects Persian digits in Firefox, so numeric
+   * fields render as text with a numeric keyboard and are normalised below.
+   */
+  readonly inputMode = computed(() => {
+    if (this.type() === 'number') {
+      return this.step() !== undefined && String(this.step()) !== '1'
+        ? 'decimal'
+        : 'numeric';
+    }
+    return this.type() === 'tel' ? 'tel' : null;
+  });
 
   readonly input = output<string>({ alias: 'inputChange' });
   readonly blur = output<void>({ alias: 'inputBlur' });
@@ -120,7 +138,13 @@ export class InputComponent
   #onTouched: () => void = () => {};
 
   onInput(event: Event) {
-    const value = (event.target as HTMLInputElement).value;
+    const element = event.target as HTMLInputElement;
+    const raw = element.value;
+    const value =
+      this.type() === 'number' || this.type() === 'tel'
+        ? normalizeDigits(raw)
+        : raw;
+    if (value !== raw) element.value = value;
     this.value.set(value);
     this.#onChange(value);
     this.input.emit(value);

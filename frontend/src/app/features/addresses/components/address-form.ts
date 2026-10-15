@@ -82,6 +82,7 @@ import { AddressFormService } from '../forms/address';
         <div>
           <app-input
             [formField]="addressForm.form.postalCode"
+            type="tel"
             [label]="'postalCode' | translate"
             [placeholder]="'postalCode' | translate"
           />
