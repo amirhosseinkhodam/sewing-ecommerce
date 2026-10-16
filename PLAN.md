@@ -554,7 +554,7 @@ Order of work: finish i18n → automated tests → real SMS → real bank gatewa
 ### Phase 9 — Finish i18n + hardening — **TODO**
 - [ ] Full `fa.json` wording review against every page (fix awkward phrasing, one term per concept); the owner or a native speaker does the final sign-off
 - [ ] Dates, numbers, prices and currency formatting in Persian (Persian digits, Jalali dates where shown) consistent across customer and admin pages
-- [ ] Backend validation/error messages shown to users are translated (or mapped to keys), not raw English
+- [x] Backend validation/error messages shown to users are translated (or mapped to keys), not raw English — `apiErrorMessage` maps every known server message (plus 429/413 statuses) to `apiErrors.*` keys in en/fa; unknown or validation-detail messages fall back to the caller's translated text instead of raw English
 - [ ] SMS message texts reviewed by a native speaker (they are sent to real customers later)
 - [x] Hardening before tests: global throttler (300/min) with stricter limits on login (10/min), register (5/min) and contact (3/min); `/api/upload*` now requires login, 5 MB cap, JPEG/PNG/WebP/GIF only; `helmet` security headers (CSP left to Caddy/Angular), `trust proxy` for correct client IPs behind Caddy; CORS stays closed unless `CORS_ORIGIN` is set (smoke-tested: anonymous upload 401, 4th contact post 429)
 - [ ] `npm run lint` + `npm run build` + manual pass in both languages

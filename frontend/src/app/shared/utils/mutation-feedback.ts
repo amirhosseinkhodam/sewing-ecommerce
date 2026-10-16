@@ -28,7 +28,9 @@ export function injectMutationFeedback(): MutationFeedback {
     error: (error, fallbackKey) =>
       notification.show(
         'error',
-        apiErrorMessage(error, language.translate(fallbackKey)),
+        apiErrorMessage(error, language.translate(fallbackKey), (key) =>
+          language.translate(key),
+        ),
       ),
     errorMessage: (messageKey) =>
       notification.show('error', language.translate(messageKey)),
