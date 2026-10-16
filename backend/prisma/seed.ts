@@ -15,6 +15,12 @@ const prisma = new PrismaClient({ adapter });
 
 const SETTINGS_ID = 'default';
 
+function placeholderImages(slug: string): string[] {
+  return [1, 2].map(
+    (index) => `https://picsum.photos/seed/${slug}-${index}/600/600`,
+  );
+}
+
 const isProduction = process.env.NODE_ENV === 'production';
 /** Demo data defaults on in development and off in production; SEED_DEMO overrides. */
 const seedDemo = (process.env.SEED_DEMO ?? String(!isProduction)) === 'true';
@@ -159,14 +165,14 @@ async function main() {
 
     await prisma.product.upsert({
       where: { slug: product.slug },
-      update: {},
+      update: { images: placeholderImages(product.slug) },
       create: {
         name: product.name,
         slug: product.slug,
         description: product.description,
         price: product.price,
         fabric: product.fabric,
-        images: [],
+        images: placeholderImages(product.slug),
         categoryId: category.id,
         isFeatured: product.isFeatured,
         variants: {

@@ -71,22 +71,28 @@ import { LanguageService } from '@shared/services/language';
         <div class="w-full sm:w-36">
           <app-input
             type="number"
+            [thousands]="true"
             [ngModel]="minPrice()"
             [placeholder]="'fromPrice' | translate"
+            (inputChange)="minPrice.set($event)"
             (inputBlur)="onMinPriceBlur()"
+            (inputKeydown)="onPriceEnter($event)"
           />
         </div>
 
         <div class="w-full sm:w-36">
           <app-input
             type="number"
+            [thousands]="true"
             [ngModel]="maxPrice()"
             [placeholder]="'toPrice' | translate"
+            (inputChange)="maxPrice.set($event)"
             (inputBlur)="onMaxPriceBlur()"
+            (inputKeydown)="onPriceEnter($event)"
           />
         </div>
 
-        <app-button variant="ghost" (buttonClick)="onReset()">
+        <app-button variant="primary" cssClass="h-11" (buttonClick)="onReset()">
           {{ 'clearFilters' | translate }}
         </app-button>
       </div>
@@ -117,10 +123,10 @@ export class ProductFilterComponent {
       this.category.set(query.category ?? 'all');
       this.sort.set(query.sort ?? PRODUCT_SORTS.newest);
       this.minPrice.set(
-        query.minPrice !== undefined ? String(query.minPrice) : '',
+        query.minPrice !== undefined ? formatThousands(query.minPrice) : '',
       );
       this.maxPrice.set(
-        query.maxPrice !== undefined ? String(query.maxPrice) : '',
+        query.maxPrice !== undefined ? formatThousands(query.maxPrice) : '',
       );
     });
 
@@ -177,20 +183,35 @@ export class ProductFilterComponent {
   }
 
   onMinPriceBlur() {
-    const value = this.minPrice().trim();
-    this.filtersChange.emit({
-      minPrice: value ? Number(value) : undefined,
-    });
+    this.#emitPrices();
   }
 
   onMaxPriceBlur() {
-    const value = this.maxPrice().trim();
-    this.filtersChange.emit({
-      maxPrice: value ? Number(value) : undefined,
-    });
+    this.#emitPrices();
+  }
+
+  onPriceEnter(event: KeyboardEvent) {
+    if (event.key === 'Enter') this.#emitPrices();
+  }
+
+  #emitPrices() {
+    const min = parsePrice(this.minPrice());
+    const max = parsePrice(this.maxPrice());
+    const current = this.query();
+    if (min === current.minPrice && max === current.maxPrice) return;
+    this.filtersChange.emit({ minPrice: min, maxPrice: max });
   }
 
   onReset() {
     this.filtersReset.emit();
   }
+}
+
+function formatThousands(value: number): string {
+  return value.toLocaleString('en-US');
+}
+
+function parsePrice(raw: string): number | undefined {
+  const digits = raw.replace(/\D/g, '');
+  return digits ? Number(digits) : undefined;
 }

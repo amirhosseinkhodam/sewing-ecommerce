@@ -5,7 +5,6 @@ import {
   model,
   output,
   forwardRef,
-  signal,
   ChangeDetectionStrategy,
 } from '@angular/core';
 import {
@@ -32,7 +31,7 @@ import { uniqueId } from '../utils/unique-id';
     }
     <ng-select
       [labelForId]="selectId"
-      [items]="options()"
+      [items]="stableOptions()"
       [bindLabel]="'label'"
       [bindValue]="'value'"
       [placeholder]="placeholder() || ''"
@@ -85,14 +84,20 @@ export class SelectComponent
 
   #onChange: (value: number | string | null) => void = () => {};
   #onTouched: () => void = () => {};
-  /** Set by `writeValue` for CVA callers; ignored once `value` is bound. */
-  readonly #writtenValue = signal<number | string | null>(null);
+  readonly innerValue = computed(() => this.value());
 
-  readonly innerValue = computed(() => this.value() ?? this.#writtenValue());
+  readonly stableOptions = computed(() => this.options(), {
+    equal: (previous, next) =>
+      previous.length === next.length &&
+      previous.every(
+        (option, index) =>
+          option.value === next[index].value &&
+          option.label === next[index].label,
+      ),
+  });
 
   onChange(event: SelectOption | null) {
     const value = event?.value ?? null;
-    this.#writtenValue.set(value);
     this.value.set(value);
     this.#onChange(value);
     this.change.emit(value);
@@ -109,7 +114,7 @@ export class SelectComponent
   }
 
   writeValue(value: number | string | null): void {
-    this.#writtenValue.set(value);
+    this.value.set(value);
   }
 
   registerOnChange(fn: (value: number | string | null) => void): void {

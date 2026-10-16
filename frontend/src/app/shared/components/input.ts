@@ -103,6 +103,7 @@ export class InputComponent
   readonly step = input<string | number>();
   readonly error = input<boolean>(false);
   readonly label = input<string>();
+  readonly thousands = input<boolean>(false);
 
   readonly icons = { ViewIcon, ViewOffSlashIcon };
   readonly showPassword = signal(false);
@@ -140,10 +141,14 @@ export class InputComponent
   onInput(event: Event) {
     const element = event.target as HTMLInputElement;
     const raw = element.value;
-    const value =
+    let value =
       this.type() === 'number' || this.type() === 'tel'
         ? normalizeDigits(raw)
         : raw;
+    if (this.thousands()) {
+      const digits = value.replace(/\D/g, '');
+      value = digits ? Number(digits).toLocaleString('en-US') : '';
+    }
     if (value !== raw) element.value = value;
     this.value.set(value);
     this.#onChange(value);
@@ -189,7 +194,7 @@ export class InputComponent
     const focusClasses = this.focusRing()
       ? 'focus:ring-2 focus:ring-slate-500 focus:ring-offset-2'
       : 'focus:outline-none';
-    const base = `w-full rounded-lg border px-3 py-2 transition-colors ${focusClasses} placeholder:text-slate-400 dark:placeholder:text-slate-500`;
+    const base = `w-full h-11 rounded-lg border px-3 py-2 transition-colors ${focusClasses} placeholder:text-slate-400 dark:placeholder:text-slate-500`;
 
     const variants = {
       default:
