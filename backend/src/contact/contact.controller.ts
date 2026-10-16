@@ -10,6 +10,7 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { Throttle } from '@nestjs/throttler';
 import { Role } from '../generated/prisma/client';
 import { Roles } from '../common/decorators/roles.decorator';
 import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
@@ -29,6 +30,7 @@ export class ContactController {
   }
 
   @Post()
+  @Throttle({ default: { ttl: 60_000, limit: 3 } })
   create(@Body() dto: CreateContactDto) {
     return this.#contact.create(dto);
   }

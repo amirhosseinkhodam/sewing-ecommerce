@@ -1,9 +1,11 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
+import { APP_GUARD } from '@nestjs/core';
 import {
   ServeStaticModule,
   ServeStaticModuleOptions,
 } from '@nestjs/serve-static';
+import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { ServerResponse } from 'http';
 import { existsSync } from 'fs';
 import { join } from 'path';
@@ -65,6 +67,7 @@ function staticRoots(): ServeStaticModuleOptions[] {
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
+    ThrottlerModule.forRoot([{ ttl: 60_000, limit: 300 }]),
     ServeStaticModule.forRoot(...staticRoots()),
     PrismaModule,
     AuthModule,
@@ -83,5 +86,6 @@ function staticRoots(): ServeStaticModuleOptions[] {
     DashboardModule,
   ],
   controllers: [AppController],
+  providers: [{ provide: APP_GUARD, useClass: ThrottlerGuard }],
 })
 export class AppModule {}

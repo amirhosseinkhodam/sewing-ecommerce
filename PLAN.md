@@ -522,7 +522,7 @@ Only admin can change status. (Phase 8: SMS sent to customer on each transition.
 - [ ] Complete i18n pass (all Persian text verified)
   - [x] Automated pass: en/fa key parity, no untranslated values, every template/feedback key resolves (added missing `quantity`/`remove`/`total`), hardcoded strings moved to keys (theme/language toggle aria-labels, home tagline, admin image-preview alt), RTL-flipped product-detail back arrow
   - [x] Editorial pass over `fa.json` (2026-10-05): one spelling per term (`سفارش‌ها`, `جست‌وجو`, `نمونه‌کار`, `ثبت‌نام`, `آپلود` for every upload), natural phrasing for the `couldNot*` errors, `subtotal` no longer collides with "grand total" (`مبلغ کالاها`), `paymentRefunded` reads as a status (`مسترد شده`), checkout-context hints say "هنگام ثبت سفارش" instead of "در پرداخت", `invalidPhone` asks for a mobile number
-  - [ ] Native-speaker read-through of `fa.json` wording
+  - [ ] Native-speaker read-through of `fa.json` wording — moved to Phase 9
 - [x] Loading skeletons for all data-fetching pages — shared `app-skeleton`/`app-skeleton-table`/`app-skeleton-grid` primitives replace the bouncing-dot spinner across catalog/portfolio grids, all 5 admin tables, 4 detail pages, the dashboard, 3 admin forms, and cart/order-history/addresses/messages/checkout row lists
 - [x] Error boundaries: API failure -> inline error + retry button, 404 page, 500 page
   - [x] Inline error + retry button on every store that reads server state (cart, addresses, and six admin stores gained `error`/`reload()`)
@@ -535,7 +535,7 @@ Only admin can change status. (Phase 8: SMS sent to customer on each transition.
   - [x] Docker packaging — single image (NestJS serves the API, `/uploads`, and the production Angular build), `docker-compose.yml` (Postgres + app), `.env.production.example`; production guardrails: demo seed off and `SEED_ADMIN_PASSWORD` required under `NODE_ENV=production`, CORS closed unless `CORS_ORIGIN` is set, secrets never baked into the image
   - [x] Verified locally: image build, `prisma migrate deploy` on start, admin-only seed, SPA deep links, immutable asset caching, JSON 404s for `/api` and `/uploads`, login + admin stats against the running stack
   - [x] TLS reverse proxy — `caddy` service in `docker-compose.yml` + root `Caddyfile`: automatic Let's Encrypt for `DOMAIN` (from `.env.production`), HTTP→HTTPS redirect, HSTS/nosniff/referrer headers, gzip/zstd, HTTP/2+3. Verified locally (2026-10-05, `DOMAIN=localhost`): SPA + deep links, `/api` health and JSON 404s, validation errors, headers, redirect
-  - [ ] Deploy to the server (owner runs it): DNS A record → server, open 80/443, fill `.env.production` (incl. `DOMAIN`), `up -d --build`, seed admin once
+  - [ ] Deploy to the server (owner runs it) — moved to Phase 13
 
 ### Phase 8 — Online Payment + Notifications — **DONE (free scope, 2026-10-16)**
 
@@ -545,9 +545,63 @@ No paid API accounts yet, so every integration is written against a provider-neu
 - [x] Auto-cancel unpaid online orders after 24h (restore stock): `UnpaidOrderSweeper` runs every 15 min, cancels stale unpaid ONLINE orders in a transaction, restores stock, sends SMS
 - [x] Backend: `SmsProvider` interface + `LogSmsProvider` (writes to the log; free), `SMS_PROVIDER` env selects it (unknown values fail at startup)
 - [x] SMS on order status transitions (through the interface): `SmsService.sendOrderStatus`, Persian text per status, never throws
-- Deferred (needs paid accounts, out of scope for now): a real SMS provider class and a real payment gateway class; both slot in behind the existing interfaces via env vars.
+- Real SMS provider and real payment gateway moved to Phases 11 and 12 (need paid accounts).
 
-**Total estimate: ~26 working days**
+### Remaining roadmap (reordered 2026-10-16)
+
+Order of work: finish i18n → automated tests → real SMS → real bank gateway → deploy. Each phase is finished and verified before the next starts. Phase 7's two open items (native-speaker `fa.json` read-through, server deploy) moved into Phases 9 and 13.
+
+### Phase 9 — Finish i18n + hardening — **TODO**
+- [ ] Full `fa.json` wording review against every page (fix awkward phrasing, one term per concept); the owner or a native speaker does the final sign-off
+- [ ] Dates, numbers, prices and currency formatting in Persian (Persian digits, Jalali dates where shown) consistent across customer and admin pages
+- [ ] Backend validation/error messages shown to users are translated (or mapped to keys), not raw English
+- [ ] SMS message texts reviewed by a native speaker (they are sent to real customers later)
+- [x] Hardening before tests: global throttler (300/min) with stricter limits on login (10/min), register (5/min) and contact (3/min); `/api/upload*` now requires login, 5 MB cap, JPEG/PNG/WebP/GIF only; `helmet` security headers (CSP left to Caddy/Angular), `trust proxy` for correct client IPs behind Caddy; CORS stays closed unless `CORS_ORIGIN` is set (smoke-tested: anonymous upload 401, 4th contact post 429)
+- [ ] `npm run lint` + `npm run build` + manual pass in both languages
+
+### Phase 10 — Automated tests — **TODO**
+Approach: test the riskiest logic first, by feature, in three layers. Each feature slice ships its own tests and must pass before the next slice starts.
+- Backend: Jest (NestJS default) — service tests against a throwaway Postgres test database (real Prisma, no mocks for DB logic), plus controller tests with supertest for auth/permission and validation
+- Frontend: Vitest (Angular's built-in runner) — stores, guards, interceptor, form validators, pure utils, and component tests for key shared components
+- End-to-end: Playwright — a few critical user journeys against the seeded dev stack, in fa and en
+- [ ] Test infrastructure: backend Jest config + separate test DB (`DATABASE_URL_TEST`) with migrate/reset helper and fixtures; frontend Vitest setup; Playwright setup; scripts `test`, `test:backend`, `test:frontend`, `test:e2e`; update `AGENTS.md` ("Testing" section and verification line) and `README.md`
+- [ ] Slice 1 — Auth: register/login/refresh/logout, phone validation, duplicate phone, roles and guards (backend + frontend guards/interceptor/AuthStore)
+- [ ] Slice 2 — Catalog: categories, products, variants, filters/pagination/search, image upload rules
+- [ ] Slice 3 — Cart + addresses: add/update/remove, stock limits, address CRUD, ownership checks
+- [ ] Slice 4 — Orders: placement (price/stock snapshot, shipping cost), status lifecycle, stock restore on cancel, ownership/admin permissions
+- [ ] Slice 5 — Payment + SMS + sweeper: card-to-card receipt flow, fake gateway request/verify/callback and retry, double-callback safety, SMS per status via a fake provider, 24h auto-cancel (the existing manual sweep script becomes a real test)
+- [ ] Slice 6 — Portfolio, contact, admin dashboard/customers/settings
+- [ ] Slice 7 — Playwright journeys: guest → register → cart → card-to-card checkout; online payment pay/fail/retry; admin confirms and ships an order; admin product CRUD; language/theme switch
+- [ ] CI: GitHub Actions workflow running lint, build, backend + frontend tests, and e2e on every push/PR
+- [ ] Coverage report for backend services; target the order/payment/auth modules first
+
+### Phase 11 — Real SMS provider (paid) — **TODO**
+Needs an SMS provider account (e.g. Kavenegar) and API key from the owner.
+- [ ] Choose provider; get API key, sender line and approved message templates (Iranian providers often require pre-approved templates)
+- [ ] Implement the provider class behind `SmsProvider` + register it in `SmsModule` via `SMS_PROVIDER` and its credentials env vars; startup fails with a clear error if credentials are missing
+- [ ] Unit tests with the provider's HTTP API mocked (success, API error, timeout); SMS failures never break order actions
+- [ ] Verify with the provider's test mode or one real SMS to the owner's phone
+- [ ] Optional: store a log of sent SMS (status, provider reference) for support; low-balance warning in logs
+- [ ] Document env vars in `.env.production.example` and `README.md`
+
+### Phase 12 — Real bank gateway (paid) — **TODO**
+Needs a verified merchant account for the gateway (e.g. Zarinpal) and a public HTTPS domain for the callback.
+- [ ] Choose gateway; get merchant ID; confirm amount unit (Toman vs Rial) and callback rules
+- [ ] Implement the gateway class behind `PaymentGateway` (`request` + `verify`), register via `PAYMENT_PROVIDER` + merchant env vars; `fake` stays refused in production
+- [ ] Tests with the gateway API mocked (success, failure, cancelled by user, verify mismatch, already-verified callback)
+- [ ] Verify against the gateway's sandbox, then one small real payment end to end
+- [ ] Refund/dispute handling procedure for the owner (manual refund through the gateway panel, mark order refunded in admin)
+- [ ] Document env vars in `.env.production.example` and `README.md`
+
+### Phase 13 — Deploy + launch — **TODO**
+- [ ] Final pre-launch checklist: production env filled (`DOMAIN`, `JWT` secrets, `SEED_ADMIN_PASSWORD`, SMS and gateway keys), demo seed off, default admin password changed
+- [ ] Deploy to the server (owner runs it): DNS A record → server, open 80/443, `up -d --build`, seed admin once
+- [ ] Automated daily Postgres backup and backup of the `/uploads` volume, with a tested restore
+- [ ] Basic monitoring: container restart policy, uptime check on the site, log rotation
+- [ ] Production smoke test: register, order (card-to-card and online), SMS received, admin confirms, a real small payment
+- [ ] Rollback plan noted (previous image tag, how to restore the DB backup)
+
+**Total estimate: ~26 working days for Phases 0-8; Phases 9-13 add roughly 4 + 12 + 2 + 3 + 2 days (tests are the largest piece)**
 
 ---
 
@@ -653,5 +707,5 @@ Breadcrumbs: `home, products, portfolio, about, contact, cart, checkout, orders,
 - Day 3: Manual QA pass of critical paths (checkout, admin CRUD)
 - Day 4: Build + deploy
 
-**Week 6**
-- Deferred (needs paid accounts): real SMS provider and payment gateway
+**Week 6 onward**
+- Phase 9 finish i18n + hardening, Phase 10 automated tests (feature by feature), Phase 11 real SMS, Phase 12 real bank gateway, Phase 13 deploy (see section 8)

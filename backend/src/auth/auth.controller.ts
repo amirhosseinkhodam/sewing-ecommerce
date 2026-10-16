@@ -8,6 +8,7 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { Throttle } from '@nestjs/throttler';
 import {
   CurrentUser,
   type AuthUser,
@@ -29,11 +30,13 @@ export class AuthController {
   }
 
   @Post('register')
+  @Throttle({ default: { ttl: 60_000, limit: 5 } })
   register(@Body() dto: RegisterDto) {
     return this.#auth.register(dto);
   }
 
   @Post('login')
+  @Throttle({ default: { ttl: 60_000, limit: 10 } })
   @HttpCode(200)
   login(@Body() dto: LoginDto) {
     return this.#auth.login(dto);
