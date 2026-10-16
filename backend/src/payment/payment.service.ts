@@ -20,21 +20,25 @@ import {
 import { CALLBACK_STATUSES } from './const/callback-statuses';
 import { PaymentCallbackDto } from './dto/payment-callback.dto';
 import { PaymentGateway } from './gateways/payment-gateway';
+import { SmsService } from '../sms/sms.service';
 
 @Injectable()
 export class PaymentService {
   readonly #prisma: PrismaService;
   readonly #config: ConfigService;
+  readonly #sms: SmsService;
   /** Absent when `PAYMENT_PROVIDER` is unset: only card-to-card is offered. */
   readonly #gateway: PaymentGateway | undefined;
 
   constructor(
     prisma: PrismaService,
     config: ConfigService,
+    sms: SmsService,
     @Optional() @Inject(PaymentGateway) gateway?: PaymentGateway,
   ) {
     this.#prisma = prisma;
     this.#config = config;
+    this.#sms = sms;
     this.#gateway = gateway;
   }
 
@@ -138,7 +142,7 @@ export class PaymentService {
     // wins, and on not-yet-paid so two racing callbacks record it once.
     // A paid PENDING order moves to CONFIRMED, as an admin-confirmed
     // card-to-card payment does.
-    await this.#prisma.order.updateMany({
+    const { count } = await this.#prisma.order.updateMany({
       where: {
         id: order.id,
         paymentAuthority: dto.Authority,
@@ -152,6 +156,13 @@ export class PaymentService {
           : {}),
       },
     });
+    if (count > 0 && order.status === OrderStatus.PENDING) {
+      await this.#sms.sendOrderStatus(
+        order.userId,
+        order.id,
+        OrderStatus.CONFIRMED,
+      );
+    }
     return succeeded;
   }
 

@@ -2,7 +2,7 @@
 
 ## Overview
 
-A Persian-first, mobile-responsive sewing shop ecommerce website with guest browsing, customer cart/checkout, admin panel for full management, card-to-card payment (Zarinpal in Phase 8), and SMS notifications (Phase 8).
+A Persian-first, mobile-responsive sewing shop ecommerce website with guest browsing, customer cart/checkout, admin panel for full management, card-to-card payment, and SMS notifications.
 
 ---
 
@@ -16,7 +16,7 @@ Backend (NestJS + Prisma + PostgreSQL)
 Database (PostgreSQL)
 ```
 
-**Other services:** Zarinpal (payment), Kavenegar (SMS), local filesystem (images)
+**Other services:** local filesystem (images); third-party payment/SMS providers are deferred until paid accounts exist
 
 ---
 
@@ -29,7 +29,7 @@ Database (PostgreSQL)
 | ORM | Prisma | Type-safe, auto-generated types, migrations |
 | Database | PostgreSQL | Reliable, JSON support, full-text search |
 | Auth | JWT (access + refresh) | Stateless, standard |
-| Payment | Card-to-card (MVP), Zarinpal (Phase 8) | Simple MVP, no API keys needed upfront |
+| Payment | Card-to-card (always-on) + provider-neutral online gateway interface | No paid API keys needed |
 | Styling | Tailwind CSS + tailwindcss-rtl | Mobile-first, RTL ready |
 | CDN | ArvanCloud (production) | Iranian CDN |
 
@@ -365,7 +365,7 @@ frontend/src/app/
 11. Redirect to `/orders/:id` -> shows card-to-card payment instructions (bank card info, amount)
 12. User transfers money externally, uploads receipt screenshot
 13. Admin confirms payment -> status CONFIRMED, paymentStatus PAID
-14. (Phase 8: Zarinpal redirect available as alternative payment method)
+14. (optional third-party online gateway available via /api/payment/methods when configured)
 
 ### Checkout flow (multi-step)
 
@@ -431,7 +431,7 @@ Only admin can change status. (Phase 8: SMS sent to customer on each transition.
 - On order placement -> `/orders/:id` shows bank card info and receipt upload form
 - User uploads receipt for admin review
 - Admin confirms or rejects from OrderListPage
-- Phase 8: online payment through the configured gateway (fake in dev, Zarinpal later), with callback verification, retry flow, and auto-cancel after 24h
+- Phase 8: online payment through the configured gateway (fake in dev; real gateway deferred), with callback verification, retry flow, and auto-cancel after 24h
 
 ---
 
@@ -537,16 +537,15 @@ Only admin can change status. (Phase 8: SMS sent to customer on each transition.
   - [x] TLS reverse proxy — `caddy` service in `docker-compose.yml` + root `Caddyfile`: automatic Let's Encrypt for `DOMAIN` (from `.env.production`), HTTP→HTTPS redirect, HSTS/nosniff/referrer headers, gzip/zstd, HTTP/2+3. Verified locally (2026-10-05, `DOMAIN=localhost`): SPA + deep links, `/api` health and JSON 404s, validation errors, headers, redirect
   - [ ] Deploy to the server (owner runs it): DNS A record → server, open 80/443, fill `.env.production` (incl. `DOMAIN`), `up -d --build`, seed admin once
 
-### Phase 8 — Online Payment + Notifications — **IN PROGRESS (2026-10-07)**
+### Phase 8 — Online Payment + Notifications — **DONE (free scope, 2026-10-16)**
 
 No paid API accounts yet, so every integration is written against a provider-neutral interface with a free stand-in. Real providers drop in later by setting env vars, with no code changes. Card-to-card stays the always-on payment method.
 - [x] Backend: `PaymentGateway` interface + `FakePaymentGateway` (local Pay/Fail page, verify only succeeds after Pay was pressed), `PAYMENT_PROVIDER` env selects it (unset = card-to-card only; `fake` refused under `NODE_ENV=production`). `PaymentMethod.ZARINPAL` → `ONLINE`, `zarinpalAuthority` → provider-neutral `paymentAuthority` (unique) + `paymentRefId`. Endpoints: `GET /api/payment/methods`, `POST /api/payment/:orderId/start` (also the retry path), `GET /api/payment/callback` (verifies server-side, redirects to `/orders/:id?payment=SUCCESS|FAILED`; a paid PENDING order auto-advances to CONFIRMED)
 - [x] Frontend: "Online payment" option in checkout (only when `/payment/methods` offers it), redirect to the gateway after placing the order (lands on the order page if the gateway can't be reached), result banner driven by the order's real payment status + "Pay now"/"Pay again" on order detail, payment reference shown to customer and admin; admin order detail shows the gateway reference instead of the receipt review for online orders
-- [ ] Backend: `ZarinpalGateway` (REST v4 request + verify), `ZARINPAL_MERCHANT_ID` + `ZARINPAL_SANDBOX=true` — verified against the free sandbox
-- [ ] Auto-cancel unpaid online orders after 24h (restore stock)
-- [ ] Backend: `SmsProvider` interface + `LogSmsProvider` (writes to the log; free), `SMS_PROVIDER` env selects it
-- [ ] SMS on order status transitions (through the interface)
-- [ ] Later, with paid accounts: `KavenegarSmsProvider`; Zarinpal production merchant ID
+- [x] Auto-cancel unpaid online orders after 24h (restore stock): `UnpaidOrderSweeper` runs every 15 min, cancels stale unpaid ONLINE orders in a transaction, restores stock, sends SMS
+- [x] Backend: `SmsProvider` interface + `LogSmsProvider` (writes to the log; free), `SMS_PROVIDER` env selects it (unknown values fail at startup)
+- [x] SMS on order status transitions (through the interface): `SmsService.sendOrderStatus`, Persian text per status, never throws
+- Deferred (needs paid accounts, out of scope for now): a real SMS provider class and a real payment gateway class; both slot in behind the existing interfaces via env vars.
 
 **Total estimate: ~26 working days**
 
@@ -590,7 +589,7 @@ Product: `product(s), category(ies), price, size(s), fabric, addToCart, addedToC
 
 Cart: `cart, cartEmpty, cartEmptyMessage, startShopping, quantity, total, subtotal, shipping, grandTotal, proceedToCheckout, remove, updateCart, itemAdded, continueShopping`
 
-Checkout: `checkout, shippingAddress, selectAddress, addAddress, shippingMethod, post, courier, paymentMethod, zarinpal, cardToCard, placeOrder, reviewOrder, bankCardInfo, transferAmount, cardNumber, cardHolder, uploadReceipt, receiptUploaded`
+Checkout: `checkout, shippingAddress, selectAddress, addAddress, shippingMethod, post, courier, paymentMethod, online, cardToCard, placeOrder, reviewOrder, bankCardInfo, transferAmount, cardNumber, cardHolder, uploadReceipt, receiptUploaded`
 
 Order: `order(s), orderDetail, orderNumber, orderDate, orderStatus, orderHistory, status(Pending|Confirmed|Processing|Shipped|Delivered|Cancelled), paymentStatus, payment(Pending|Paid|Failed|Refunded), trackingCode, retryPayment, paymentFailed, paymentCancelled`
 
@@ -655,5 +654,4 @@ Breadcrumbs: `home, products, portfolio, about, contact, cart, checkout, orders,
 - Day 4: Build + deploy
 
 **Week 6**
-- Day 1: Zarinpal integration (request, verify, callback)
-- Day 2: SMS notification (Kavenegar) + order status SMS
+- Deferred (needs paid accounts): real SMS provider and payment gateway

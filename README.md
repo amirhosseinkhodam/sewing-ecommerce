@@ -1,6 +1,6 @@
 # Sewing Ecommerce
 
-Persian-first, mobile-responsive sewing shop ecommerce website with guest browsing, customer cart/checkout, and an admin panel for full management. Card-to-card payment (Zarinpal in Phase 8) and SMS notifications (Phase 8) planned.
+Persian-first, mobile-responsive sewing shop ecommerce website with guest browsing, customer cart/checkout, and an admin panel for full management. Card-to-card payment and log-based SMS notifications (real providers deferred until paid accounts exist).
 
 ## Stack
 
@@ -82,6 +82,6 @@ shared/                   # Cross-half shared types (root, backend-importable)
 - **Phase 3 — Cart + Checkout**: done (cart/address/order backend modules; CartPage, AddressManagementPage, multi-step CheckoutPage; navbar cart badge; add-to-cart with login-return flow)
 - **Phases 4–5**: done (orders, portfolio, contact)
 - **Frontend migration + Phases 6–7**: done except deployment and a native-speaker `fa.json` review
-- **Phase 8 — Online payment + notifications**: in progress (provider-neutral gateway with a free fake provider first; see `PLAN.md`)
+- **Phase 8 — Online payment + notifications**: done for free scope (fake gateway, log SMS, 24h auto-cancel); real paid providers deferred
 
 Full roadmap, database schema, API endpoints, and implementation phases: see `PLAN.md`. Swagger at `/docs` is the generated API reference.

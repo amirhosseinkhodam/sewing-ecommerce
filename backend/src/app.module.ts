@@ -21,6 +21,7 @@ import { PaymentModule } from './payment/payment.module';
 import { PortfolioModule } from './portfolio/portfolio.module';
 import { ProductsModule } from './products/products.module';
 import { SettingsModule } from './settings/settings.module';
+import { SmsModule } from './sms/sms.module';
 import { UploadModule } from './upload/upload.module';
 
 const FRONTEND_ROOT = join(process.cwd(), 'dist', 'frontend', 'browser');
@@ -74,6 +75,7 @@ function staticRoots(): ServeStaticModuleOptions[] {
     AddressesModule,
     OrdersModule,
     PaymentModule.register(),
+    SmsModule.register(),
     PortfolioModule,
     ContactModule,
     SettingsModule,

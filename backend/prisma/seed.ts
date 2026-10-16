@@ -234,21 +234,23 @@ async function seedDemoOrders() {
     });
     users.push(user);
 
-    await prisma.address.upsert({
-      where: { id: `${user.id}-home` },
-      update: {},
-      create: {
-        id: `${user.id}-home`,
-        userId: user.id,
-        label: 'خانه',
-        province: 'تهران',
-        city: 'تهران',
-        fullAddress: 'خیابان ولیعصر، کوچه بهار، پلاک ۱۰',
-        postalCode: '1234567890',
-        phone: customer.phone,
-        isDefault: true,
-      },
+    const homeAddress = await prisma.address.findFirst({
+      where: { userId: user.id, label: 'خانه' },
     });
+    if (!homeAddress) {
+      await prisma.address.create({
+        data: {
+          userId: user.id,
+          label: 'خانه',
+          province: 'تهران',
+          city: 'تهران',
+          fullAddress: 'خیابان ولیعصر، کوچه بهار، پلاک ۱۰',
+          postalCode: '1234567890',
+          phone: customer.phone,
+          isDefault: true,
+        },
+      });
+    }
   }
 
   // (daysAgo, status, paymentStatus, shippingMethod) — a spread that exercises
@@ -316,8 +318,8 @@ async function seedDemoOrders() {
     const existing = await prisma.order.findUnique({ where: { id: orderId } });
     if (existing) continue;
 
-    const address = await prisma.address.findUnique({
-      where: { id: `${user.id}-home` },
+    const address = await prisma.address.findFirst({
+      where: { userId: user.id, label: 'خانه' },
     });
     if (!address) continue;
 

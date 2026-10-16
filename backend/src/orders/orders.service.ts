@@ -13,6 +13,7 @@ import { OrderStatus, PaymentMethod, Prisma } from '../generated/prisma/client';
 import { PrismaService } from '../common/prisma/prisma.service';
 import { PaymentService } from '../payment/payment.service';
 import { SettingsService } from '../settings/settings.service';
+import { SmsService } from '../sms/sms.service';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { OrderQueryDto } from './dto/order-query.dto';
 import { UpdateOrderStatusDto } from './dto/update-order-status.dto';
@@ -51,15 +52,18 @@ export class OrdersService {
   readonly #prisma: PrismaService;
   readonly #settings: SettingsService;
   readonly #payment: PaymentService;
+  readonly #sms: SmsService;
 
   constructor(
     prisma: PrismaService,
     settings: SettingsService,
     payment: PaymentService,
+    sms: SmsService,
   ) {
     this.#prisma = prisma;
     this.#settings = settings;
     this.#payment = payment;
+    this.#sms = sms;
   }
 
   async create(userId: string, dto: CreateOrderDto): Promise<OrderModel> {
@@ -284,6 +288,7 @@ export class OrdersService {
           include: ADMIN_ORDER_INCLUDE,
         });
       });
+      await this.#notify(updated.userId, id, dto.status);
       return this.#toAdminModel(updated);
     }
 
@@ -297,6 +302,9 @@ export class OrdersService {
       },
       include: ADMIN_ORDER_INCLUDE,
     });
+    if (dto.status !== order.status) {
+      await this.#notify(updated.userId, id, dto.status, updated.trackingCode);
+    }
     return this.#toAdminModel(updated);
   }
 
@@ -321,6 +329,9 @@ export class OrdersService {
       },
       include: ADMIN_ORDER_INCLUDE,
     });
+    if (advance) {
+      await this.#notify(updated.userId, id, OrderStatus.CONFIRMED);
+    }
     return this.#toAdminModel(updated);
   }
 
@@ -371,7 +382,17 @@ export class OrdersService {
         include: ORDER_INCLUDE,
       });
     });
+    await this.#notify(userId, id, OrderStatus.CANCELLED);
     return this.#toModel(updated);
+  }
+
+  #notify(
+    userId: string,
+    orderId: string,
+    status: OrderStatus,
+    trackingCode?: string | null,
+  ): Promise<void> {
+    return this.#sms.sendOrderStatus(userId, orderId, status, trackingCode);
   }
 
   /**
