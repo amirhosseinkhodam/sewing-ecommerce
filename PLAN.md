@@ -30,12 +30,11 @@ Why this order:
 
 ## Phase 9 — Cleanup — TODO
 Behavior must not change; lint and build stay green after every slice.
-- [ ] Inventory first, no deletions: `knip`/`ts-prune` over `frontend/`, `backend/`, `shared/`, and `depcheck` for dependencies; owner reviews the list
-- [ ] Remove unused files and exports (components, services, stores, models, consts, DTOs, uncalled backend routes)
+Already done: `knip` inventory, unused files/exports/types, unused dev dependencies, `multer` added as a real dependency. Re-run `npx knip` at the end of the phase to confirm it is clean.
 - [ ] Merge duplicated code (repeated templates, class strings, `queryFn`s, models duplicated across halves)
-- [ ] Remove unused dependencies, unused i18n keys (keep en/fa parity), unused Prisma fields (migration only)
-- [ ] Remove local clutter: `.backup_*/`, `opencode.jsonc` if unused; make sure `.gitignore`/`.dockerignore` cover generated output
-- [ ] Clear the ~34 `no-floating-promises` lint warnings so new ones stand out
+- [ ] Remove unused i18n keys (keep en/fa parity) and unused Prisma fields (migration only)
+- [ ] Delete `opencode.jsonc` if the owner no longer uses opencode
+- [ ] Confirm the `no-floating-promises` lint warnings are really gone (last lint run printed none)
 - [ ] Verify each slice: `npm run lint` + `npm run build` + quick manual pass
 
 ## Phase 10 — Finish i18n — TODO

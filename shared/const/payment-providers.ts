@@ -7,6 +7,3 @@ export const PAYMENT_PROVIDERS = {
   FAKE: 'FAKE',
   ZARINPAL: 'ZARINPAL',
 } as const;
-
-export type PaymentProvider =
-  (typeof PAYMENT_PROVIDERS)[keyof typeof PAYMENT_PROVIDERS];

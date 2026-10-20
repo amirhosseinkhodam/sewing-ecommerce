@@ -4,9 +4,8 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { JwtService } from '@nestjs/jwt';
+import { JwtService, type JwtSignOptions } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
-import type { SignOptions } from 'jsonwebtoken';
 import { Prisma, User } from '../generated/prisma/client';
 import type { UserModel } from '../../../shared/models/user';
 import { PrismaService } from '../common/prisma/prisma.service';
@@ -136,10 +135,10 @@ export class AuthService {
       role: user.role,
     };
     const accessExpiresIn =
-      this.#config.get<SignOptions['expiresIn']>('JWT_ACCESS_EXPIRES_IN') ??
+      this.#config.get<JwtSignOptions['expiresIn']>('JWT_ACCESS_EXPIRES_IN') ??
       '15m';
     const refreshExpiresIn =
-      this.#config.get<SignOptions['expiresIn']>('JWT_REFRESH_EXPIRES_IN') ??
+      this.#config.get<JwtSignOptions['expiresIn']>('JWT_REFRESH_EXPIRES_IN') ??
       '7d';
     const [accessToken, refreshToken] = await Promise.all([
       this.#jwt.signAsync(payload, {

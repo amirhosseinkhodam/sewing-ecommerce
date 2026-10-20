@@ -29,5 +29,3 @@ export const QUERY_KEYS = {
   adminCustomers: 'admin-customers',
   adminDashboard: 'admin-dashboard',
 } as const;
-
-export type QueryKey = (typeof QUERY_KEYS)[keyof typeof QUERY_KEYS];

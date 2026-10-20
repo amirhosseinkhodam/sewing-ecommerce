@@ -3,7 +3,7 @@ import type { PaymentMethod } from '../const/payment-methods';
 import type { PaymentStatus } from '../const/payment-statuses';
 import type { ShippingMethod } from '../const/shipping-methods';
 
-export interface OrderItemModel {
+interface OrderItemModel {
   readonly id: string;
   readonly productId: string;
   readonly productName: string;
@@ -15,7 +15,7 @@ export interface OrderItemModel {
 }
 
 /** Address as captured when the order was placed, not as it exists today. */
-export interface OrderShippingAddressModel {
+interface OrderShippingAddressModel {
   readonly label: string;
   readonly province: string;
   readonly city: string;
@@ -60,19 +60,6 @@ export interface CreateOrderPayloadModel {
   readonly shippingAddressId: string;
   readonly paymentMethod: PaymentMethod;
   readonly notes?: string;
-}
-
-export interface UpdateOrderStatusPayloadModel {
-  readonly status: OrderStatus;
-  readonly trackingCode?: string;
-}
-
-export interface UpdatePaymentStatusPayloadModel {
-  readonly paymentStatus: PaymentStatus;
-}
-
-export interface UploadReceiptPayloadModel {
-  readonly paymentReceipt: string;
 }
 
 export interface PaginatedOrdersModel<T = OrderModel> {

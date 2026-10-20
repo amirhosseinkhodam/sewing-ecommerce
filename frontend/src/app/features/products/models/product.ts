@@ -59,7 +59,7 @@ export interface ProductQueryModel {
   readonly isFeatured?: boolean;
 }
 
-export interface ProductVariantPayloadModel {
+interface ProductVariantPayloadModel {
   readonly size: string;
   readonly stock: number;
   readonly price?: number;

@@ -1,4 +1,4 @@
-export interface PortfolioCategoryModel {
+interface PortfolioCategoryModel {
   readonly id: string;
   readonly name: string;
   readonly slug: string;

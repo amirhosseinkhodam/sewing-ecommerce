@@ -1,6 +1,6 @@
 import type { ShippingMethod } from '../const/shipping-methods';
 
-export interface ShippingRateModel {
+interface ShippingRateModel {
   /** Decimal crosses the API as a string; it is added to the items subtotal. */
   readonly price: string;
   readonly etaDays: number;
