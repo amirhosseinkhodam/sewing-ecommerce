@@ -28,7 +28,7 @@ const PAYMENT_STATUS_CLASSES: Readonly<Record<PaymentStatus, string>> = {
   REFUNDED: 'bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300',
 };
 
-/** i18n keys follow PLAN.md §10: `statusPending`, `paymentPaid`, and so on. */
+/** i18n keys are `statusPending`, `paymentPaid`, and so on. */
 export const ORDER_STATUS_KEYS: Readonly<Record<OrderStatus, string>> = {
   PENDING: 'statusPending',
   CONFIRMED: 'statusConfirmed',

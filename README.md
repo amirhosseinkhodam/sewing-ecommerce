@@ -1,87 +1,65 @@
 # Sewing Ecommerce
 
-Persian-first, mobile-responsive sewing shop ecommerce website with guest browsing, customer cart/checkout, and an admin panel for full management. Card-to-card payment and log-based SMS notifications (real providers deferred until paid accounts exist).
+Persian-first, mobile-responsive sewing shop: guest browsing, customer cart/checkout, admin panel, card-to-card payment, and a provider-neutral online gateway and SMS layer (fake/log providers until paid accounts exist).
 
 ## Stack
 
 | Layer | Technology |
 |---|---|
-| Frontend | Angular 22 standalone + Tailwind CSS v4 + Spartan UI; TanStack Query and NgRx SignalStore during migration |
-| Backend | NestJS + Prisma + PostgreSQL (in `backend/`) |
+| Frontend | Angular 22 standalone + Tailwind CSS v4 + Spartan UI primitives; TanStack Query (server state), SignalStore (session), Signal Forms |
+| Backend | NestJS 11 + Prisma 7 + PostgreSQL (`backend/`) |
 | Auth | JWT (access + refresh) |
-| Styling | Tailwind CSS v4 + tailwindcss-rtl (RTL ready) |
+| Deploy | Docker image + Postgres + Caddy (automatic HTTPS) |
 
-## Quick Start
+## Quick start
 
-```bash
-npm install            # all deps (frontend + backend)
-npm run dev            # both servers: frontend on localhost:4200 + backend on localhost:3000
-```
-
-Requires Node ≥ 22 and a running PostgreSQL with a `sewing_ecommerce` database. First-time setup:
+Requires Node ≥ 22 and a running PostgreSQL with a `sewing_ecommerce` database.
 
 ```bash
-npm run prisma:migrate && npm run prisma:seed
-npm run start:backend  # API on localhost:3000, Swagger at /docs
+npm install
+npm run prisma:migrate && npm run prisma:seed   # first time only
+npm run dev                                     # frontend :4200 + backend :3000 (Swagger at /docs)
 ```
 
-`npm run dev` proxies `/api` and `/uploads` from the Angular dev server to `localhost:3000`.
+`npm run dev` proxies `/api` and `/uploads` to `localhost:3000`. Online payment is off unless `PAYMENT_PROVIDER` is set in `.env`; `PAYMENT_PROVIDER=fake` enables a local Pay / Fail page (no money moves) and is refused under `NODE_ENV=production`. Card-to-card is always available.
 
-Online payment is off unless `PAYMENT_PROVIDER` is set in `.env`. `PAYMENT_PROVIDER=fake` enables a free local gateway (a Pay / Fail page, no money moves). The backend refuses to start with it under `NODE_ENV=production`. Card-to-card is always available.
-
-## Production (Docker)
-
-One image serves the API, `/uploads`, and the built Angular app from a single port:
-
-```bash
-cp .env.production.example .env.production   # then fill in real secrets (never committed)
-docker compose --env-file .env.production up -d --build
-# first run only — creates the admin account:
-docker compose --env-file .env.production run --rm app npx prisma db seed
-```
-
-Pending migrations apply on every container start. The `caddy` service terminates TLS on ports 80/443 for `DOMAIN` (set in `.env.production`) and fetches and renews the Let's Encrypt certificate itself — point the domain's DNS at the server and open 80/443 before the first `up`. The app itself only binds to `127.0.0.1:3000`. Demo catalog data is skipped when `NODE_ENV=production` (force it with `SEED_DEMO=true`).
-
-## Available Scripts
+## Scripts
 
 | Command | Action |
 |---|---|
-| `npm start` | Frontend dev server on `localhost:4200` |
-| `npm run start:backend` | Backend dev server on `localhost:3000` |
-| `npm run dev` | Run frontend + backend together (concurrently) |
-| `npm run build` | Production build (backend then frontend) |
-| `npm run lint` | ESLint — checks `frontend/src/**/*.ts` `backend/src/**/*.ts` |
-| `npm run format` | Prettier — writes both halves |
+| `npm start` | Frontend dev server (`:4200`) |
+| `npm run start:backend` | Backend dev server (`:3000`) |
+| `npm run dev` | Both together |
+| `npm run build` | Production build (backend, then frontend) |
+| `npm run lint` | ESLint over `frontend/`, `backend/`, `shared/` |
+| `npm run format` | Prettier |
+| `npm run prisma:migrate` / `prisma:generate` / `prisma:seed` / `prisma:studio` | Database tooling |
 
-## Project Structure
+## Production (Docker)
+
+One image serves the API, `/uploads` and the built Angular app on one port.
+
+```bash
+cp .env.production.example .env.production   # fill in real secrets (never committed)
+docker compose --env-file .env.production up -d --build
+docker compose --env-file .env.production run --rm app npx prisma db seed   # first run only: creates the admin
+```
+
+Migrations apply on every container start. The `caddy` service serves HTTPS for `DOMAIN` and renews the certificate itself: point DNS at the server and open ports 80/443 before the first `up`. The app binds only to `127.0.0.1:3000`. Demo data is skipped when `NODE_ENV=production` (force with `SEED_DEMO=true`).
+
+## Project structure
 
 ```
 frontend/src/app/
-├── app.ts / main.route.ts  # bootstrap is frontend/src/main.ts
-├── core/                 # Guards, interceptors, API service
-├── auth/                 # Auth feature (store, services, forms, pages)
-├── features/             # Feature modules (home, products, ...)
-│   ├── <feature>/pages/    # Routed page components
-│   ├── <feature>/query/    # injectQuery factories (server reads)
-│   ├── <feature>/mutation/ # injectMutation factories (server writes)
-│   ├── <feature>/store/    # Client state + computed projections
-│   ├── <feature>/forms/  # Signal Forms or existing Reactive Forms
-│   ├── <feature>/models/ # Feature models/interfaces
-│   └── <feature>/services/
-├── i18n/                 # en.json + fa.json (Persian RTL)
-└── shared/               # Custom element library, pipes, services (import via @shared/*)
-backend/                  # NestJS + Prisma backend
-shared/                   # Cross-half shared types (root, backend-importable)
+├── core/        # guards, interceptors, API service
+├── auth/        # auth feature
+├── features/    # <feature>/{pages,query,mutation,store,forms,models,services}
+├── i18n/        # en.json + fa.json (Persian RTL)
+└── shared/      # app-* component library, pipes, services
+backend/         # NestJS + Prisma
+shared/          # types and consts used by both halves
 ```
 
-## Current Progress
+## Status and roadmap
 
-- **Phase 0 — Backend Foundation**: done (NestJS 11 + Prisma 7 + PostgreSQL in `backend/`)
-- **Phase 1 — Auth Frontend + Layout**: done (login, register, profile, guards, interceptor, navbar/footer, AuthStore)
-- **Phase 2 — Products + Categories**: done (public catalog + product detail with gallery/sizes, admin category/product management with image upload)
-- **Phase 3 — Cart + Checkout**: done (cart/address/order backend modules; CartPage, AddressManagementPage, multi-step CheckoutPage; navbar cart badge; add-to-cart with login-return flow)
-- **Phases 4–5**: done (orders, portfolio, contact)
-- **Frontend migration + Phases 6–7**: done except deployment and a native-speaker `fa.json` review
-- **Phase 8 — Online payment + notifications**: done for free scope (fake gateway, log SMS, 24h auto-cancel); real paid providers deferred
-
-Full roadmap, database schema, API endpoints, and implementation phases: see `PLAN.md`. Swagger at `/docs` is the generated API reference.
+Core shop, admin panel and Docker packaging are done. Remaining work — cleanup, i18n review, automated tests, real SMS, real payment gateway, PWA, deploy — is tracked in [PLAN.md](PLAN.md). The generated API reference is Swagger at `/docs`.

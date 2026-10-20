@@ -80,6 +80,4 @@ dist-esbuild
 
 # Agent instruction and coordination files (local only)
 AGENTS.md
-CURRENT.md
-DECISIONS.md
 .claude/

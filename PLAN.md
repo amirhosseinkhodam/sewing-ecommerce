@@ -1,711 +1,118 @@
-# Sewing Ecommerce — Complete Plan
-
-## Overview
-
-A Persian-first, mobile-responsive sewing shop ecommerce website with guest browsing, customer cart/checkout, admin panel for full management, card-to-card payment, and SMS notifications.
-
----
-
-## 1. System Architecture
-
-```
-Frontend (Angular 22 + Tailwind CSS + Spartan UI + TanStack Query)
-       │  HTTP (JSON + JWT)
-Backend (NestJS + Prisma + PostgreSQL)
-       │  SQL
-Database (PostgreSQL)
-```
-
-**Other services:** local filesystem (images); third-party payment/SMS providers are deferred until paid accounts exist
-
----
-
-## 2. Stack
-
-| Layer | Technology | Reason |
-|-------|-----------|--------|
-| Frontend | Angular 22 standalone + Tailwind + Spartan UI; TanStack Query for server state and NgRx SignalStore for client state | Migrate the existing app before Phase 6 |
-| Backend | NestJS + TypeScript | Same language as frontend, structured, scalable |
-| ORM | Prisma | Type-safe, auto-generated types, migrations |
-| Database | PostgreSQL | Reliable, JSON support, full-text search |
-| Auth | JWT (access + refresh) | Stateless, standard |
-| Payment | Card-to-card (always-on) + provider-neutral online gateway interface | No paid API keys needed |
-| Styling | Tailwind CSS + tailwindcss-rtl | Mobile-first, RTL ready |
-| CDN | ArvanCloud (production) | Iranian CDN |
-
----
-
-## 3. Database Schema
-
-```
-User
-├── id (uuid, PK)
-├── firstName / lastName / phone
-├── password (bcrypt)
-├── role: CUSTOMER | ADMIN
-├── createdAt / updatedAt
-├── addresses: Address[]
-├── orders: Order[]
-└── cart: Cart?
-
-Category
-├── id (uuid, PK)
-├── name / slug (unique) / description / image
-├── sortOrder / isActive
-├── createdAt / updatedAt
-├── products: Product[]
-└── portfolio: Portfolio[]
-
-Product
-├── id (uuid, PK)
-├── name / slug (unique) / description / price
-├── fabric / images (JSON string[])
-├── categoryId (FK -> Category)
-├── isActive / isFeatured
-├── createdAt / updatedAt
-├── variants: ProductVariant[]
-└── cartItems: CartItem[]
-
-ProductVariant
-├── id (uuid, PK)
-├── productId (FK -> Product)
-├── size: STRING (XS/S/M/L/XL)
-├── stock: INT
-├── price: DECIMAL (nullable, fallback to product.price)
-├── createdAt / updatedAt
-
-Portfolio
-├── id (uuid, PK)
-├── title / slug (unique) / description
-├── images (JSON string[])
-├── categoryId (FK -> Category, nullable)
-├── isActive
-├── createdAt / updatedAt
-
-Cart (one per user)
-├── id (uuid, PK)
-├── userId (FK -> User, unique)
-├── items: CartItem[]
-├── createdAt / updatedAt
-
-CartItem
-├── id (uuid, PK)
-├── cartId (FK -> Cart)
-├── productId (FK -> Product)
-├── variantId (FK -> ProductVariant)
-├── quantity: INT
-├── createdAt / updatedAt
-
-Address
-├── id (uuid, PK)
-├── userId (FK -> User)
-├── label / province / city / fullAddress
-├── postalCode / phone
-├── isDefault
-├── createdAt / updatedAt
-
-Order
-├── id (uuid, PK)
-├── userId (FK -> User)
-├── items: OrderItem[]
-├── totalAmount: DECIMAL  (items subtotal + shippingAmount)
-├── shippingAmount: DECIMAL  (snapshotted from ShopSetting at order time)
-├── status: PENDING | CONFIRMED | PROCESSING | SHIPPED | DELIVERED | CANCELLED
-├── shippingMethod: POST | COURIER
-├── shippingAddressId (FK -> Address)
-├── shippingLabel / shippingProvince / shippingCity   (address snapshot)
-├── shippingFullAddress / shippingPostalCode / shippingPhone
-├── paymentMethod: ONLINE | CARD_TO_CARD
-├── paymentStatus: PENDING | PAID | FAILED | REFUNDED
-├── paymentAuthority (unique), paymentRefId
-├── paymentReceipt (card-to-card receipt image path)
-├── trackingCode
-├── notes
-├── createdAt / updatedAt
-
-OrderItem (snapshot)
-├── id (uuid, PK)
-├── orderId (FK -> Order)
-├── productId (FK -> Product)
-├── productName / productImage / size
-├── quantity / unitPrice / totalPrice
-
-ContactMessage
-├── id (uuid, PK)
-├── name / phone
-├── message
-├── isRead
-├── createdAt / updatedAt
-
-ShopSetting (single row, id = 'default')
-├── id (PK, defaults to 'default' so the row is a singleton)
-├── shopName / businessHours
-├── bankCardNumber / bankCardHolder
-├── shopPhone / shopAddress
-├── postPrice: DECIMAL / postEtaDays: INT
-├── courierPrice: DECIMAL / courierEtaDays: INT
-├── createdAt / updatedAt
-```
-
----
-
-## 4. Frontend Routes
-
-```
-Public (guest)
-────────────────────────────
-/                 HomePage
-/products         CatalogPage (grid + filters + pagination)
-/products/:slug   ProductDetailPage (images, sizes, add-to-cart)
-/portfolio        PortfolioPage (gallery grid)
-/portfolio/:slug  PortfolioDetailPage
-/about            AboutPage
-/contact          ContactPage
-/login            LoginPage
-/register         RegisterPage
-
-Protected (customer)
-────────────────────────────
-/cart             CartPage
-/checkout         CheckoutPage (multi-step: address -> shipping -> payment -> review)
-/orders           OrderHistoryPage
-/orders/:id       OrderDetailPage
-/profile          ProfilePage
-/addresses        AddressManagementPage
-
-Admin (admin role)
-────────────────────────────
-/admin                    DashboardPage (stats, charts)
-/admin/products           ProductListPage
-/admin/products/new       ProductFormPage (create)
-/admin/products/:id/edit  ProductFormPage (edit)
-/admin/categories         CategoryListPage
-/admin/orders             OrderListPage
-/admin/orders/:id         OrderDetailPage (admin view)
-/admin/portfolio          PortfolioListPage
-/admin/portfolio/new      PortfolioFormPage
-/admin/customers          CustomerListPage
-/admin/messages           MessagesPage
-/admin/settings           SettingsPage
-```
-
----
-
-## 5. Frontend Feature Tree
-
-```
-frontend/src/app/
-├── main.ts / app.ts / main.route.ts
-│
-├── core/
-│   ├── guards/
-│   │   ├── auth.ts
-│   │   └── admin.ts
-│   ├── interceptors/
-│   │   └── auth.ts
-│   └── services/
-│       └── api.ts (exists)
-│
-├── auth/
-│   ├── pages/login.ts, register.ts, profile.ts
-│   ├── store/auth.ts
-│   ├── forms/login.ts, register.ts
-│   ├── models/auth.ts
-│   └── services/auth.ts
-│
-├── features/
-│   ├── products/
-│   │   ├── pages/catalog.ts, product-detail.ts
-│   │   ├── models/product.ts
-│   │   ├── services/product.ts
-│   │   └── components/product-card.ts, product-filter.ts, size-selector.ts
-│   ├── cart/
-│   │   ├── pages/cart.ts
-│   │   ├── services/cart.ts
-│   │   └── components/cart-item.ts, cart-summary.ts
-│   ├── orders/
-│   │   ├── pages/checkout.ts, order-history.ts, order-detail.ts
-│   │   ├── models/order.ts
-│   │   ├── services/order.ts
-│   │   └── components/order-summary.ts, address-selector.ts, payment-method.ts
-│   ├── portfolio/
-│   │   ├── pages/portfolio.ts, portfolio-detail.ts
-│   │   ├── models/portfolio.ts
-│   │   └── services/portfolio.ts
-│   ├── contact/
-│   │   ├── pages/about.ts, contact.ts
-│   │   ├── models/contact.ts
-│   │   └── services/contact.ts
-│   └── admin/
-│       ├── pages/dashboard.ts, products-list.ts, product-form.ts
-│       ├── pages/categories.ts, orders-list.ts, order-detail.ts
-│       ├── pages/portfolio-list.ts, portfolio-form.ts
-│       ├── pages/customers.ts, messages.ts, settings.ts
-│       └── components/admin-layout.ts, data-table.ts, stat-card.ts
-│
-├── i18n/
-│   ├── en.json (~150 keys)
-│   └── fa.json (~150 keys)
-│
-└── shared/
-    ├── components/ (10 exist: button, card, input, select, textarea, form, confirm-dialog, confirm-bottom-sheet, theme-toggle, language-toggle)
-    │   └── NEW: navbar.ts, footer.ts, breadcrumbs.ts, quantity-selector.ts, image-gallery.ts, skeleton.ts, back-to-top.ts
-    ├── services/theme.ts, language.ts (exist)
-    ├── pipes/translate.ts, localized-date.ts (exist)
-    ├── forms/password.ts (exist)
-    ├── const/http-methods.ts (exist)
-    └── models/ (exists)
-```
-
----
-
-## 6. API Endpoints
-
-**Auth**
-- `POST /api/auth/register`
-- `POST /api/auth/login`
-- `POST /api/auth/refresh`
-- `GET /api/auth/me`
-- `PATCH /api/auth/profile`
-
-**Products (public)**
-- `GET /api/products` — paginated, filterable
-- `GET /api/products/:slug` — detail
-- `GET /api/products/:slug/variants` — sizes with stock
-
-**Categories (public)**
-- `GET /api/categories` — all active
-
-**Cart (auth)**
-- `GET /api/cart`
-- `POST /api/cart/items`
-- `PATCH /api/cart/items/:id`
-- `DELETE /api/cart/items/:id`
-
-**Orders (auth)**
-- `GET /api/orders` — paginated, filterable by status/paymentStatus
-- `GET /api/orders/:id`
-- `POST /api/orders` — from cart
-- `PATCH /api/orders/:id/receipt` — card-to-card receipt path
-- `PATCH /api/orders/:id/cancel` — customer cancel while PENDING/CONFIRMED
-
-**Addresses (auth)**
-- `GET /api/addresses`
-- `POST /api/addresses`
-- `PATCH /api/addresses/:id`
-- `DELETE /api/addresses/:id`
-
-**Payment**
-- `GET /api/payment/methods` — public; `ONLINE` only when `PAYMENT_PROVIDER` is set
-- `POST /api/payment/:orderId/start` — auth; opens (or retries) a gateway attempt, returns `{ redirectUrl }`
-- `GET /api/payment/callback` — unauthenticated browser redirect from the gateway; verifies server-side
-
-**Portfolio (public)**
-- `GET /api/portfolio` — paginated, active only; filters: `category` (slug), `search`
-- `GET /api/portfolio/:slug` — active only, 404 otherwise
-
-**Contact (public)**
-- `POST /api/contact` — unauthenticated; returns `{ submitted: true }` only
-
-**Admin**
-- `GET /POST /api/admin/products`
-- `GET /PATCH/DELETE /api/admin/products/:id`
-- `GET /POST /api/admin/categories`
-- `PATCH/DELETE /api/admin/categories/:id`
-- `GET /api/admin/orders` — paginated; filters: status, paymentStatus, search (order id / customer name / phone)
-- `GET /api/admin/orders/:id`
-- `PATCH /api/admin/orders/:id/status` — enforces the lifecycle state machine
-- `PATCH /api/admin/orders/:id/payment` — confirm/reject card-to-card payment
-- `GET /POST /api/admin/portfolio` — list includes inactive items
-- `GET /PATCH/DELETE /api/admin/portfolio/:id`
-- `GET /api/admin/customers` — paginated; filters: `search` (name/phone), `role`; rows carry `orderCount` and `totalSpent` (cancelled orders excluded)
-- `GET /api/admin/messages` — paginated; filter: `isRead`; response carries `unreadCount`
-- `PATCH /api/admin/messages/:id/read`
-- `DELETE /api/admin/messages/:id`
-- `GET /api/admin/dashboard/stats` — `days` (1–365, default 30) sets the trend window; returns shop totals, all-time and in-range revenue, dense daily trend, and status/payment breakdowns
-- `GET /PATCH /api/admin/settings`
-
-**Settings (public read)**
-- `GET /api/settings` — the shop's own details; unauthenticated, since Contact/About show them to guests and checkout shows the card and rates to customers
-
-**Upload**
-- `POST /api/upload` — single
-- `POST /api/upload/multiple` — multiple
-
----
-
-## 7. Key Workflows
-
-### Roles & access
-
-- **Guest** — no account; browses everything public (catalog, product detail, portfolio, about, contact).
-- **Customer** — logged-in `CUSTOMER`; cart, checkout, orders, addresses, profile.
-- **Admin** — `ADMIN` role; manages the shop from `/admin` (products, categories, orders, portfolio, customers, messages, settings).
-
-### Profile
-
-- Customer visits `/profile` → `GET /api/auth/me` shows account info; edits via `PATCH /api/auth/profile`. Changes persist server-side.
-
-### Contact
-
-- `/contact` → `POST /api/contact` submits name/phone/message; stored as a `ContactMessage` the admin reads in the admin panel (mark read / delete).
-
-### Guest browsing -> Add to cart -> Checkout
-
-1. Guest visits `/products` -> `GET /api/products?page=1`
-2. Clicks product -> `GET /api/products/:slug` -> detail with sizes + "Add to Cart"
-3. Clicks "Add to Cart" -> no JWT -> redirect to `/login?returnUrl=/products/:slug&autoAdd=1&variantId=...`
-4. Logs in -> `POST /api/auth/login` -> JWT stored in AuthStore
-5. LoginPage detects `autoAdd=1` query param -> redirects back to `/products/:slug`
-6. ProductDetailPage reads `autoAdd` + `variantId` from query params -> auto-adds item to cart -> `POST /api/cart/items { productId, variantId, quantity: 1 }`
-7. Shows "Added to cart" toast notification -> clears `autoAdd` from URL
-8. Goes to `/cart` -> `GET /api/cart` -> reviews items, updates qty
-9. "Proceed to Checkout" -> multi-step: address -> shipping -> payment -> review
-10. "Place Order" -> `POST /api/orders` -> status PENDING, paymentStatus PENDING
-11. Redirect to `/orders/:id` -> shows card-to-card payment instructions (bank card info, amount)
-12. User transfers money externally, uploads receipt screenshot
-13. Admin confirms payment -> status CONFIRMED, paymentStatus PAID
-14. (optional third-party online gateway available via /api/payment/methods when configured)
-
-### Checkout flow (multi-step)
-
-**Step 1: Address**
-- If user has saved addresses -> show list with radio selection + "Add New Address" button
-- If no saved addresses -> show inline address form (province/city dropdown from Iranian provinces data)
-- Address saved via `POST /api/addresses` -> user selects it for this order
-- Default address auto-selected if exists
-
-**Step 2: Shipping**
-- Radio: POST (پست) or COURIER (پیک)
-- Show estimated delivery time + shipping cost
-
-**Step 3: Payment**
-- Default: CARD_TO_CARD (کارت به کارت) — show admin bank card info + instructions: "Transfer amount to card XXXX-XXXX-XXXX-XXXX under name YYY, then upload receipt screenshot"
-- (Phase 8: ONLINE option, shown only when a payment gateway is configured)
-
-**Step 4: Review**
-- Show order summary: items, address, shipping, payment method, total
-- "Place Order" button -> `POST /api/orders`
-
-### Card-to-card payment flow
-
-1. User selects CARD_TO_CARD at checkout step 3
-2. Order placed -> `POST /api/orders` -> status PENDING, paymentStatus PENDING
-3. Redirect to `/orders/:id` -> show bank card details (admin's card number, name, amount)
-4. User transfers money externally
-5. User uploads receipt screenshot -> `POST /api/payment/receipt`
-6. Admin reviews receipt in OrdersPage -> confirms or rejects
-7. On confirm -> status CONFIRMED, paymentStatus PAID
-8. (Phase 8: SMS notification sent to customer on confirmation)
-
-### Auth flow
-
-- Guest browsing = no JWT -> can view all public pages
-- Login required for cart, checkout, orders, profile
-- AuthGuard checks JWT, redirects to `/login?returnUrl=...` if missing
-- AuthInterceptor attaches `Authorization: Bearer <token>` to all HTTP requests
-- On 401 -> attempt refresh token -> if fails, logout + redirect
-
-### Admin flow
-
-- Login as admin -> AuthStore stores user with `role: ADMIN`
-- AdminGuard: `canActivate` checks `store.role() === 'ADMIN'`
-- Admin layout: sidebar navigation + header + content area
-- All admin pages are lazy-loaded under `/admin` route
-- Product CRUD, Order status management, Portfolio management, Customer list, Messages
-
-### Order status lifecycle
-
-```
-PENDING -> CONFIRMED -> PROCESSING -> SHIPPED -> DELIVERED
-  |          |
-  |          +-> CANCELLED
-  +-> CANCELLED
-```
-
-Only admin can change status. (Phase 8: SMS sent to customer on each transition.)
-
-### Payment handling
-
-- Card-to-card is the default payment method
-- On order placement -> `/orders/:id` shows bank card info and receipt upload form
-- User uploads receipt for admin review
-- Admin confirms or rejects from OrderListPage
-- Phase 8: online payment through the configured gateway (fake in dev; real gateway deferred), with callback verification, retry flow, and auto-cancel after 24h
-
----
-
-## 8. Implementation Phases
-
-### Phase 0 — Backend Foundation (3 days) — **DONE**
-- [x] Initialize NestJS project with Prisma + PostgreSQL
-- [x] Define all Prisma models + run migrations + seed
-- [x] Auth module: JWT, bcrypt, Passport strategies
-- [x] File upload module (Multer)
-- [x] Global guards, filters, pipes
-- [x] Swagger/OpenAPI docs
-
-### Phase 1 — Auth Frontend + Layout (3 days) — **DONE**
-- [x] Shared layout: Navbar (logo, nav links, cart badge, login/profile dropdown), Footer
-- [x] LoginPage + RegisterPage
-- [x] AuthStore (SignalStore, `providedIn: 'root'`)
-- [x] AuthGuard + AdminGuard
-- [x] AuthInterceptor (attach JWT + handle 401)
-- [x] ProfilePage
-
-### Phase 2 — Products + Categories (4 days) — **DONE**
-- [x] Backend: Category CRUD
-- [x] Backend: Product CRUD + variants + image upload
-- [x] Admin: CategoryListPage
-- [x] Admin: ProductListPage + ProductFormPage
-- [x] Public: CatalogPage (grid, filters, pagination, search)
-- [x] Public: ProductDetailPage (gallery, sizes, add-to-cart)
-
-### Phase 3 — Cart + Checkout (4 days) — **DONE**
-- [x] Backend: Cart CRUD
-- [x] Backend: Address CRUD
-- [x] Frontend: AddressManagementPage
-- [x] Frontend: CartPage
-- [x] Frontend: CheckoutPage (multi-step stepper)
-- [x] Cart count badge in navbar
-- [x] (pulled forward from Phase 4) Backend: `POST /api/orders` — order creation from cart in one transaction (snapshot items, decrement stock, clear cart) so checkout is functional end-to-end
-
-### Phase 4 — Orders (3 days) — **DONE**
-- [x] Backend: Order creation from cart (done in Phase 3 — see note above)
-- [x] Backend: `GET /api/orders`, `GET /api/orders/:id`, `PATCH /api/orders/:id/receipt`, `PATCH /api/orders/:id/cancel`
-- [x] Backend: `GET /api/admin/orders`, `GET /api/admin/orders/:id`, `PATCH /api/admin/orders/:id/status`, `PATCH /api/admin/orders/:id/payment`
-- [x] Backend: status transition state machine + stock restore on cancellation
-- [x] Frontend: OrderHistoryPage + OrderDetailPage
-- [x] Admin: OrderListPage (filters/search/pagination) + OrderDetailPage with status management + tracking
-- [x] Card-to-card payment receipt upload flow (customer uploads, admin confirms/rejects)
-
-### Phase 5 — Portfolio + Contact (2 days) — **DONE**
-- [x] Backend: Portfolio CRUD (public paginated list/detail + admin CRUD, category filter, Persian slug transliteration)
-- [x] Backend: Contact module — public `POST /api/contact` + admin message management
-- [x] Admin: PortfolioListPage + PortfolioFormPage (multi-image upload)
-- [x] Public: PortfolioPage (gallery, category filter, pagination) + PortfolioDetailPage
-- [x] Public: AboutPage (static i18n content — owner's decision; admin-editable in Phase 6)
-- [x] Public: ContactPage (form + shop contact details)
-- [x] Admin: MessagesPage (read/unread filter, mark read, delete)
-- [x] Fixed: `CategoriesService.remove` now guards portfolio items too (was a latent 500)
-
-### Frontend migration — before Phase 6
-- [x] Configure TanStack Query at bootstrap; migrate public catalog, product detail, and portfolio reads; invalidate affected caches on admin changes
-- [x] Migrate login, registration, and contact forms to Signal Forms; use a contact mutation and Spartan button primitive
-- [x] Migrate address list/write workflows and shared address form to Query and Signal Forms
-- [x] Migrate cart reads and writes to TanStack Query; preserve navbar count and checkout clear
-- [x] Migrate customer order history/detail and checkout queries/mutations
-- [x] Migrate admin categories and product lists/writes to TanStack Query; migrate category form to Signal Forms
-- [x] Migrate remaining admin product/portfolio forms, portfolio, orders, and messages to queries and mutations
-- [x] Migrate customer profile reads/writes to queries and mutations (`AuthStore` now holds only the session tokens plus login/register loading; `user`/`profileLoading` are computed from a `profile` query seeded by login, registration, and the profile PATCH, and the auth interceptor attaches the JWT to `/api/auth/me` and `/api/auth/profile`)
-- [x] Migrate remaining admin product/portfolio forms to Angular Signal Forms; retain validation and accessibility (Reactive Forms are now fully gone from the app; the unused `PasswordFormService` and `shared/validators` were deleted rather than ported)
-- [x] Adopt Spartan primitives for shared controls when appropriate while preserving `app-*` APIs and visual/RTL behavior (`app-button` → `BrnButton`, `app-toggle` → `BrnSwitch`/`BrnSwitchThumb`, `app-modal` + `ModalService` → `BrnDialogService`/`BrnDialogRef`, `app-input`/`app-textarea` → `BrnLabel`, `app-select` → ng-select `labelForId`; only the headless `@spartan-ng/brain` package is installed, so styled shells remain custom Tailwind)
-- [x] Check lint, development build, and critical login/cart/checkout/admin flows before Phase 6
-  - [x] Lint and builds green (`npm run lint` 0 errors; `npm run build` backend + production frontend)
-  - [x] Manual pass over the critical flows (login, cart, checkout, admin)
-    - [x] API-level end-to-end pass against the production image (2026-10-02, 56/56): admin catalog setup + image upload, public list/detail, register/login, cart, address, checkout (shipping snapshotted from settings, total = subtotal + shipping, cart cleared, stock decremented), receipt upload + attach, access control (401 anonymous, 403 customer→admin, 404 other user's order), payment confirm auto-advances to CONFIRMED, full status lifecycle + 400 on an illegal transition, customer cancel restoring stock, refresh token, profile update
-    - [x] In-browser pass (2026-10-04, Playwright against the running Docker stack + a throwaway `ng serve` to verify the fix) — guest browsing, login/register, product detail + size select + add-to-cart, cart qty, checkout stepper (address/shipping/payment/review), admin dashboard/products/categories/orders/order-detail/portfolio/messages/customers/settings, profile, addresses, order history, portfolio, about, contact, mobile (375px) and desktop (1280px) layouts in fa (RTL) and en (LTR); zero console errors across every screen, no horizontal overflow
-      - Found and fixed: the `phoneNumber` and `address` i18n keys held hardcoded demo contact details instead of labels, so the Contact/About info cards, Contact form, admin Settings form, and admin Customers column header showed the literal phone/street where a label belonged. Both keys are now labels ("Phone Number"/"شماره تلفن", "Address"/"آدرس"). The footer, which had used those keys as content, now takes `phone`/`address` inputs fed by the shared `settings` query in the app shell, so it shows the admin-editable shop details.
-
-### Phase 6 — Admin Dashboard (2 days)
-- [x] Backend: Dashboard stats endpoint (`GET /api/admin/dashboard/stats?days=`), customer list (`GET /api/admin/customers`), and settings (`GET /api/settings` public, `GET/PATCH /api/admin/settings`)
-- [x] Backend: `ShopSetting` singleton + `Order.shippingAmount` snapshot — `OrdersService` resolves the shipping rate server-side, so a later rate change can never rewrite what an order was charged
-- [x] Frontend: DashboardPage (stat cards, inline-SVG orders trend, status/payment breakdowns, recent orders)
-- [x] Frontend: CustomerListPage (search, role filter, pagination, aggregate order count/spend)
-- [x] Frontend: SettingsPage (shop name, business hours, bank card info, shipping rates) — the Phase 4/5 placeholder consts `orders/const/bank-card.ts` and `contact/const/shop-contact.ts` are deleted and `orders/const/shipping-options.ts` is now a factory over the settings row; order detail, checkout, Contact, and About read from the shared `settings` query
-- [x] Manual pass over the new admin screens (dashboard, customers, settings) and the settings-driven checkout/order-detail/contact reads — covered in the same 2026-10-04 pass above; settings-driven shop phone/address/hours render correctly on Contact, About, checkout, and order detail
-- [x] Admin layout (sidebar + header) — done in Phase 2, extended in Phases 4–5
-- [x] ~~Admin: MessagesPage~~ — delivered in Phase 5
-
-### Phase 7 — Polish + Launch (3 days)
-- [x] SEO meta tags for all pages (Title, Description, OG tags) — `SeoService` (Title + Meta) driven by route `data`, admin routes carry `noindex`, `index.html` has static fallback tags
-- [ ] Complete i18n pass (all Persian text verified)
-  - [x] Automated pass: en/fa key parity, no untranslated values, every template/feedback key resolves (added missing `quantity`/`remove`/`total`), hardcoded strings moved to keys (theme/language toggle aria-labels, home tagline, admin image-preview alt), RTL-flipped product-detail back arrow
-  - [x] Editorial pass over `fa.json` (2026-10-05): one spelling per term (`سفارش‌ها`, `جست‌وجو`, `نمونه‌کار`, `ثبت‌نام`, `آپلود` for every upload), natural phrasing for the `couldNot*` errors, `subtotal` no longer collides with "grand total" (`مبلغ کالاها`), `paymentRefunded` reads as a status (`مسترد شده`), checkout-context hints say "هنگام ثبت سفارش" instead of "در پرداخت", `invalidPhone` asks for a mobile number
-  - [ ] Native-speaker read-through of `fa.json` wording — moved to Phase 9
-- [x] Loading skeletons for all data-fetching pages — shared `app-skeleton`/`app-skeleton-table`/`app-skeleton-grid` primitives replace the bouncing-dot spinner across catalog/portfolio grids, all 5 admin tables, 4 detail pages, the dashboard, 3 admin forms, and cart/order-history/addresses/messages/checkout row lists
-- [x] Error boundaries: API failure -> inline error + retry button, 404 page, 500 page
-  - [x] Inline error + retry button on every store that reads server state (cart, addresses, and six admin stores gained `error`/`reload()`)
-  - [x] 404 page (`features/errors/pages/not-found.ts`, wired as the wildcard route)
-  - [x] 500 page (`features/errors/pages/server-error.ts`, eager `/error` route; `withNavigationErrorHandler` redirects failed navigations there with `skipLocationChange`)
-- [x] Empty states: no products, no orders, no messages, empty cart — shared `EmptyStateComponent` used across list/error states
-- [x] Responsive audit (mobile/tablet/desktop) — headless pass over every public, customer, and admin route at 375/768/1280 (plus 320 for the navbar) in fa and en: no horizontal overflow; fixed the ng-select placeholder overlapping the value and the logged-in navbar overflowing on small phones (brand truncates, avatar dropdown moves into the mobile menu below `md`)
-- [x] Image lazy loading, code splitting — every list/thumbnail/receipt `<img>` has `loading="lazy"`, the gallery's main image (detail-page LCP) gets `fetchpriority="high"`; every route is `loadComponent` except the eager `/error` fallback
-- [ ] Build + deploy
-  - [x] Docker packaging — single image (NestJS serves the API, `/uploads`, and the production Angular build), `docker-compose.yml` (Postgres + app), `.env.production.example`; production guardrails: demo seed off and `SEED_ADMIN_PASSWORD` required under `NODE_ENV=production`, CORS closed unless `CORS_ORIGIN` is set, secrets never baked into the image
-  - [x] Verified locally: image build, `prisma migrate deploy` on start, admin-only seed, SPA deep links, immutable asset caching, JSON 404s for `/api` and `/uploads`, login + admin stats against the running stack
-  - [x] TLS reverse proxy — `caddy` service in `docker-compose.yml` + root `Caddyfile`: automatic Let's Encrypt for `DOMAIN` (from `.env.production`), HTTP→HTTPS redirect, HSTS/nosniff/referrer headers, gzip/zstd, HTTP/2+3. Verified locally (2026-10-05, `DOMAIN=localhost`): SPA + deep links, `/api` health and JSON 404s, validation errors, headers, redirect
-  - [ ] Deploy to the server (owner runs it) — moved to Phase 13
-
-### Phase 8 — Online Payment + Notifications — **DONE (free scope, 2026-10-16)**
-
-No paid API accounts yet, so every integration is written against a provider-neutral interface with a free stand-in. Real providers drop in later by setting env vars, with no code changes. Card-to-card stays the always-on payment method.
-- [x] Backend: `PaymentGateway` interface + `FakePaymentGateway` (local Pay/Fail page, verify only succeeds after Pay was pressed), `PAYMENT_PROVIDER` env selects it (unset = card-to-card only; `fake` refused under `NODE_ENV=production`). `PaymentMethod.ZARINPAL` → `ONLINE`, `zarinpalAuthority` → provider-neutral `paymentAuthority` (unique) + `paymentRefId`. Endpoints: `GET /api/payment/methods`, `POST /api/payment/:orderId/start` (also the retry path), `GET /api/payment/callback` (verifies server-side, redirects to `/orders/:id?payment=SUCCESS|FAILED`; a paid PENDING order auto-advances to CONFIRMED)
-- [x] Frontend: "Online payment" option in checkout (only when `/payment/methods` offers it), redirect to the gateway after placing the order (lands on the order page if the gateway can't be reached), result banner driven by the order's real payment status + "Pay now"/"Pay again" on order detail, payment reference shown to customer and admin; admin order detail shows the gateway reference instead of the receipt review for online orders
-- [x] Auto-cancel unpaid online orders after 24h (restore stock): `UnpaidOrderSweeper` runs every 15 min, cancels stale unpaid ONLINE orders in a transaction, restores stock, sends SMS
-- [x] Backend: `SmsProvider` interface + `LogSmsProvider` (writes to the log; free), `SMS_PROVIDER` env selects it (unknown values fail at startup)
-- [x] SMS on order status transitions (through the interface): `SmsService.sendOrderStatus`, Persian text per status, never throws
-- Real SMS provider and real payment gateway moved to Phases 11 and 12 (need paid accounts).
-
-### Remaining roadmap (reordered 2026-10-16)
-
-Order of work: finish i18n → automated tests → real SMS → real bank gateway → deploy. Each phase is finished and verified before the next starts. Phase 7's two open items (native-speaker `fa.json` read-through, server deploy) moved into Phases 9 and 13.
-
-### Phase 9 — Finish i18n + hardening — **TODO**
-- [ ] Full `fa.json` wording review against every page (fix awkward phrasing, one term per concept); the owner or a native speaker does the final sign-off
-- [ ] Dates, numbers, prices and currency formatting in Persian (Persian digits, Jalali dates where shown) consistent across customer and admin pages
-- [x] Backend validation/error messages shown to users are translated (or mapped to keys), not raw English — `apiErrorMessage` maps every known server message (plus 429/413 statuses) to `apiErrors.*` keys in en/fa; unknown or validation-detail messages fall back to the caller's translated text instead of raw English
-- [ ] SMS message texts reviewed by a native speaker (they are sent to real customers later)
-- [x] Hardening before tests: global throttler (300/min) with stricter limits on login (10/min), register (5/min) and contact (3/min); `/api/upload*` now requires login, 5 MB cap, JPEG/PNG/WebP/GIF only; `helmet` security headers (CSP left to Caddy/Angular), `trust proxy` for correct client IPs behind Caddy; CORS stays closed unless `CORS_ORIGIN` is set (smoke-tested: anonymous upload 401, 4th contact post 429)
-- [ ] `npm run lint` + `npm run build` + manual pass in both languages
-
-### Phase 10 — Automated tests — **TODO**
-Approach: test the riskiest logic first, by feature, in three layers. Each feature slice ships its own tests and must pass before the next slice starts.
-- Backend: Jest (NestJS default) — service tests against a throwaway Postgres test database (real Prisma, no mocks for DB logic), plus controller tests with supertest for auth/permission and validation
-- Frontend: Vitest (Angular's built-in runner) — stores, guards, interceptor, form validators, pure utils, and component tests for key shared components
-- End-to-end: Playwright — a few critical user journeys against the seeded dev stack, in fa and en
-- [ ] Test infrastructure: backend Jest config + separate test DB (`DATABASE_URL_TEST`) with migrate/reset helper and fixtures; frontend Vitest setup; Playwright setup; scripts `test`, `test:backend`, `test:frontend`, `test:e2e`; update `AGENTS.md` ("Testing" section and verification line) and `README.md`
-- [ ] Slice 1 — Auth: register/login/refresh/logout, phone validation, duplicate phone, roles and guards (backend + frontend guards/interceptor/AuthStore)
-- [ ] Slice 2 — Catalog: categories, products, variants, filters/pagination/search, image upload rules
-- [ ] Slice 3 — Cart + addresses: add/update/remove, stock limits, address CRUD, ownership checks
-- [ ] Slice 4 — Orders: placement (price/stock snapshot, shipping cost), status lifecycle, stock restore on cancel, ownership/admin permissions
-- [ ] Slice 5 — Payment + SMS + sweeper: card-to-card receipt flow, fake gateway request/verify/callback and retry, double-callback safety, SMS per status via a fake provider, 24h auto-cancel (the existing manual sweep script becomes a real test)
-- [ ] Slice 6 — Portfolio, contact, admin dashboard/customers/settings
-- [ ] Slice 7 — Playwright journeys: guest → register → cart → card-to-card checkout; online payment pay/fail/retry; admin confirms and ships an order; admin product CRUD; language/theme switch
-- [ ] CI: GitHub Actions workflow running lint, build, backend + frontend tests, and e2e on every push/PR
-- [ ] Coverage report for backend services; target the order/payment/auth modules first
-
-### Phase 11 — Real SMS provider (paid) — **TODO**
-Needs an SMS provider account (e.g. Kavenegar) and API key from the owner.
-- [ ] Choose provider; get API key, sender line and approved message templates (Iranian providers often require pre-approved templates)
-- [ ] Implement the provider class behind `SmsProvider` + register it in `SmsModule` via `SMS_PROVIDER` and its credentials env vars; startup fails with a clear error if credentials are missing
-- [ ] Unit tests with the provider's HTTP API mocked (success, API error, timeout); SMS failures never break order actions
-- [ ] Verify with the provider's test mode or one real SMS to the owner's phone
-- [ ] Optional: store a log of sent SMS (status, provider reference) for support; low-balance warning in logs
+# Sewing Ecommerce — Plan
+
+Persian-first, mobile-responsive sewing shop for real customers: guest browsing, customer cart/checkout, admin panel, card-to-card payment, online gateway and SMS notifications.
+
+Sources of truth: database → `backend/prisma/schema.prisma`; API → Swagger at `/docs`; routes → `frontend/src/app/main.route.ts`; conventions → `AGENTS.md`; run/deploy commands → `README.md`.
+
+## Stack
+
+| Layer | Technology |
+|---|---|
+| Frontend | Angular 22 (standalone, zoneless) + Tailwind v4 + Spartan headless primitives; TanStack Query for server state, SignalStore for session state, Signal Forms |
+| Backend | NestJS 11 + Prisma 7 + PostgreSQL |
+| Auth | JWT: 15 min access token + 7 day refresh token |
+| Payment | Card-to-card (always on) + provider-neutral `PaymentGateway` interface |
+| SMS | Provider-neutral `SmsProvider` interface |
+| Deploy | Single Docker image + Postgres + Caddy (automatic HTTPS) |
+
+## Status
+
+Done: backend, auth, catalog, cart/checkout, orders, portfolio/contact, admin panel (dashboard, customers, settings), TanStack Query + Signal Forms migration, SEO, loading/error/empty states, responsive audit, Docker + Caddy packaging, fake payment gateway, log-based SMS, 24h auto-cancel of unpaid online orders, rate limiting, helmet, upload limits, translated API errors.
+
+Not yet done: everything below. Order of work (set 2026-10-21): cleanup → i18n → tests → real SMS → real gateway → PWA → deploy. Finish and verify each phase before starting the next.
+
+Why this order:
+- Cleanup first, so tests are not written for code about to be deleted.
+- i18n before tests, so assertions on Persian text are not rewritten after wording changes.
+- Tests before paid services, so the integrations land on a safety net.
+- PWA after the paid integrations, because the service worker must never cache payment, auth or order responses. Installability can only be fully verified over HTTPS.
+- The real gateway callback needs a public HTTPS URL, so use a staging deploy or tunnel in Phase 13.
+
+## Phase 9 — Cleanup — TODO
+Behavior must not change; lint and build stay green after every slice.
+- [ ] Inventory first, no deletions: `knip`/`ts-prune` over `frontend/`, `backend/`, `shared/`, and `depcheck` for dependencies; owner reviews the list
+- [ ] Remove unused files and exports (components, services, stores, models, consts, DTOs, uncalled backend routes)
+- [ ] Merge duplicated code (repeated templates, class strings, `queryFn`s, models duplicated across halves)
+- [ ] Remove unused dependencies, unused i18n keys (keep en/fa parity), unused Prisma fields (migration only)
+- [ ] Remove local clutter: `.backup_*/`, `opencode.jsonc` if unused; make sure `.gitignore`/`.dockerignore` cover generated output
+- [ ] Clear the ~34 `no-floating-promises` lint warnings so new ones stand out
+- [ ] Verify each slice: `npm run lint` + `npm run build` + quick manual pass
+
+## Phase 10 — Finish i18n — TODO
+- [ ] Review `fa.json` wording page by page (one term per concept); native speaker signs off
+- [ ] Persian digits, Jalali dates and currency formatting consistent on customer and admin pages
+- [ ] Native speaker reviews SMS texts (sent to real customers)
+- [ ] Lint + build + manual pass in both languages
+
+## Phase 11 — Automated tests — TODO
+Cover money, stock, auth and permissions first. Each slice ships its tests and must pass before the next starts.
+- Backend: Jest, real Postgres test DB (`DATABASE_URL_TEST`), no DB mocks; supertest for permissions/validation
+- Frontend: Vitest for stores, guards, interceptor, utils, key shared components
+- E2E: Playwright journeys in fa and en
+- [ ] Infrastructure: configs, test DB reset helper, fixtures, scripts `test`, `test:backend`, `test:frontend`, `test:e2e`; update `AGENTS.md` Testing section and `README.md`
+- [ ] Auth: register/login/refresh, phone validation, duplicate phone, roles, guards, interceptor
+- [ ] Catalog: categories, products, variants, filters/pagination/search, upload rules
+- [ ] Cart + addresses: add/update/remove, stock limits, ownership checks
+- [ ] Orders: placement (price/stock snapshot, shipping cost), status lifecycle, stock restore on cancel, permissions
+- [ ] Payment + SMS + sweeper: receipt flow, fake gateway start/verify/callback/retry, double-callback safety, SMS per status, 24h auto-cancel
+- [ ] Portfolio, contact, admin dashboard/customers/settings, rate and upload limits
+- [ ] Playwright: guest → register → cart → card-to-card checkout; online pay/fail/retry; admin confirms and ships; admin product CRUD; language/theme switch
+- [ ] CI (GitHub Actions): lint, build, all tests on every push/PR
+- [ ] Backend coverage report, order/payment/auth first
+
+## Phase 12 — Real SMS provider (paid) — TODO
+Needs a provider account (e.g. Kavenegar), API key, sender line, approved templates.
+- [ ] Implement the provider behind `SmsProvider`, selected by `SMS_PROVIDER`; startup fails clearly if credentials are missing
+- [ ] Tests with the HTTP API mocked (success, API error, timeout); SMS failure never breaks an order action
+- [ ] Verify with one real SMS to the owner
+- [ ] Optional: sent-SMS log table, low-balance warning
 - [ ] Document env vars in `.env.production.example` and `README.md`
 
-### Phase 12 — Real bank gateway (paid) — **TODO**
-Needs a verified merchant account for the gateway (e.g. Zarinpal) and a public HTTPS domain for the callback.
-- [ ] Choose gateway; get merchant ID; confirm amount unit (Toman vs Rial) and callback rules
-- [ ] Implement the gateway class behind `PaymentGateway` (`request` + `verify`), register via `PAYMENT_PROVIDER` + merchant env vars; `fake` stays refused in production
-- [ ] Tests with the gateway API mocked (success, failure, cancelled by user, verify mismatch, already-verified callback)
-- [ ] Verify against the gateway's sandbox, then one small real payment end to end
-- [ ] Refund/dispute handling procedure for the owner (manual refund through the gateway panel, mark order refunded in admin)
+## Phase 13 — Real bank gateway (paid) — TODO
+Needs a verified merchant account (e.g. Zarinpal) and a public HTTPS callback URL.
+- [ ] Confirm amount unit (Toman vs Rial) and callback rules
+- [ ] Implement the gateway behind `PaymentGateway` (`request` + `verify`), selected by `PAYMENT_PROVIDER`; `fake` stays refused in production
+- [ ] Tests with the API mocked (success, failure, user cancel, verify mismatch, already-verified callback)
+- [ ] Verify in the gateway sandbox, then one small real payment
+- [ ] Write the owner's refund/dispute procedure (refund in gateway panel, mark order refunded in admin)
 - [ ] Document env vars in `.env.production.example` and `README.md`
 
-### Phase 13 — Deploy + launch — **TODO**
-- [ ] Final pre-launch checklist: production env filled (`DOMAIN`, `JWT` secrets, `SEED_ADMIN_PASSWORD`, SMS and gateway keys), demo seed off, default admin password changed
-- [ ] Deploy to the server (owner runs it): DNS A record → server, open 80/443, `up -d --build`, seed admin once
-- [ ] Automated daily Postgres backup and backup of the `/uploads` volume, with a tested restore
-- [ ] Basic monitoring: container restart policy, uptime check on the site, log rotation
-- [ ] Production smoke test: register, order (card-to-card and online), SMS received, admin confirms, a real small payment
-- [ ] Rollback plan noted (previous image tag, how to restore the DB backup)
+## Phase 14 — PWA — TODO
+- [ ] Angular service worker + web manifest (fa name, `dir: rtl`, theme colors, `display: standalone`), icons (192/512, maskable, Apple touch)
+- [ ] Cache the app shell, hashed assets, capped images/fonts; **`/api` is network-only** (auth, cart, orders, payment, admin never cached); service worker file stays `no-cache` in Nest static config and `Caddyfile`
+- [ ] Offline fallback page and indicator; checkout/payment require a connection
+- [ ] New-version prompt so a deploy never strands users on a stale shell
+- [ ] Install button where `beforeinstallprompt` exists, iOS "Add to Home Screen" hint
+- [ ] Verify on HTTPS staging: Lighthouse installability, Android + iOS install, offline, update after redeploy; Playwright check that `/api` is not served from cache
 
-**Total estimate: ~26 working days for Phases 0-8; Phases 9-13 add roughly 4 + 12 + 2 + 3 + 2 days (tests are the largest piece)**
+## Phase 15 — Deploy + launch — TODO
+- [ ] Production env complete (`DOMAIN`, JWT secrets, `SEED_ADMIN_PASSWORD`, SMS and gateway keys); demo seed off; default admin password changed
+- [ ] Owner deploys: DNS A record → server, open 80/443, `up -d --build`, seed admin once
+- [ ] Daily Postgres backup and `/uploads` backup, with a tested restore
+- [ ] Monitoring: restart policy, uptime check, log rotation
+- [ ] Production smoke test: register, card-to-card and online order, SMS received, admin confirms, small real payment, PWA installs
+- [ ] Rollback plan: previous image tag and DB restore steps
 
----
+## Business rules to preserve
 
-## 9. Backend (NestJS) Structure
+- **Roles**: Guest browses public pages; Customer (`CUSTOMER`) has cart, checkout, orders, addresses, profile; Admin (`ADMIN`) manages everything under `/admin`. Client guards are UX only; the backend guards enforce.
+- **Add to cart as guest**: redirect to `/login?returnUrl=…&autoAdd=1&variantId=…`; after login the product page adds the item and clears the params.
+- **Checkout**: address → shipping (POST/COURIER, rate read server-side from settings) → payment (card-to-card default, online only if `/api/payment/methods` offers it) → review. Order creation is one transaction: snapshot items and address, decrement stock, clear cart. `total = subtotal + shippingAmount`.
+- **Card-to-card**: order is PENDING/PENDING → customer transfers and uploads receipt → admin confirms (order auto-advances to CONFIRMED, paymentStatus PAID) or rejects.
+- **Order lifecycle**: `PENDING → CONFIRMED → PROCESSING → SHIPPED → DELIVERED`; `PENDING` and `CONFIRMED` can go to `CANCELLED`. `DELIVERED` and `CANCELLED` are terminal. Enforced by `STATUS_TRANSITIONS` in `backend/src/orders/orders.service.ts`; the admin UI mirrors the map, so change both together. Cancelling restores variant stock; customers may cancel only while PENDING/CONFIRMED.
+- **Online payment**: unpaid online orders auto-cancel after 24h (stock restored, SMS sent). The gateway callback is verified server-side.
+- **Auth**: on 401 the frontend refreshes automatically; if refresh fails it logs out and redirects to `/login`. Refresh tokens are stateless (separate secret, no rotation or revocation); a stolen token stays valid until expiry — revisit before launch if the risk is not acceptable.
 
-```
-backend/
-├── prisma/
-│   ├── schema.prisma
-│   └── seed.ts
-├── src/
-│   ├── main.ts
-│   ├── app.module.ts
-│   ├── common/
-│   │   ├── decorators/ (current-user, roles)
-│   │   ├── guards/ (jwt-auth, roles)
-│   │   ├── filters/ (http-exception)
-│   │   └── pipes/ (validation)
-│   ├── auth/ (module, controller, service, jwt.strategy, dto)
-│   ├── users/ (module, controller, service, dto)
-│   ├── products/ (module, controller, service, dto)
-│   ├── categories/ (module, controller, service, dto)
-│   ├── cart/ (module, controller, service, dto)
-│   ├── orders/ (module, controller, service, dto)
-│   ├── portfolio/ (module, controller, service, dto)
-│   ├── contact/ (module, controller, service, dto)
-│   ├── upload/ (module, controller, service)
-│   └── payment/ (module, controller, service, dto — Phase 8)
-└── uploads/ (gitignored)
-```
-
----
-
-## 10. i18n Keys (~180 per language)
-
-Navigation: `appName, home, products, portfolio, about, contact, cart, orders, profile, logout, login, register, admin, settings, search, backToHome`
-
-Product: `product(s), category(ies), price, size(s), fabric, addToCart, addedToCart, outOfStock, inStock, relatedProducts, noProductsFound, sortBy, filter, clearFilters, fromPrice, toPrice, startingFrom, viewDetails`
-
-Cart: `cart, cartEmpty, cartEmptyMessage, startShopping, quantity, total, subtotal, shipping, grandTotal, proceedToCheckout, remove, updateCart, itemAdded, continueShopping`
-
-Checkout: `checkout, shippingAddress, selectAddress, addAddress, shippingMethod, post, courier, paymentMethod, online, cardToCard, placeOrder, reviewOrder, bankCardInfo, transferAmount, cardNumber, cardHolder, uploadReceipt, receiptUploaded`
-
-Order: `order(s), orderDetail, orderNumber, orderDate, orderStatus, orderHistory, status(Pending|Confirmed|Processing|Shipped|Delivered|Cancelled), paymentStatus, payment(Pending|Paid|Failed|Refunded), trackingCode, retryPayment, paymentFailed, paymentCancelled`
-
-Auth: `phone, password, confirmPassword, firstName, lastName, phone, register, login, forgotPassword, loginRequired, loginToAddToCart, alreadyHaveAccount, dontHaveAccount`
-
-Admin: `dashboard, totalOrders, totalRevenue, totalCustomers, totalProducts, recentOrders, manageProducts, manageOrders, manageCategories, managePortfolio, manageCustomers, messages, shopName, businessHours, bankCardSettings, shippingSettings`
-
-General: `save, cancel, delete, edit, add, refresh, loading, noData, confirm, success, error, couldNotLoadData, couldNotSave, couldNotDelete, darkMode, language, yes, no, submit, back, next, done, search, filter, clear, close, viewAll, required, optional, or`
-
-Portfolio: `portfolio, portfolioDetail, viewProject, relatedProjects, ourWork`
-
-Contact: `contactUs, aboutUs, name, message, sendMessage, messageSent, address, phoneNumber, workingHours, getInTouch`
-
-Breadcrumbs: `home, products, portfolio, about, contact, cart, checkout, orders, profile, settings`
-
----
-
-## 11. Key Technical Decisions
+## Key technical decisions
 
 | Decision | Choice | Why |
-|----------|--------|-----|
-| Repo layout | Single-package monorepo (one root `package.json`, `node_modules`, ESLint/Prettier config) | One install/lockfile, one toolchain, `@shared/*` works across halves; see `AGENTS.md` |
-| ORM | Prisma | Type-safe, auto-generated types, migrations, TypeScript-native |
-| Auth tokens | JWT (access 15min + refresh 7d) | Standard, stateless, secure |
-| Refresh tokens | Stateless signed JWT with **separate secret**, no DB table/rotation/revocation for MVP | Simpler auth module; a stolen token stays valid until expiry — acceptable for MVP |
-| Cart | Server-side (PostgreSQL) | Persists across devices, no data loss |
-| Image upload | Local + Multer (MVP) | Simple for now, upgrade to CDN later |
-| Pagination | Offset-based | Simple, sufficient for this scale |
-| Search | `ILIKE %search%` + category filter | Simple for MVP |
-| State management | SignalStore for Auth only | Everything else fetched via API service |
-| Responsive | Tailwind sm/md/lg breakpoints | Mobile-first design |
-| RTL | tailwindcss-rtl plugin | Already configured |
-
----
-
-## 12. Day-by-Day Execution
-
-**Week 1**
-- Day 1-2: NestJS init + Prisma schema + migrations + seed
-- Day 3: Auth module (register, login, JWT, guards)
-- Day 4-6: Auth frontend (LoginPage, RegisterPage, AuthStore, AuthGuard, AuthInterceptor, ProfilePage) + Shared layout (Navbar, Footer)
-
-**Week 2**
-- Day 1: Categories + Products backend (CRUD, filtering, pagination, image upload)
-- Day 2-3: Admin ProductPages (list, form) + CategoryPage
-- Day 4-5: Public ProductCatalog + ProductDetail pages
-
-**Week 3**
-- Day 1: Cart backend API
-- Day 2: CartPage frontend
-- Day 3-4: Addresses + Checkout flow
-- Day 5: Orders backend + OrderHistory/OrderDetail frontend
-
-**Week 4**
-- Day 1-2: Portfolio (admin + public) + Contact
-- Day 3: Admin Dashboard + Customers + Messages
-- Day 4: AboutPage, home page polish, responsive audit
-
-**Week 5**
-- Day 1-2: i18n complete pass, SEO meta tags, error/loading/empty states
-- Day 3: Manual QA pass of critical paths (checkout, admin CRUD)
-- Day 4: Build + deploy
-
-**Week 6 onward**
-- Phase 9 finish i18n + hardening, Phase 10 automated tests (feature by feature), Phase 11 real SMS, Phase 12 real bank gateway, Phase 13 deploy (see section 8)
+|---|---|---|
+| Repo layout | Single-package monorepo, shared code in `shared/` | One toolchain, API contract compiles on both sides |
+| Server vs client state | TanStack Query for server data; SignalStore only for `AuthStore` | Caching and invalidation without hand-written loading/refetch code |
+| Cart | Server-side (PostgreSQL) | Survives devices; stock rules cannot be bypassed client-side |
+| Money | `Decimal` serialized as strings at the API edge | No float precision loss |
+| Validation | Global `ValidationPipe({ whitelist, transform })` | Blocks mass assignment (e.g. injecting `role`) |
+| Order history | Items and shipping address are snapshotted on the order | Later product/address edits never rewrite past orders |
+| Slugs | Persian → Latin transliteration, UUID fallback | Readable URLs |
+| UI primitives | `app-*` components wrapping Spartan headless primitives, styled with Tailwind; no Angular Material | Accessibility without a styled library |
+| About text / shop details | About copy is static i18n; phone, address, hours, bank card are admin-editable in Settings | Owner's decision |

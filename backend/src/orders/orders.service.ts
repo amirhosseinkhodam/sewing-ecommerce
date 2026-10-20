@@ -21,7 +21,7 @@ import { UpdatePaymentStatusDto } from './dto/update-payment-status.dto';
 import { UploadReceiptDto } from './dto/upload-receipt.dto';
 
 /**
- * Legal status transitions (PLAN.md §7 "Order status lifecycle"). A terminal
+ * Legal status transitions. A terminal
  * status has no successors, so an admin cannot revive a delivered order.
  */
 const STATUS_TRANSITIONS: Readonly<
