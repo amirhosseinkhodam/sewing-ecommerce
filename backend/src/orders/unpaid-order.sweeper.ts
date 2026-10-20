@@ -11,6 +11,7 @@ import {
   PaymentMethod,
   PaymentStatus,
 } from '../generated/prisma/client';
+import { restoreStock } from './restore-stock';
 
 /** How long an unpaid online order is held before it is released. */
 const UNPAID_ORDER_TTL_MS = 24 * 60 * 60 * 1000;
@@ -82,19 +83,7 @@ export class UnpaidOrderSweeper implements OnModuleInit, OnModuleDestroy {
         });
         if (count === 0) return false;
 
-        await Promise.all(
-          order.items.map((item) =>
-            item.variantId
-              ? tx.productVariant.updateMany({
-                  where: { id: item.variantId },
-                  data: { stock: { increment: item.quantity } },
-                })
-              : tx.productVariant.updateMany({
-                  where: { productId: item.productId, size: item.size },
-                  data: { stock: { increment: item.quantity } },
-                }),
-          ),
-        );
+        await restoreStock(tx, order.items);
         return true;
       });
 

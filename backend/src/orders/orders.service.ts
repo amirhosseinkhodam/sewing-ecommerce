@@ -19,10 +19,11 @@ import { OrderQueryDto } from './dto/order-query.dto';
 import { UpdateOrderStatusDto } from './dto/update-order-status.dto';
 import { UpdatePaymentStatusDto } from './dto/update-payment-status.dto';
 import { UploadReceiptDto } from './dto/upload-receipt.dto';
+import { restoreStock } from './restore-stock';
 
 /**
- * Legal status transitions. A terminal
- * status has no successors, so an admin cannot revive a delivered order.
+ * Legal status transitions. A terminal status has no successors, so an admin
+ * cannot revive a delivered order.
  */
 const STATUS_TRANSITIONS: Readonly<
   Record<OrderStatus, readonly OrderStatus[]>
@@ -395,26 +396,10 @@ export class OrdersService {
     return this.#sms.sendOrderStatus(userId, orderId, status, trackingCode);
   }
 
-  /**
-   * Returns a cancelled order's items to stock. Prefers the recorded
-   * `variantId`; falls back to (productId, size) for rows placed before that
-   * column existed, which is ambiguous when a product has duplicate sizes.
-   */
+  /** Returns a cancelled order's items to stock. */
   async #restoreStock(tx: Prisma.TransactionClient, orderId: string) {
     const items = await tx.orderItem.findMany({ where: { orderId } });
-    await Promise.all(
-      items.map((item) =>
-        item.variantId
-          ? tx.productVariant.updateMany({
-              where: { id: item.variantId },
-              data: { stock: { increment: item.quantity } },
-            })
-          : tx.productVariant.updateMany({
-              where: { productId: item.productId, size: item.size },
-              data: { stock: { increment: item.quantity } },
-            }),
-      ),
-    );
+    await restoreStock(tx, items);
   }
 
   #assertTransitionAllowed(from: OrderStatus, to: OrderStatus): void {

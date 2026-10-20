@@ -30,8 +30,8 @@ Why this order:
 
 ## Phase 9 — Cleanup — TODO
 Behavior must not change; lint and build stay green after every slice.
-Already done: `knip` inventory, unused files/exports/types, unused dev dependencies, `multer` added as a real dependency. Re-run `npx knip` at the end of the phase to confirm it is clean.
-- [ ] Merge duplicated code (repeated templates, class strings, `queryFn`s, models duplicated across halves)
+Already done: `knip` inventory, unused files/exports/types, unused dev dependencies, `multer` added as a real dependency, shared stock-restore helper (backend), shared phone/name form rules (frontend). Re-run `npx knip` at the end of the phase to confirm it is clean.
+- [ ] Merge the remaining duplicates found by `jscpd` (rerun: `npx jscpd frontend/src backend/src shared --min-lines 8 --min-tokens 70`): the `page`/`pageSize` fields repeated in five backend query DTOs; the near-identical `AdminOrderStore` and `OrderStore` (list/detail query wiring); the import blocks shared by login/register and the admin pages are not worth merging
 - [ ] Remove unused i18n keys (keep en/fa parity) and unused Prisma fields (migration only)
 - [ ] Delete `opencode.jsonc` if the owner no longer uses opencode
 - [ ] Confirm the `no-floating-promises` lint warnings are really gone (last lint run printed none)

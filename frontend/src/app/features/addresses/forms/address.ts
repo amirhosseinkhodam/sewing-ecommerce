@@ -1,6 +1,7 @@
 import { Injectable, signal } from '@angular/core';
-import { form, required, validate } from '@angular/forms/signals';
+import { form, required } from '@angular/forms/signals';
 import type { AddressModel } from '@domain/models/address';
+import { phoneRule } from '@shared/forms/rules';
 
 @Injectable({ providedIn: 'root' })
 export class AddressFormService {
@@ -19,15 +20,10 @@ export class AddressFormService {
       path.province,
       path.city,
       path.fullAddress,
-      path.phone,
     ]) {
       required(field, { message: 'validation.required' });
     }
-    validate(path.phone, ({ value }) =>
-      value() && !/^09\d{9}$/.test(value())
-        ? { kind: 'invalidPhone', message: 'validation.invalidPhone' }
-        : undefined,
-    );
+    phoneRule(path.phone);
   });
 
   patchFromAddress(address: Partial<AddressModel>) {

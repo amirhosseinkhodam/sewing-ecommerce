@@ -1,6 +1,7 @@
 import { Injectable, signal } from '@angular/core';
-import { form, minLength, required, validate } from '@angular/forms/signals';
+import { form, minLength, required } from '@angular/forms/signals';
 import type { ContactPayloadModel } from '@domain/models/contact';
+import { phoneRule } from '@shared/forms/rules';
 
 @Injectable({ providedIn: 'root' })
 export class ContactFormService {
@@ -11,12 +12,7 @@ export class ContactFormService {
   });
   readonly form = form(this.model, (path) => {
     required(path.name, { message: 'validation.required' });
-    required(path.phone, { message: 'validation.required' });
-    validate(path.phone, ({ value }) =>
-      value() && !/^09\d{9}$/.test(value())
-        ? { kind: 'invalidPhone', message: 'validation.invalidPhone' }
-        : undefined,
-    );
+    phoneRule(path.phone);
     required(path.message, { message: 'validation.required' });
     minLength(path.message, 10, { message: 'validation.minlength' });
   });
