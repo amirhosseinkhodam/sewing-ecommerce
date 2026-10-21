@@ -28,14 +28,11 @@ Why this order:
 - PWA after the paid integrations, because the service worker must never cache payment, auth or order responses. Installability can only be fully verified over HTTPS.
 - The real gateway callback needs a public HTTPS URL, so use a staging deploy or tunnel in Phase 13.
 
-## Phase 9 — Cleanup — TODO
-Behavior must not change; lint and build stay green after every slice.
-Already done: `knip` inventory, unused files/exports/types, unused dev dependencies, `multer` added as a real dependency, shared stock-restore helper (backend), shared phone/name form rules (frontend). Re-run `npx knip` at the end of the phase to confirm it is clean.
-- [ ] Merge the remaining duplicates found by `jscpd` (rerun: `npx jscpd frontend/src backend/src shared --min-lines 8 --min-tokens 70`): the `page`/`pageSize` fields repeated in five backend query DTOs; the near-identical `AdminOrderStore` and `OrderStore` (list/detail query wiring); the import blocks shared by login/register and the admin pages are not worth merging
-- [ ] Remove unused i18n keys (keep en/fa parity) and unused Prisma fields (migration only)
-- [ ] Delete `opencode.jsonc` if the owner no longer uses opencode
-- [ ] Confirm the `no-floating-promises` lint warnings are really gone (last lint run printed none)
-- [ ] Verify each slice: `npm run lint` + `npm run build` + quick manual pass
+## Phase 9 — Cleanup — almost done
+Behavior must not change; lint and build stay green after every slice. Done: `knip` inventory, unused files/exports/types/dependencies/i18n keys, shared stock-restore helper and phone/name form rules. No unused Prisma fields exist.
+- [ ] Delete `opencode.jsonc` if the owner no longer uses opencode (it only configures that tool)
+- [ ] Optional, owner's call: merge the `page`/`pageSize` fields repeated in five backend query DTOs, and the similar `AdminOrderStore`/`OrderStore` (left alone because their defaults and mutations differ)
+- [ ] Manual pass over the pages touched by this phase (login, register, profile, contact, address form, order cancel) before moving on
 
 ## Phase 10 — Finish i18n — TODO
 - [ ] Review `fa.json` wording page by page (one term per concept); native speaker signs off
