@@ -45,7 +45,7 @@ Cover money, stock, auth and permissions first. Each slice ships its tests and m
 - Backend: Jest, real Postgres test DB (`DATABASE_URL_TEST`), no DB mocks; supertest for permissions/validation
 - Frontend: Vitest for stores, guards, interceptor, utils, key shared components
 - E2E: Playwright journeys in fa and en
-- [ ] Infrastructure: configs, test DB reset helper, fixtures, scripts `test`, `test:backend`, `test:frontend`, `test:e2e`; update `AGENTS.md` Testing section and `README.md`
+- [ ] Infrastructure (backend done: Jest config, test DB migrate/reset helpers, `test`/`test:backend`, docs; still to do: Vitest, Playwright, fixtures, `test:frontend`, `test:e2e`): configs, test DB reset helper, fixtures, scripts `test`, `test:backend`, `test:frontend`, `test:e2e`; update `AGENTS.md` Testing section and `README.md`
 - [ ] Auth: register/login/refresh, phone validation, duplicate phone, roles, guards, interceptor
 - [ ] Catalog: categories, products, variants, filters/pagination/search, upload rules
 - [ ] Cart + addresses: add/update/remove, stock limits, ownership checks

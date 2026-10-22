@@ -1,4 +1,3 @@
-import { ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
@@ -6,14 +5,14 @@ import { mkdirSync } from 'fs';
 import helmet from 'helmet';
 import { join } from 'path';
 import { AppModule } from './app.module';
-import { HttpExceptionFilter } from './common/filters/http-exception.filter';
+import { configureApp } from './common/configure-app';
 
 async function bootstrap() {
   mkdirSync(join(process.cwd(), 'uploads'), { recursive: true });
 
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
 
-  app.setGlobalPrefix('api');
+  configureApp(app);
   app.set('trust proxy', 1);
   app.use(
     helmet({
@@ -25,8 +24,6 @@ async function bootstrap() {
   // in dev), so CORS stays closed unless a separate origin is configured.
   const corsOrigin = process.env.CORS_ORIGIN;
   if (corsOrigin) app.enableCors({ origin: corsOrigin.split(',') });
-  app.useGlobalPipes(new ValidationPipe({ whitelist: true, transform: true }));
-  app.useGlobalFilters(new HttpExceptionFilter());
 
   const swaggerConfig = new DocumentBuilder()
     .setTitle('Sewing Ecommerce API')

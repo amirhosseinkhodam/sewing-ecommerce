@@ -33,6 +33,7 @@ npm run dev                                     # frontend :4200 + backend :3000
 | `npm run build` | Production build (backend, then frontend) |
 | `npm run lint` | ESLint over `frontend/`, `backend/`, `shared/` |
 | `npm run format` | Prettier |
+| `npm test` / `npm run test:backend` | Backend Jest tests (needs `DATABASE_URL_TEST` in `.env`, an empty Postgres database) |
 | `npm run prisma:migrate` / `prisma:generate` / `prisma:seed` / `prisma:studio` | Database tooling |
 
 ## Production (Docker)
