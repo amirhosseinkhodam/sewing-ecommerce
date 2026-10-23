@@ -30,6 +30,7 @@ export class UnpaidOrderSweeper implements OnModuleInit, OnModuleDestroy {
   readonly #sms: SmsService;
   readonly #logger = new Logger(UnpaidOrderSweeper.name);
   #timer: NodeJS.Timeout | undefined;
+  #startupSweep: Promise<void> = Promise.resolve();
 
   constructor(prisma: PrismaService, sms: SmsService) {
     this.#prisma = prisma;
@@ -37,8 +38,9 @@ export class UnpaidOrderSweeper implements OnModuleInit, OnModuleDestroy {
   }
 
   onModuleInit(): void {
-    void this.sweep().catch((error: unknown) =>
-      this.#logger.error('Startup sweep failed', error),
+    this.#startupSweep = this.sweep().then(
+      () => undefined,
+      (error: unknown) => this.#logger.error('Startup sweep failed', error),
     );
     this.#timer = setInterval(() => {
       void this.sweep();
@@ -47,8 +49,10 @@ export class UnpaidOrderSweeper implements OnModuleInit, OnModuleDestroy {
     this.#timer.unref();
   }
 
-  onModuleDestroy(): void {
+  async onModuleDestroy(): Promise<void> {
     if (this.#timer) clearInterval(this.#timer);
+    // Let an in-flight startup sweep finish before the DB pool is closed.
+    await this.#startupSweep;
   }
 
   /** Cancels every stale unpaid online order and returns how many it released. */
