@@ -1,13 +1,29 @@
 import { INestApplication } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
+import { ThrottlerStorage } from '@nestjs/throttler';
 import { AppModule } from '../../src/app.module';
 import { configureApp } from '../../src/common/configure-app';
 import { PrismaService } from '../../src/common/prisma/prisma.service';
 
-export async function createTestApp() {
-  const moduleRef = await Test.createTestingModule({
-    imports: [AppModule],
-  }).compile();
+const UNLIMITED_HIT = {
+  totalHits: 1,
+  timeToExpire: 0,
+  isBlocked: false,
+  timeToBlockExpire: 0,
+};
+
+/**
+ * Rate limiting is off by default: the per-route limits (register 5/min, ...)
+ * would make unrelated tests flaky. Pass `{ throttle: true }` to test the limits.
+ */
+export async function createTestApp({ throttle = false } = {}) {
+  const builder = Test.createTestingModule({ imports: [AppModule] });
+  if (!throttle) {
+    builder
+      .overrideProvider(ThrottlerStorage)
+      .useValue({ increment: () => Promise.resolve(UNLIMITED_HIT) });
+  }
+  const moduleRef = await builder.compile();
   const app: INestApplication = moduleRef.createNestApplication();
   configureApp(app);
   await app.init();
