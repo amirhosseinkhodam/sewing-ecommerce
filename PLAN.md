@@ -43,18 +43,18 @@ Behavior must not change; lint and build stay green after every slice. Done: `kn
 ## Phase 11 — Automated tests — TODO
 Cover money, stock, auth and permissions first. Each slice ships its tests and must pass before the next starts.
 - Backend: Jest, real Postgres test DB (`DATABASE_URL_TEST`), no DB mocks; supertest for permissions/validation
-- Frontend: Vitest for stores, guards, interceptor, utils, key shared components
+- Frontend: Vitest for the auth store, guards, interceptor, utils, pipes, services and translation files (feature stores and shared components are covered through the Playwright journeys)
 - E2E: Playwright journeys in fa and en
-- [ ] Infrastructure (backend done: Jest config, test DB migrate/reset helpers, `test`/`test:backend`, docs; still to do: Vitest, Playwright, fixtures, `test:frontend`, `test:e2e`): configs, test DB reset helper, fixtures, scripts `test`, `test:backend`, `test:frontend`, `test:e2e`; update `AGENTS.md` Testing section and `README.md`
-- [ ] Auth: register/login/refresh, phone validation, duplicate phone, roles, guards, interceptor
-- [ ] Catalog: categories, products, variants, filters/pagination/search, upload rules
-- [ ] Cart + addresses: add/update/remove, stock limits, ownership checks
-- [ ] Orders: placement (price/stock snapshot, shipping cost), status lifecycle, stock restore on cancel, permissions
-- [ ] Payment + SMS + sweeper: receipt flow, fake gateway start/verify/callback/retry, double-callback safety, SMS per status, 24h auto-cancel
-- [ ] Portfolio, contact, admin dashboard/customers/settings, rate and upload limits
-- [ ] Playwright: guest → register → cart → card-to-card checkout; online pay/fail/retry; admin confirms and ships; admin product CRUD; language/theme switch
-- [ ] CI (GitHub Actions): lint, build, all tests on every push/PR
-- [ ] Backend coverage report, order/payment/auth first
+- [x] Infrastructure: Jest, Vitest (`ng test`), Playwright, test DB reset, fixtures, scripts, docs
+- [x] Auth: register/login/refresh, phone validation, duplicate phone, roles, guards, interceptor
+- [x] Catalog: categories, products, variants, filters/pagination/search, upload rules
+- [x] Cart + addresses: add/update/remove, stock limits, ownership checks
+- [x] Orders: placement (price/stock snapshot, shipping cost), status lifecycle, stock restore on cancel, permissions
+- [x] Payment + SMS + sweeper: receipt flow, fake gateway start/verify/callback/retry, double-callback safety, SMS per status, 24h auto-cancel
+- [x] Portfolio, contact, admin dashboard/customers/settings, rate and upload limits
+- [x] Playwright: guest → register → cart → card-to-card checkout; online pay/fail/retry; admin confirms and ships; admin product CRUD; language/theme switch
+- [x] CI (GitHub Actions): lint, build, all tests on every push/PR
+- [x] Backend coverage report, order/payment/auth first
 
 ## Phase 12 — Real SMS provider (paid) — TODO
 Needs a provider account (e.g. Kavenegar), API key, sender line, approved templates.

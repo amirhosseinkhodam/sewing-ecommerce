@@ -81,3 +81,8 @@ dist-esbuild
 # Agent instruction and coordination files (local only)
 AGENTS.md
 .claude/
+
+# Test output
+/coverage
+/test-results
+/playwright-report

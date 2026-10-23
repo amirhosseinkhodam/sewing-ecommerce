@@ -16,6 +16,14 @@ const config: Config = {
   moduleNameMapper: { '^@domain/(.*)$': '<rootDir>/shared/$1' },
   // Tests share one database, so files must not run in parallel.
   maxWorkers: 1,
+  collectCoverageFrom: [
+    '<rootDir>/backend/src/**/*.ts',
+    '!<rootDir>/backend/src/generated/**',
+    '!<rootDir>/backend/src/main.ts',
+    '!<rootDir>/backend/src/**/*.module.ts',
+    '!<rootDir>/backend/src/**/dto/**',
+  ],
+  coverageDirectory: '<rootDir>/coverage/backend',
 };
 
 export default config;

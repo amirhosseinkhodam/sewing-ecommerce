@@ -33,16 +33,15 @@ describe('upload', () => {
   });
 
   afterAll(async () => {
-    for (const name of created) rmSync(join(UPLOADS_DIR, name), { force: true });
+    for (const name of created)
+      rmSync(join(UPLOADS_DIR, name), { force: true });
     await app.close();
   });
 
   it('requires authentication', async () => {
     const before = filesOnDisk();
 
-    const res = await http()
-      .post('/api/upload')
-      .attach('file', PNG, 'a.png');
+    const res = await http().post('/api/upload').attach('file', PNG, 'a.png');
 
     expect(res.status).toBe(401);
     expect(filesOnDisk()).toEqual(before);
@@ -87,20 +86,23 @@ describe('upload', () => {
     ['a pdf', 'doc.pdf', 'application/pdf'],
     ['an allowed type with a bad extension', 'photo.exe', 'image/png'],
     ['an allowed extension with a bad type', 'photo.png', 'text/html'],
-  ])('rejects %s with 400 and writes nothing', async (_label, filename, contentType) => {
-    const before = filesOnDisk();
+  ])(
+    'rejects %s with 400 and writes nothing',
+    async (_label, filename, contentType) => {
+      const before = filesOnDisk();
 
-    const res = await http()
-      .post('/api/upload')
-      .set('Authorization', bearer)
-      .attach('file', PNG, { filename, contentType });
+      const res = await http()
+        .post('/api/upload')
+        .set('Authorization', bearer)
+        .attach('file', PNG, { filename, contentType });
 
-    expect(res.status).toBe(400);
-    expect(res.body.message).toBe(
-      'Only JPEG, PNG, WebP or GIF images are allowed',
-    );
-    expect(filesOnDisk()).toEqual(before);
-  });
+      expect(res.status).toBe(400);
+      expect(res.body.message).toBe(
+        'Only JPEG, PNG, WebP or GIF images are allowed',
+      );
+      expect(filesOnDisk()).toEqual(before);
+    },
+  );
 
   it('rejects a file over 5 MB with 413', async () => {
     const before = filesOnDisk();
@@ -163,7 +165,9 @@ describe('upload', () => {
 
     it('rejects more than 10 files', async () => {
       const before = filesOnDisk();
-      let req = http().post('/api/upload/multiple').set('Authorization', bearer);
+      let req = http()
+        .post('/api/upload/multiple')
+        .set('Authorization', bearer);
       for (let i = 0; i < 11; i += 1) {
         req = req.attach('files', PNG, {
           filename: `f${i}.png`,

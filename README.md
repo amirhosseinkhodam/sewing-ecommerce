@@ -33,7 +33,11 @@ npm run dev                                     # frontend :4200 + backend :3000
 | `npm run build` | Production build (backend, then frontend) |
 | `npm run lint` | ESLint over `frontend/`, `backend/`, `shared/` |
 | `npm run format` | Prettier |
-| `npm test` / `npm run test:backend` | Backend Jest tests (needs `DATABASE_URL_TEST` in `.env`, an empty Postgres database) |
+| `npm test` | Backend + frontend unit tests |
+| `npm run test:backend` | Backend Jest + supertest specs (needs `DATABASE_URL_TEST` in `.env`, a Postgres database separate from `DATABASE_URL`) |
+| `npm run test:backend:coverage` | Same, with a coverage report in `coverage/backend` |
+| `npm run test:frontend` | Frontend Vitest specs (`frontend/tests/`), run through `ng test` |
+| `npm run test:e2e` | Builds the app, then runs the Playwright journeys in `e2e/` in English and Persian against `DATABASE_URL_TEST` (first run: `npx playwright install chromium`; set `E2E_CHROMIUM_PATH` to use an installed Chromium) |
 | `npm run prisma:migrate` / `prisma:generate` / `prisma:seed` / `prisma:studio` | Database tooling |
 
 ## Production (Docker)
@@ -63,4 +67,4 @@ shared/          # types and consts used by both halves
 
 ## Status and roadmap
 
-Core shop, admin panel and Docker packaging are done. Remaining work — cleanup, i18n review, automated tests, real SMS, real payment gateway, PWA, deploy — is tracked in [PLAN.md](PLAN.md). The generated API reference is Swagger at `/docs`.
+Core shop, admin panel and Docker packaging are done. Remaining work — cleanup, i18n review, real SMS, real payment gateway, PWA, deploy — is tracked in [PLAN.md](PLAN.md). The generated API reference is Swagger at `/docs`.

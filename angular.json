@@ -15,7 +15,9 @@
             "index": "frontend/src/index.html",
             "browser": "frontend/src/main.ts",
             "tsConfig": "tsconfig.frontend.app.json",
-            "styles": ["frontend/src/styles.scss"]
+            "styles": [
+              "frontend/src/styles.scss"
+            ]
           },
           "configurations": {
             "production": {
@@ -61,6 +63,17 @@
             }
           },
           "defaultConfiguration": "development"
+        },
+        "test": {
+          "builder": "@angular/build:unit-test",
+          "options": {
+            "tsConfig": "tsconfig.frontend.spec.json",
+            "buildTarget": "sewing-ecommerce:build:development",
+            "runner": "vitest",
+            "include": [
+              "../tests/**/*.spec.ts"
+            ]
+          }
         }
       }
     }

@@ -260,9 +260,9 @@ describe('catalog', () => {
       const res = await http().get('/api/products?minPrice=200&maxPrice=300');
       const upTo = await http().get('/api/products?maxPrice=100');
 
-      expect(res.body.items.map((p: { slug: string }) => p.slug).sort()).toEqual(
-        ['mid', 'pricey'],
-      );
+      expect(
+        res.body.items.map((p: { slug: string }) => p.slug).sort(),
+      ).toEqual(['mid', 'pricey']);
       expect(upTo.body.total).toBe(1);
     });
 
@@ -505,17 +505,17 @@ describe('catalog', () => {
         .patch(`/api/admin/products/${product.id}`)
         .set('Authorization', admin)
         .send({ fabric: 'wool' });
-      expect(untouched.body.variants.map((v: { size: string }) => v.size)).toEqual(
-        ['S'],
-      );
+      expect(
+        untouched.body.variants.map((v: { size: string }) => v.size),
+      ).toEqual(['S']);
 
       const replaced = await http()
         .patch(`/api/admin/products/${product.id}`)
         .set('Authorization', admin)
         .send({ variants: [{ size: 'XL', stock: 9 }] });
-      expect(replaced.body.variants.map((v: { size: string }) => v.size)).toEqual(
-        ['XL'],
-      );
+      expect(
+        replaced.body.variants.map((v: { size: string }) => v.size),
+      ).toEqual(['XL']);
       expect(await prisma.productVariant.count()).toBe(1);
     });
 
