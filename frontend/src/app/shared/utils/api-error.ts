@@ -28,6 +28,7 @@ const API_MESSAGE_KEYS: Readonly<Record<string, string>> = {
   'Product variant not found': 'apiErrors.variantNotFound',
   'Receipts apply to card-to-card orders only': 'apiErrors.receiptCardOnly',
   'Shop settings not found': 'apiErrors.settingsNotFound',
+  'Slug already in use': 'apiErrors.slugInUse',
   'User not found': 'apiErrors.userNotFound',
   'File too large': 'apiErrors.fileTooLarge',
   'Too Many Requests': 'apiErrors.tooManyRequests',

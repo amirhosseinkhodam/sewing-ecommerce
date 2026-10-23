@@ -338,6 +338,7 @@
     "phoneRegistered": "This phone number is already registered.",
     "portfolioNotFound": "Portfolio item not found.",
     "productNotFound": "Product not found.",
+    "slugInUse": "This slug is already in use. Choose a different one.",
     "variantNotFound": "Product size not found.",
     "receiptCardOnly": "Receipts apply to card-to-card orders only.",
     "settingsNotFound": "Shop settings not found.",

@@ -6,6 +6,22 @@ import {
   HttpStatus,
 } from '@nestjs/common';
 import { Response } from 'express';
+import { Prisma } from '../../generated/prisma/client';
+
+const UNIQUE_VIOLATION = 'P2002';
+
+/**
+ * Category, product and portfolio slugs are unique. A clash is the admin's
+ * input error, so it surfaces as a 409 instead of a bare 500. `meta` differs
+ * between Prisma query engines and driver adapters, so match on its text.
+ */
+function isSlugConflict(exception: unknown): boolean {
+  return (
+    exception instanceof Prisma.PrismaClientKnownRequestError &&
+    exception.code === UNIQUE_VIOLATION &&
+    JSON.stringify(exception.meta ?? {}).includes('slug')
+  );
+}
 
 @Catch()
 export class HttpExceptionFilter implements ExceptionFilter {
@@ -16,7 +32,10 @@ export class HttpExceptionFilter implements ExceptionFilter {
     let status = HttpStatus.INTERNAL_SERVER_ERROR;
     let message = 'Internal server error';
 
-    if (exception instanceof HttpException) {
+    if (isSlugConflict(exception)) {
+      status = HttpStatus.CONFLICT;
+      message = 'Slug already in use';
+    } else if (exception instanceof HttpException) {
       status = exception.getStatus();
       const res = exception.getResponse();
       if (typeof res === 'string') {
