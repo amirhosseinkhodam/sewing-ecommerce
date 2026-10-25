@@ -31,7 +31,7 @@ Why this order:
 ## Phase 9 — Cleanup — almost done
 Behavior must not change; lint and build stay green after every slice. Done: `knip` inventory, unused files/exports/types/dependencies/i18n keys, shared stock-restore helper and phone/name form rules. No unused Prisma fields exist.
 - [x] Delete `opencode.jsonc` (owner moved to Claude Code; it only configured opencode)
-- [ ] Optional, owner's call: merge the `page`/`pageSize` fields repeated in five backend query DTOs, and the similar `AdminOrderStore`/`OrderStore` (left alone because their defaults and mutations differ)
+- [x] Merged the `page`/`pageSize` fields repeated in five backend query DTOs into `PaginationQueryDto`; `AdminOrderStore`/`OrderStore` left alone because their defaults and mutations differ
 - [ ] Manual pass over the pages touched by this phase (login, register, profile, contact, address form, order cancel) before moving on
 
 ## Phase 10 — Finish i18n — TODO

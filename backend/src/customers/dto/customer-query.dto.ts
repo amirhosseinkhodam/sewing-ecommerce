@@ -1,21 +1,9 @@
-import { Transform, Type } from 'class-transformer';
-import { IsIn, IsInt, IsOptional, IsString, Max, Min } from 'class-validator';
+import { Transform } from 'class-transformer';
+import { IsIn, IsOptional, IsString } from 'class-validator';
+import { PaginationQueryDto } from '../../common/dto/pagination-query.dto';
 import { Role } from '../../generated/prisma/client';
 
-export class CustomerQueryDto {
-  @IsOptional()
-  @Type(() => Number)
-  @IsInt()
-  @Min(1)
-  readonly page: number = 1;
-
-  @IsOptional()
-  @Type(() => Number)
-  @IsInt()
-  @Min(1)
-  @Max(50)
-  readonly pageSize: number = 10;
-
+export class CustomerQueryDto extends PaginationQueryDto {
   @IsOptional()
   @IsString()
   readonly search?: string;

@@ -5,27 +5,16 @@ import {
   IsInt,
   IsOptional,
   IsString,
-  Max,
   Min,
 } from 'class-validator';
+import { PaginationQueryDto } from '../../common/dto/pagination-query.dto';
 
 export const PRODUCT_SORTS = ['newest', 'priceAsc', 'priceDesc'] as const;
 
 export type ProductSort = (typeof PRODUCT_SORTS)[number];
 
-export class ProductQueryDto {
-  @IsOptional()
-  @Type(() => Number)
-  @IsInt()
-  @Min(1)
-  readonly page: number = 1;
-
-  @IsOptional()
-  @Type(() => Number)
-  @IsInt()
-  @Min(1)
-  @Max(50)
-  readonly pageSize: number = 12;
+export class ProductQueryDto extends PaginationQueryDto {
+  override readonly pageSize: number = 12;
 
   @IsOptional()
   @IsString()
