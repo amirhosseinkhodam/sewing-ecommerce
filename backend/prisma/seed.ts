@@ -1,5 +1,7 @@
 import 'dotenv/config';
 import * as bcrypt from 'bcrypt';
+import { mkdirSync, writeFileSync } from 'fs';
+import { join } from 'path';
 import { PrismaPg } from '@prisma/adapter-pg';
 import {
   OrderStatus,
@@ -15,10 +17,31 @@ const prisma = new PrismaClient({ adapter });
 
 const SETTINGS_ID = 'default';
 
+/**
+ * Writes offline SVG placeholders into `uploads/` (gitignored, served at
+ * `/uploads`) so demo products show images without internet access.
+ */
 function placeholderImages(slug: string): string[] {
-  return [1, 2].map(
-    (index) => `https://picsum.photos/seed/${slug}-${index}/600/600`,
-  );
+  const directory = join(process.cwd(), 'uploads');
+  mkdirSync(directory, { recursive: true });
+  return [1, 2].map((index) => {
+    let hash = 0;
+    for (const char of `${slug}-${index}`) {
+      hash = (hash * 31 + char.charCodeAt(0)) % 360;
+    }
+    const file = `seed-${slug}-${index}.svg`;
+    const svg =
+      `<svg xmlns="http://www.w3.org/2000/svg" width="600" height="600" viewBox="0 0 600 600">` +
+      `<defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1">` +
+      `<stop offset="0" stop-color="hsl(${hash},45%,72%)"/>` +
+      `<stop offset="1" stop-color="hsl(${(hash + 40) % 360},45%,52%)"/>` +
+      `</linearGradient></defs>` +
+      `<rect width="600" height="600" fill="url(#g)"/>` +
+      `<circle cx="300" cy="300" r="${index === 1 ? 120 : 80}" fill="rgba(255,255,255,0.35)"/>` +
+      `</svg>`;
+    writeFileSync(join(directory, file), svg);
+    return `/uploads/${file}`;
+  });
 }
 
 const isProduction = process.env.NODE_ENV === 'production';

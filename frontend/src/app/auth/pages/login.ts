@@ -25,7 +25,7 @@ import { safeReturnUrl } from '../utils/return-url';
   ],
   changeDetection: ChangeDetectionStrategy.Eager,
   template: `
-    <div class="min-h-screen-80 flex items-center justify-center px-4">
+    <div class="min-h-screen-80 flex items-center justify-center px-4 py-8">
       <app-card variant="bordered" [cssClass]="'max-w-md w-full'">
         <div class="flex flex-col gap-6">
           <div class="text-center">

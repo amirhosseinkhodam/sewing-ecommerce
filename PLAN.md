@@ -17,7 +17,7 @@ Sources of truth: database → `backend/prisma/schema.prisma`; API → Swagger a
 
 ## Status
 
-Done: backend, auth, catalog, cart/checkout, orders, portfolio/contact, admin panel (dashboard, customers, settings), TanStack Query + Signal Forms migration, SEO, loading/error/empty states, responsive audit, Docker + Caddy packaging, fake payment gateway, log-based SMS, 24h auto-cancel of unpaid online orders, rate limiting, helmet, upload limits, translated API errors, automated tests (Jest, Vitest, Playwright, CI, coverage), Kavenegar SMS provider (code and env docs).
+Done: backend, auth, catalog, cart/checkout, orders, portfolio/contact, admin panel (dashboard, customers, settings), TanStack Query + Signal Forms migration, SEO, loading/error/empty states, responsive audit, Docker + Caddy packaging, fake payment gateway, log-based SMS, 24h auto-cancel of unpaid online orders, rate limiting, helmet, upload limits, translated API errors, automated tests (Jest, Vitest, Playwright, CI, coverage), Kavenegar SMS provider (code and env docs), cleanup (Phase 9).
 
 Not yet done: everything below. Order of work (set 2026-10-21): cleanup → i18n → tests → real SMS → real gateway → PWA → deploy. Finish and verify each phase before starting the next.
 
@@ -27,10 +27,6 @@ Why this order:
 - Tests before paid services, so the integrations land on a safety net.
 - PWA after the paid integrations, because the service worker must never cache payment, auth or order responses. Installability can only be fully verified over HTTPS.
 - The real gateway callback needs a public HTTPS URL, so use a staging deploy or tunnel in Phase 13.
-
-## Phase 9 — Cleanup — almost done
-Behavior must not change; lint and build stay green after every slice. Done: `knip` inventory, unused files/exports/types/dependencies/i18n keys, shared stock-restore helper and phone/name form rules. No unused Prisma fields exist.
-- [ ] Manual pass over the pages touched by this phase (login, register, profile, contact, address form, order cancel) before moving on
 
 ## Phase 10 — Finish i18n — TODO
 - [ ] Review `fa.json` wording page by page (one term per concept); native speaker signs off

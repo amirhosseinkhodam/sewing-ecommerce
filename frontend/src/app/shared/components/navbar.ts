@@ -114,7 +114,7 @@ import { CartStore } from '../../features/cart/store/cart';
 
                 @if (profileDropdownOpen()) {
                   <div
-                    class="absolute end-0 mt-2 w-48 bg-white dark:bg-slate-800 rounded-lg shadow-lg border border-slate-200 dark:border-slate-700 py-1 z-50"
+                    class="absolute end-0 mt-2 w-48 bg-white dark:bg-slate-800 rounded-lg shadow-dropdown border border-slate-300 dark:border-slate-500 dark:ring-1 dark:ring-white/10 py-1 z-50"
                     (click)="profileDropdownOpen.set(false)"
                   >
                     @if (store.user(); as user) {
@@ -207,7 +207,7 @@ import { CartStore } from '../../features/cart/store/cart';
         </div>
 
         <div
-          class="md:hidden absolute top-16 inset-x-0 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-700 shadow-lg z-40 origin-top transition-all duration-300 ease-in-out"
+          class="md:hidden absolute top-16 inset-x-0 bg-white dark:bg-slate-900 border-b border-slate-300 dark:border-slate-600 shadow-dropdown z-40 origin-top transition-all duration-300 ease-in-out"
           [class]="
             mobileMenuOpen()
               ? 'opacity-100 scale-y-100 pointer-events-auto'

@@ -54,7 +54,7 @@ import { TranslatePipe } from '@shared/pipes/translate';
         }
         @if (product().isFeatured) {
           <span
-            class="absolute top-2 start-2 rounded-full bg-amber-500 px-2 py-0.5 text-xs font-medium text-white"
+            class="absolute top-2 left-2 rounded-full bg-amber-500 px-2 py-0.5 text-xs font-medium text-white"
           >
             {{ 'featured' | translate }}
           </span>
