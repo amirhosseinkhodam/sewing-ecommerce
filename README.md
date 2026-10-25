@@ -67,4 +67,6 @@ shared/          # types and consts used by both halves
 
 ## Status and roadmap
 
+SMS: set `SMS_PROVIDER=kavenegar` with `KAVENEGAR_API_KEY` and `KAVENEGAR_SENDER` for real messages (`log` only logs; unset sends nothing).
+
 Core shop, admin panel and Docker packaging are done. Remaining work — cleanup, i18n review, real SMS, real payment gateway, PWA, deploy — is tracked in [PLAN.md](PLAN.md). The generated API reference is Swagger at `/docs`.

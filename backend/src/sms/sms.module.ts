@@ -1,12 +1,14 @@
 import { DynamicModule, Module, Provider } from '@nestjs/common';
+import { KavenegarSmsProvider } from './providers/kavenegar';
 import { LogSmsProvider } from './providers/log';
 import { SmsProvider } from './providers/sms-provider';
 import { SmsService } from './sms.service';
 
 /**
  * Binds `SmsProvider` to the provider named by `SMS_PROVIDER` (`log` writes to
- * the application log). Unset means no SMS at all. Global so order and
- * payment code can notify without importing it.
+ * the application log, `kavenegar` sends real SMS and fails startup without
+ * credentials). Unset means no SMS at all. Global so order and payment code
+ * can notify without importing it.
  */
 @Module({})
 export class SmsModule {
@@ -18,6 +20,11 @@ export class SmsModule {
       providers.push(LogSmsProvider, {
         provide: SmsProvider,
         useExisting: LogSmsProvider,
+      });
+    } else if (provider === 'KAVENEGAR') {
+      providers.push(KavenegarSmsProvider, {
+        provide: SmsProvider,
+        useExisting: KavenegarSmsProvider,
       });
     } else if (provider) {
       throw new Error(`Unknown SMS_PROVIDER: ${provider}`);

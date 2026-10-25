@@ -17,7 +17,7 @@ Sources of truth: database → `backend/prisma/schema.prisma`; API → Swagger a
 
 ## Status
 
-Done: backend, auth, catalog, cart/checkout, orders, portfolio/contact, admin panel (dashboard, customers, settings), TanStack Query + Signal Forms migration, SEO, loading/error/empty states, responsive audit, Docker + Caddy packaging, fake payment gateway, log-based SMS, 24h auto-cancel of unpaid online orders, rate limiting, helmet, upload limits, translated API errors.
+Done: backend, auth, catalog, cart/checkout, orders, portfolio/contact, admin panel (dashboard, customers, settings), TanStack Query + Signal Forms migration, SEO, loading/error/empty states, responsive audit, Docker + Caddy packaging, fake payment gateway, log-based SMS, 24h auto-cancel of unpaid online orders, rate limiting, helmet, upload limits, translated API errors, automated tests (Jest, Vitest, Playwright, CI, coverage), Kavenegar SMS provider (code and env docs).
 
 Not yet done: everything below. Order of work (set 2026-10-21): cleanup → i18n → tests → real SMS → real gateway → PWA → deploy. Finish and verify each phase before starting the next.
 
@@ -30,8 +30,6 @@ Why this order:
 
 ## Phase 9 — Cleanup — almost done
 Behavior must not change; lint and build stay green after every slice. Done: `knip` inventory, unused files/exports/types/dependencies/i18n keys, shared stock-restore helper and phone/name form rules. No unused Prisma fields exist.
-- [x] Delete `opencode.jsonc` (owner moved to Claude Code; it only configured opencode)
-- [x] Merged the `page`/`pageSize` fields repeated in five backend query DTOs into `PaginationQueryDto`; `AdminOrderStore`/`OrderStore` left alone because their defaults and mutations differ
 - [ ] Manual pass over the pages touched by this phase (login, register, profile, contact, address form, order cancel) before moving on
 
 ## Phase 10 — Finish i18n — TODO
@@ -40,29 +38,10 @@ Behavior must not change; lint and build stay green after every slice. Done: `kn
 - [ ] Native speaker reviews SMS texts (sent to real customers)
 - [ ] Lint + build + manual pass in both languages
 
-## Phase 11 — Automated tests — TODO
-Cover money, stock, auth and permissions first. Each slice ships its tests and must pass before the next starts.
-- Backend: Jest, real Postgres test DB (`DATABASE_URL_TEST`), no DB mocks; supertest for permissions/validation
-- Frontend: Vitest for the auth store, guards, interceptor, utils, pipes, services and translation files (feature stores and shared components are covered through the Playwright journeys)
-- E2E: Playwright journeys in fa and en
-- [x] Infrastructure: Jest, Vitest (`ng test`), Playwright, test DB reset, fixtures, scripts, docs
-- [x] Auth: register/login/refresh, phone validation, duplicate phone, roles, guards, interceptor
-- [x] Catalog: categories, products, variants, filters/pagination/search, upload rules
-- [x] Cart + addresses: add/update/remove, stock limits, ownership checks
-- [x] Orders: placement (price/stock snapshot, shipping cost), status lifecycle, stock restore on cancel, permissions
-- [x] Payment + SMS + sweeper: receipt flow, fake gateway start/verify/callback/retry, double-callback safety, SMS per status, 24h auto-cancel
-- [x] Portfolio, contact, admin dashboard/customers/settings, rate and upload limits
-- [x] Playwright: guest → register → cart → card-to-card checkout; online pay/fail/retry; admin confirms and ships; admin product CRUD; language/theme switch
-- [x] CI (GitHub Actions): lint, build, all tests on every push/PR
-- [x] Backend coverage report, order/payment/auth first
-
-## Phase 12 — Real SMS provider (paid) — TODO
+## Phase 12 — Real SMS provider (paid) — code done, needs real-SMS verification
 Needs a provider account (e.g. Kavenegar), API key, sender line, approved templates.
-- [ ] Implement the provider behind `SmsProvider`, selected by `SMS_PROVIDER`; startup fails clearly if credentials are missing
-- [ ] Tests with the HTTP API mocked (success, API error, timeout); SMS failure never breaks an order action
 - [ ] Verify with one real SMS to the owner
 - [ ] Optional: sent-SMS log table, low-balance warning
-- [ ] Document env vars in `.env.production.example` and `README.md`
 
 ## Phase 13 — Real bank gateway (paid) — TODO
 Needs a verified merchant account (e.g. Zarinpal) and a public HTTPS callback URL.
