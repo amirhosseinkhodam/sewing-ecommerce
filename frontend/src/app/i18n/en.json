@@ -1,5 +1,14 @@
 {
   "appName": "Sewing Shop",
+  "pwa": {
+    "offline": "You are offline. Browsing works, but checkout and payment need a connection.",
+    "updateReady": "A new version is available.",
+    "reload": "Update",
+    "installPrompt": "Install the app on your device.",
+    "install": "Install",
+    "iosHint": "To install: tap Share, then Add to Home Screen.",
+    "dismiss": "Dismiss"
+  },
   "home": "Home",
   "products": "Products",
   "portfolio": "Portfolio",

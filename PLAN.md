@@ -17,7 +17,7 @@ Sources of truth: database → `backend/prisma/schema.prisma`; API → Swagger a
 
 ## Status
 
-Done: Phase 10 (i18n), Zarinpal gateway code + mocked tests (Phase 13, code only), backend, auth, catalog, cart/checkout, orders, portfolio/contact, admin panel (dashboard, customers, settings), TanStack Query + Signal Forms migration, SEO, loading/error/empty states, responsive audit, Docker + Caddy packaging, fake payment gateway, log-based SMS, 24h auto-cancel of unpaid online orders, rate limiting, helmet, upload limits, translated API errors, automated tests (Jest, Vitest, Playwright, CI, coverage), Kavenegar SMS provider (code and env docs), cleanup (Phase 9).
+Done: Phase 10 (i18n), Zarinpal gateway code + mocked tests (Phase 13, code only), backend, auth, catalog, cart/checkout, orders, portfolio/contact, admin panel (dashboard, customers, settings), TanStack Query + Signal Forms migration, SEO, loading/error/empty states, responsive audit, Docker + Caddy packaging, fake payment gateway, log-based SMS, 24h auto-cancel of unpaid online orders, rate limiting, helmet, upload limits, translated API errors, automated tests (Jest, Vitest, Playwright, CI, coverage), Kavenegar SMS provider (code and env docs), cleanup (Phase 9), PWA code (Phase 14, needs HTTPS staging verification).
 
 Not yet done: everything below. Order of work (set 2026-10-21): cleanup → i18n → tests → real SMS → real gateway → PWA → deploy. Finish and verify each phase before starting the next.
 
@@ -48,13 +48,15 @@ Needs a verified merchant account (e.g. Zarinpal) and a public HTTPS callback UR
 - [ ] Write the owner's refund/dispute procedure (refund in gateway panel, mark order refunded in admin)
 - [x] Document env vars in `.env.production.example` and `README.md`
 
-## Phase 14 — PWA — TODO
-- [ ] Angular service worker + web manifest (fa name, `dir: rtl`, theme colors, `display: standalone`), icons (192/512, maskable, Apple touch)
-- [ ] Cache the app shell, hashed assets, capped images/fonts; **`/api` is network-only** (auth, cart, orders, payment, admin never cached); service worker file stays `no-cache` in Nest static config and `Caddyfile`
-- [ ] Offline fallback page and indicator; checkout/payment require a connection
-- [ ] New-version prompt so a deploy never strands users on a stale shell
-- [ ] Install button where `beforeinstallprompt` exists, iOS "Add to Home Screen" hint
-- [ ] Verify on HTTPS staging: Lighthouse installability, Android + iOS install, offline, update after redeploy; Playwright check that `/api` is not served from cache
+## Phase 14 — PWA — code done, needs HTTPS staging verification
+- [x] Angular service worker (`frontend/ngsw-config.json`, production build only) + web manifest (fa name, `dir: rtl`, standalone, theme colors), icons (192/512, maskable, Apple touch) in `frontend/public/`
+- [x] Cache the app shell, assets, capped uploads/fonts; **`/api` is not in any cache group** (network-only); service worker, `ngsw.json`, manifest and `index.html` are `no-cache` in Nest static config and `Caddyfile`
+- [x] Offline indicator; "Place order" is disabled while offline
+- [x] New-version prompt (`PwaService` + `app-pwa-banner`)
+- [x] Install button where `beforeinstallprompt` exists, iOS "Add to Home Screen" hint
+- [x] Playwright (`e2e/pwa.spec.ts`): manifest and cache headers, `/api` never lands in Cache Storage
+- [ ] Verify on HTTPS staging: Lighthouse installability, Android + iOS install, offline, update after redeploy
+- [ ] Optional: replace the placeholder icons with the owner's logo
 
 ## Phase 15 — Deploy + launch — TODO
 - [ ] Production env complete (`DOMAIN`, JWT secrets, `SEED_ADMIN_PASSWORD`, SMS and gateway keys); demo seed off; default admin password changed

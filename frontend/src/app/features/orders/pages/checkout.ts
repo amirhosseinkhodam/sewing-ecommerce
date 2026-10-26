@@ -15,6 +15,7 @@ import {
 } from '@domain/const/payment-methods';
 import type { ShippingMethod } from '@domain/const/shipping-methods';
 import { ButtonComponent } from '@shared/components/button';
+import { PwaService } from '@shared/services/pwa';
 import { CardComponent } from '@shared/components/card';
 import { SkeletonComponent } from '@shared/components/skeleton';
 import { LocalizedNumberPipe } from '@shared/pipes/localized-number';
@@ -346,7 +347,7 @@ import { CheckoutStore } from '../store/checkout';
                   variant="primary"
                   size="lg"
                   [loading]="checkoutStore.placing()"
-                  [disabled]="!canContinue()"
+                  [disabled]="!canContinue() || !pwa.online()"
                   (buttonClick)="onPlaceOrder()"
                 >
                   {{ 'placeOrder' | translate }}
@@ -395,6 +396,7 @@ import { CheckoutStore } from '../store/checkout';
 export class CheckoutComponent {
   readonly cartStore = inject(CartStore);
   readonly checkoutStore = inject(CheckoutStore);
+  readonly pwa = inject(PwaService);
 
   readonly currentStep = signal(0);
   readonly selectedAddressId = signal<string | null>(null);

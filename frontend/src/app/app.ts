@@ -16,6 +16,7 @@ import { injectShopSettingsQuery } from './features/settings/query/settings';
 import { FooterComponent } from './shared/components/footer';
 import { NavbarComponent } from './shared/components/navbar';
 import { NotificationComponent } from './shared/components/notification';
+import { PwaBannerComponent } from './shared/components/pwa-banner';
 import { SeoService, type PageSeoModel } from './shared/services/seo';
 
 @Component({
@@ -25,6 +26,7 @@ import { SeoService, type PageSeoModel } from './shared/services/seo';
     NavbarComponent,
     FooterComponent,
     NotificationComponent,
+    PwaBannerComponent,
   ],
   changeDetection: ChangeDetectionStrategy.Eager,
   template: `
@@ -38,6 +40,7 @@ import { SeoService, type PageSeoModel } from './shared/services/seo';
         [address]="shop()?.shopAddress ?? ''"
       />
       <app-notification />
+      <app-pwa-banner />
     </div>
   `,
 })

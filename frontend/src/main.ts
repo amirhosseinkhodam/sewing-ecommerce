@@ -2,6 +2,7 @@ import {
   provideBrowserGlobalErrorListeners,
   provideAppInitializer,
   inject,
+  isDevMode,
 } from '@angular/core';
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { bootstrapApplication } from '@angular/platform-browser';
@@ -10,6 +11,7 @@ import {
   QueryClient,
 } from '@tanstack/angular-query-experimental';
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
+import { provideServiceWorker } from '@angular/service-worker';
 import {
   provideRouter,
   RedirectCommand,
@@ -50,6 +52,10 @@ bootstrapApplication(AppComponent, {
       }),
     ),
     provideAnimationsAsync(),
+    provideServiceWorker('ngsw-worker.js', {
+      enabled: !isDevMode(),
+      registrationStrategy: 'registerWhenStable:30000',
+    }),
     provideAppInitializer(() => {
       inject(LanguageService);
       inject(ThemeService);

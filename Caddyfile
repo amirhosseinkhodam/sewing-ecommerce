@@ -12,5 +12,8 @@
 		-Server
 	}
 
+	@sw path /ngsw-worker.js /ngsw.json /safety-worker.js /worker-basic.min.js /manifest.webmanifest /index.html
+	header @sw Cache-Control "no-cache"
+
 	reverse_proxy app:3000
 }

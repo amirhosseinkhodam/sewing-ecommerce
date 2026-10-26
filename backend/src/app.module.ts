@@ -50,11 +50,13 @@ function staticRoots(): ServeStaticModuleOptions[] {
     exclude: ['/api/{*path}', '/uploads/{*path}', '/docs/{*path}'],
     serveStaticOptions: {
       setHeaders: (res: ServerResponse, path: string) => {
-        // Hashed bundles can be cached forever; index.html must be revalidated
-        // so a deploy is picked up on the next load.
+        // Hashed bundles can be cached forever; index.html and the unhashed
+        // service worker files must be revalidated so a deploy is picked up.
         res.setHeader(
           'Cache-Control',
-          path.endsWith('.html')
+          /(\.html|ngsw-worker\.js|ngsw\.json|safety-worker\.js|worker-basic\.min\.js|manifest\.webmanifest)$/.test(
+            path,
+          )
             ? 'no-cache'
             : 'public, max-age=31536000, immutable',
         );

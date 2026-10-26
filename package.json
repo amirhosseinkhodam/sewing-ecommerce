@@ -36,6 +36,7 @@
     "@angular/forms": "^22.1.7",
     "@angular/platform-browser": "^22.1.7",
     "@angular/router": "^22.1.7",
+    "@angular/service-worker": "^22.1.7",
     "@hugeicons/angular": "^1.0.10",
     "@hugeicons/core-free-icons": "^4.2.3",
     "@nestjs/common": "^11.0.1",

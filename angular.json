@@ -15,12 +15,19 @@
             "index": "frontend/src/index.html",
             "browser": "frontend/src/main.ts",
             "tsConfig": "tsconfig.frontend.app.json",
+            "assets": [
+              {
+                "glob": "**/*",
+                "input": "frontend/public"
+              }
+            ],
             "styles": [
               "frontend/src/styles.scss"
             ]
           },
           "configurations": {
             "production": {
+              "serviceWorker": "frontend/ngsw-config.json",
               "optimization": {
                 "scripts": true,
                 "styles": true,
