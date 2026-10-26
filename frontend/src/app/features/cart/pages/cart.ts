@@ -132,7 +132,7 @@ import { CartStore } from '../store/cart';
                       <span
                         class="w-10 text-center text-sm font-medium text-slate-900 dark:text-slate-100"
                       >
-                        {{ item.quantity }}
+                        {{ item.quantity | localizedNumber }}
                       </span>
                       <button
                         type="button"

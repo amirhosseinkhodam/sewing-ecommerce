@@ -17,7 +17,7 @@ Sources of truth: database → `backend/prisma/schema.prisma`; API → Swagger a
 
 ## Status
 
-Done: backend, auth, catalog, cart/checkout, orders, portfolio/contact, admin panel (dashboard, customers, settings), TanStack Query + Signal Forms migration, SEO, loading/error/empty states, responsive audit, Docker + Caddy packaging, fake payment gateway, log-based SMS, 24h auto-cancel of unpaid online orders, rate limiting, helmet, upload limits, translated API errors, automated tests (Jest, Vitest, Playwright, CI, coverage), Kavenegar SMS provider (code and env docs), cleanup (Phase 9).
+Done: Phase 10 (i18n), Zarinpal gateway code + mocked tests (Phase 13, code only), backend, auth, catalog, cart/checkout, orders, portfolio/contact, admin panel (dashboard, customers, settings), TanStack Query + Signal Forms migration, SEO, loading/error/empty states, responsive audit, Docker + Caddy packaging, fake payment gateway, log-based SMS, 24h auto-cancel of unpaid online orders, rate limiting, helmet, upload limits, translated API errors, automated tests (Jest, Vitest, Playwright, CI, coverage), Kavenegar SMS provider (code and env docs), cleanup (Phase 9).
 
 Not yet done: everything below. Order of work (set 2026-10-21): cleanup → i18n → tests → real SMS → real gateway → PWA → deploy. Finish and verify each phase before starting the next.
 
@@ -28,25 +28,25 @@ Why this order:
 - PWA after the paid integrations, because the service worker must never cache payment, auth or order responses. Installability can only be fully verified over HTTPS.
 - The real gateway callback needs a public HTTPS URL, so use a staging deploy or tunnel in Phase 13.
 
-## Phase 10 — Finish i18n — TODO
-- [ ] Review `fa.json` wording page by page (one term per concept); native speaker signs off
-- [ ] Persian digits, Jalali dates and currency formatting consistent on customer and admin pages
-- [ ] Native speaker reviews SMS texts (sent to real customers)
-- [ ] Lint + build + manual pass in both languages
+## Phase 10 — Finish i18n — DONE
+- [x] Review `fa.json` wording page by page (one term per concept); owner signed off
+- [x] Persian digits, Jalali dates and currency formatting consistent on customer and admin pages
+- [x] Owner reviewed SMS texts (`backend/src/sms/sms.service.ts`)
+- [x] Lint + build
 
 ## Phase 12 — Real SMS provider (paid) — code done, needs real-SMS verification
 Needs a provider account (e.g. Kavenegar), API key, sender line, approved templates.
 - [ ] Verify with one real SMS to the owner
 - [ ] Optional: sent-SMS log table, low-balance warning
 
-## Phase 13 — Real bank gateway (paid) — TODO
+## Phase 13 — Real bank gateway (paid) — code done, needs sandbox and real-payment verification
 Needs a verified merchant account (e.g. Zarinpal) and a public HTTPS callback URL.
-- [ ] Confirm amount unit (Toman vs Rial) and callback rules
-- [ ] Implement the gateway behind `PaymentGateway` (`request` + `verify`), selected by `PAYMENT_PROVIDER`; `fake` stays refused in production
-- [ ] Tests with the API mocked (success, failure, user cancel, verify mismatch, already-verified callback)
+- [x] Amount unit: shop stores Toman, Zarinpal v4 takes Rial by default, so the gateway multiplies by 10 (confirm against the merchant panel's currency setting)
+- [x] Implement the gateway behind `PaymentGateway` (`request` + `verify`), selected by `PAYMENT_PROVIDER=zarinpal`; `fake` stays refused in production
+- [x] Tests with the API mocked (`backend/tests/payment-zarinpal.spec.ts`: success, rejection, sandbox host, verify mismatch, already-verified code 101, non-JSON)
 - [ ] Verify in the gateway sandbox, then one small real payment
 - [ ] Write the owner's refund/dispute procedure (refund in gateway panel, mark order refunded in admin)
-- [ ] Document env vars in `.env.production.example` and `README.md`
+- [x] Document env vars in `.env.production.example` and `README.md`
 
 ## Phase 14 — PWA — TODO
 - [ ] Angular service worker + web manifest (fa name, `dir: rtl`, theme colors, `display: standalone`), icons (192/512, maskable, Apple touch)

@@ -69,4 +69,6 @@ shared/          # types and consts used by both halves
 
 SMS: set `SMS_PROVIDER=kavenegar` with `KAVENEGAR_API_KEY` and `KAVENEGAR_SENDER` for real messages (`log` only logs; unset sends nothing).
 
+Online payment: set `PAYMENT_PROVIDER=zarinpal` with `ZARINPAL_MERCHANT_ID` (and `ZARINPAL_SANDBOX=true` to test against the sandbox). Prices are Toman; the gateway converts to Rial. The callback URL is built from `PUBLIC_URL` (or `DOMAIN`) and must be publicly reachable over HTTPS.
+
 Core shop, admin panel and Docker packaging are done. Remaining work — cleanup, i18n review, real SMS, real payment gateway, PWA, deploy — is tracked in [PLAN.md](PLAN.md). The generated API reference is Swagger at `/docs`.

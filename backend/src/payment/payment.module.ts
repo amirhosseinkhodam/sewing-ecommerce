@@ -3,6 +3,7 @@ import { PAYMENT_PROVIDERS } from '../../../shared/const/payment-providers';
 import { FakeGatewayController } from './fake-gateway.controller';
 import { FakePaymentGateway } from './gateways/fake';
 import { PaymentGateway } from './gateways/payment-gateway';
+import { ZarinpalPaymentGateway } from './gateways/zarinpal';
 import { PaymentController } from './payment.controller';
 import { PaymentService } from './payment.service';
 
@@ -31,6 +32,11 @@ export class PaymentModule {
       providers.push(FakePaymentGateway, {
         provide: PaymentGateway,
         useExisting: FakePaymentGateway,
+      });
+    } else if (provider === PAYMENT_PROVIDERS.ZARINPAL) {
+      providers.push(ZarinpalPaymentGateway, {
+        provide: PaymentGateway,
+        useExisting: ZarinpalPaymentGateway,
       });
     } else if (provider) {
       throw new Error(`Unknown PAYMENT_PROVIDER: ${provider}`);

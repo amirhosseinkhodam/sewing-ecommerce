@@ -275,7 +275,7 @@ import { CheckoutStore } from '../store/checkout';
                             class="text-sm text-slate-700 dark:text-slate-300"
                           >
                             {{ item.productName }} ({{ item.size }}) ×
-                            {{ item.quantity }} =
+                            {{ item.quantity | localizedNumber }} =
                             {{
                               item.quantity * toNumber(item.unitPrice)
                                 | localizedNumber
